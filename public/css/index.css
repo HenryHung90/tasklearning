@@ -1,0 +1,47 @@
+body {
+  margin: 0 auto;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' version='1.1' xmlns:xlink='http://www.w3.org/1999/xlink' xmlns:svgjs='http://svgjs.com/svgjs' width='1920' height='1080' preserveAspectRatio='none' viewBox='0 0 1920 1080'%3e%3cg mask='url(%26quot%3b%23SvgjsMask2390%26quot%3b)' fill='none'%3e%3crect width='1920' height='1080' x='0' y='0' fill='url(%23SvgjsLinearGradient2391)'%3e%3c/rect%3e%3cpath d='M1223.1 220.67 a240.38 240.38 0 1 0 480.76 0 a240.38 240.38 0 1 0 -480.76 0z' fill='rgba(18%2c 10%2c 101%2c 0.4)' class='triangle-float2'%3e%3c/path%3e%3cpath d='M374.20904560884753 488.21534037515374L271.2069360070982 659.6396380241645 442.6312336561089 762.6417476259139 545.6333432578583 591.2174499769031z' fill='rgba(18%2c 10%2c 101%2c 0.4)' class='triangle-float1'%3e%3c/path%3e%3cpath d='M944.2176308656565 1096.961145931405L770.9106733691448 829.5342132269807 640.1298388246603 1075.4971899148727z' fill='rgba(18%2c 10%2c 101%2c 0.4)' class='triangle-float3'%3e%3c/path%3e%3cpath d='M1692.743109223226 285.4230214908523L1528.8778945933802 383.88317579042547 1627.3380488929533 547.7483904202711 1791.203263522799 449.288236120698z' fill='rgba(18%2c 10%2c 101%2c 0.4)' class='triangle-float1'%3e%3c/path%3e%3cpath d='M98.843%2c595.688C173.87%2c593.998%2c218.952%2c519.83%2c252.913%2c452.908C282.886%2c393.844%2c298.22%2c325.326%2c265.176%2c267.924C232.07%2c210.415%2c165.179%2c186.953%2c98.843%2c185.27C28.823%2c183.493%2c-46.478%2c199.194%2c-82.781%2c259.095C-120.111%2c320.69%2c-101.942%2c396.748%2c-67.74%2c460.133C-31.304%2c527.659%2c22.133%2c597.416%2c98.843%2c595.688' fill='rgba(18%2c 10%2c 101%2c 0.4)' class='triangle-float2'%3e%3c/path%3e%3cpath d='M510.316%2c559.165C566.1%2c559.255%2c607.79%2c513.53%2c634.555%2c464.586C660.048%2c417.969%2c667.784%2c363.237%2c643.228%2c316.12C616.731%2c265.279%2c567.58%2c223.425%2c510.316%2c226.202C456.221%2c228.825%2c422.952%2c279.942%2c397.999%2c328.01C375.508%2c371.335%2c365.439%2c420.278%2c386.773%2c464.184C411.105%2c514.26%2c454.642%2c559.075%2c510.316%2c559.165' fill='rgba(18%2c 10%2c 101%2c 0.4)' class='triangle-float2'%3e%3c/path%3e%3cpath d='M916.88 494.77 a348.75 348.75 0 1 0 697.5 0 a348.75 348.75 0 1 0 -697.5 0z' fill='rgba(18%2c 10%2c 101%2c 0.4)' class='triangle-float1'%3e%3c/path%3e%3cpath d='M1168.3259230851554 145.1485872976043L1171.396372435607 331.21648003900407 1312.276835560919 249.87910673004598z' fill='rgba(18%2c 10%2c 101%2c 0.4)' class='triangle-float2'%3e%3c/path%3e%3cpath d='M1203.174633725918 10.543838367315452L1064.1847711851997 123.09560982875806 1176.7365426466422 262.08547236947646 1315.7264051873606 149.53370090803386z' fill='rgba(18%2c 10%2c 101%2c 0.4)' class='triangle-float2'%3e%3c/path%3e%3cpath d='M-185.05 9.57 a325.57 325.57 0 1 0 651.14 0 a325.57 325.57 0 1 0 -651.14 0z' fill='rgba(18%2c 10%2c 101%2c 0.4)' class='triangle-float3'%3e%3c/path%3e%3cpath d='M1488.414452363566 521.1752414905377L1323.949646332366 302.9230723080286 1105.697477149857 467.38787833922856 1270.1622831810569 685.6400475217376z' fill='rgba(18%2c 10%2c 101%2c 0.4)' class='triangle-float2'%3e%3c/path%3e%3cpath d='M-153.38 1056.33 a228.12 228.12 0 1 0 456.24 0 a228.12 228.12 0 1 0 -456.24 0z' fill='rgba(18%2c 10%2c 101%2c 0.4)' class='triangle-float3'%3e%3c/path%3e%3cpath d='M1523.05 702.02 a200.29 200.29 0 1 0 400.58 0 a200.29 200.29 0 1 0 -400.58 0z' fill='rgba(18%2c 10%2c 101%2c 0.4)' class='triangle-float1'%3e%3c/path%3e%3c/g%3e%3cdefs%3e%3cmask id='SvgjsMask2390'%3e%3crect width='1920' height='1080' fill='white'%3e%3c/rect%3e%3c/mask%3e%3clinearGradient x1='10.94%25' y1='119.44%25' x2='89.06%25' y2='-19.44%25' gradientUnits='userSpaceOnUse' id='SvgjsLinearGradient2391'%3e%3cstop stop-color='rgba(197%2c 26%2c 26%2c 0.78)' offset='0'%3e%3c/stop%3e%3cstop stop-color='rgba(246%2c 191%2c 0%2c 0.58)' offset='0.68'%3e%3c/stop%3e%3c/linearGradient%3e%3cstyle%3e %40keyframes float1 %7b 0%25%7btransform: translate(0%2c 0)%7d 50%25%7btransform: translate(-10px%2c 0)%7d 100%25%7btransform: translate(0%2c 0)%7d %7d .triangle-float1 %7b animation: float1 5s infinite%3b %7d %40keyframes float2 %7b 0%25%7btransform: translate(0%2c 0)%7d 50%25%7btransform: translate(-5px%2c -5px)%7d 100%25%7btransform: translate(0%2c 0)%7d %7d .triangle-float2 %7b animation: float2 4s infinite%3b %7d %40keyframes float3 %7b 0%25%7btransform: translate(0%2c 0)%7d 50%25%7btransform: translate(0%2c -10px)%7d 100%25%7btransform: translate(0%2c 0)%7d %7d .triangle-float3 %7b animation: float3 6s infinite%3b %7d %3c/style%3e%3c/defs%3e%3c/svg%3e");
+}
+
+.loginbarContainer {
+  width: 30%;
+  height: 300px;
+  border-radius: 20px;
+  border: 1px solid black;
+  padding: 20px;
+  margin-top: 14%;
+  background-color: rgba(255, 255, 255, 0.4);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 900'%3E%3Cdefs%3E%3ClinearGradient id='a' x1='0' x2='0' y1='1' y2='0' gradientTransform='rotate(230,0.5,0.5)'%3E%3Cstop offset='0' stop-color='%230FF'/%3E%3Cstop offset='1' stop-color='%23CF6'/%3E%3C/linearGradient%3E%3ClinearGradient id='b' x1='0' x2='0' y1='0' y2='1' gradientTransform='rotate(255,0.5,0.5)'%3E%3Cstop offset='0' stop-color='%23F00'/%3E%3Cstop offset='1' stop-color='%23FC0'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cg fill='%23FFF' fill-opacity='0' stroke-miterlimit='10'%3E%3Cg stroke='url(%23a)' stroke-width='17.49'%3E%3Cpath transform='translate(-181.3 25.199999999999996) rotate(11.4 1409 581) scale(0.9969960000000001)' d='M1409 581 1450.35 511 1490 581z'/%3E%3Ccircle stroke-width='5.83' transform='translate(-164.5 121) rotate(21.8 800 450) scale(1.031356)' cx='500' cy='100' r='40'/%3E%3Cpath transform='translate(62.5 -232.5) rotate(203.5 401 736) scale(1.031356)' d='M400.86 735.5h-83.73c0-23.12 18.74-41.87 41.87-41.87S400.86 712.38 400.86 735.5z'/%3E%3C/g%3E%3Cg stroke='url(%23b)' stroke-width='5.3'%3E%3Cpath transform='translate(726 -19.4) rotate(4.85 150 345) scale(0.9343319999999999)' d='M149.8 345.2 118.4 389.8 149.8 434.4 181.2 389.8z'/%3E%3Crect stroke-width='11.66' transform='translate(-324.5 -317) rotate(226.79999999999998 1089 759)' x='1039' y='709' width='100' height='100'/%3E%3Cpath transform='translate(-563.6 172.4) rotate(37.800000000000004 1400 132) scale(0.855)' d='M1426.8 132.4 1405.7 168.8 1363.7 168.8 1342.7 132.4 1363.7 96 1405.7 96z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  background-attachment: fixed;
+  background-size: cover;
+}
+
+.loginwithAccount {
+  width: 60%;
+}
+
+.loginbarTitle {
+  margin-bottom: 30px;
+}
+
+.loginwithAnother {
+  padding-left: 20px;
+  border-left: 2px solid black;
+  width: 35%;
+  height: 100%;
+}
+
+.loginBtn {
+  margin-top: 10px;
+  text-align: right;
+  width: 95%;
+}
+
+.logingoogleBtn {
+  width: 70px;
+  height: 70px;
+  padding: 10px;
+  background-color: #ffffff;
+  border: 1px solid black;
+  border-radius: 20px;
+}

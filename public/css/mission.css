@@ -1,0 +1,16 @@
+.missionThisWeek {
+  margin: 15px;
+  width: 60%;
+  height: 95%;
+  background-color: rgba(61, 150, 228, 0.5);
+  border-radius: 20px;
+  text-align: center;
+}
+.missionDecide {
+  margin: 15px;
+  width: 40%;
+  height: 95%;
+  background-color: rgba(228, 150, 61, 0.5);
+  border-radius: 20px;
+  text-align: center;
+}

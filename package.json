@@ -1,0 +1,28 @@
+{
+  "name": "tasklearning",
+  "version": "1.0.0",
+  "description": "for YZUIC students to learn task plaining",
+  "main": "server.js",
+  "scripts": {
+    "start": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/YZUICAMUM/tasklearning.git"
+  },
+  "author": "Henry H",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/YZUICAMUM/tasklearning/issues"
+  },
+  "homepage": "https://github.com/YZUICAMUM/tasklearning#readme",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1",
+    "nodemon": "^2.0.19",
+    "pug": "^3.0.2"
+  }
+}
