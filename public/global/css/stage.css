@@ -35,8 +35,13 @@ body {
 
 .taskTitle {
   padding: 10px;
+  text-align: center;
 }
-
+.WeekTitle{
+  padding:5px;
+  border:0.6px solid black;
+  border-radius: 10px;
+}
 
 .stageCheckBtn {
   text-align: center;

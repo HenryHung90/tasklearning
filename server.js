@@ -6,8 +6,12 @@ const dotenv = require('dotenv');
 dotenv.config();
 //cors 跨來源資源共用
 const cors = require('cors');
+task.use(cors({
+    origin:'http://localhost:3000',
+    credentials:true,
+}))
 //設定port 與 host
-const host = "127.0.0.1"
+const host = "127.0.0.1 "
 const port = process.env.PORT || 3000
 //用於解析json row txt URL-encoded格式
 const bodyParser = require('body-parser');
@@ -15,6 +19,19 @@ const urlencodedParser = bodyParser.urlencoded({extended:false})
 //bcrypt加密
 const bcrypt = require("bcryptjs");
 const saltRound = 15
+//Mongodb
+const mongoose = require('mongoose');
+
+mongoose.connect("mongodb+srv://Henry:yzuic1082020@task.o3vc0w3.mongodb.net/?retryWrites=true&w=majority",{
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+},()=>{
+    console.log("Connect to mongoDB")
+})
+//Router
+const stageCheckRoutes = require('./router/stagecheckroutes')
+const dashboardRoutes = require('./router/dashboardroutes')
+const adminRoutes = require('./router/adminroutes')
 
 task.use(express.json())
 //靜態物件取得從public
@@ -57,6 +74,7 @@ task.get('/user', login, (req, res) => {
     res.send("Is user")
 })
 
+//登入
 task.post('/login',urlencodedParser,(req,res)=>{
     let isUserAccount = '1082020'
     let isUserPassword = '1082020'
@@ -65,30 +83,22 @@ task.post('/login',urlencodedParser,(req,res)=>{
         res.send(`/dashboard/${req.body.Account}`)
     }
 })
+//登出
+task.get('/logout', (req, res) => {
+    res.send("/")
+})
 
 
 //守門員用法use
 task.use((req,res,next)=>{
     next()
 })
-
-//進入主畫面 學生
-task.get('/dashboard/:user',(req,res)=>{
-    let User = req.params.user.toString() + " 洪立恒";
-
-    res.render('dashboard/student',{Id:User});
-})
 //Stagepage
-task.get('/dashboard/:user/:page', (req, res) => {
-    let User = req.params.user.toString() + " 洪立恒";
-
-    res.render(`stagepage/${req.params.page}`, { Id: User });
-})
-
-//登出
-task.get('/logout', (req, res) => {
-    res.send("/")
-})
+task.use('/dashboard',dashboardRoutes)
+//stageCheck
+task.use('/student/stage',stageCheckRoutes);
+//admin
+task.use('/admin',adminRoutes);
 
 //無此路由
 task.use((req,res,next)=>{

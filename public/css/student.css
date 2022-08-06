@@ -27,7 +27,7 @@ body {
 }
 
 .taskContainer {
-  margin-top:10px;
+  margin-top: 10px;
   width: 100%;
   padding-right: 20px;
 }
@@ -39,47 +39,107 @@ body {
   background-color: rgba(240, 248, 255, 0.8);
   border-radius: 30px;
 }
+.taskWeekTitle {
+  user-select: none;
+  color: white;
+}
 .taskTitle {
+  user-select: none;
   padding: 10px;
+  text-align: center;
+}
+.taskContent {
+  transition-duration: 0.4s;
+  padding: 10px;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 20px;
+  margin-top: 20px;
+}
+.taskContent:hover {
+  transition-duration: 0.4s;
+  background-color: rgba(200, 200, 200, 0.3);
+}
+
+.taskMiddle {
+  display: none;
 }
 
 .taskStage {
+  user-select: none;
+  display: flex;
   width: 100%;
   height: 150px;
-  border: 1px solid black;
   background-color: rgba(255, 255, 255, 0.6);
   border-radius: 30px;
   padding: 10px;
-  display: flex;
   justify-content: space-around;
 }
 
-.taskStage_Box {
+.taskStage_Box,
+.taskStage_Box_Complete,
+.taskStage_Box_teacherComplete {
+  transition-duration: 0.4s;
   padding-top: 15px;
   background-color: rgba(75, 75, 75, 0.4);
   width: 13%;
   border-radius: 10px;
   height: 80%;
-  border: 1px solid black;
   text-align: center;
 }
 
 .taskStage_Box_Complete {
-    padding-top: 15px;
-    background-color: rgba(0, 217, 69, 0.6);
-    width: 13%;
-    border-radius: 10px;
-    height: 80%;
-    border: 1px solid black;
-    text-align: center;
+  background-color: rgba(0, 217, 69, 0.6);
 }
 
-.taskStage_Box_teacherComplete{
-  padding-top: 15px;
+.taskStage_Box_teacherComplete {
   background-color: rgba(213, 3, 3, 0.4);
-  width: 13%;
-  border-radius: 10px;
-  height: 80%;
-  border: 1px solid black;
-  text-align: center;
+}
+
+.taskStage_Box:hover {
+  transition-duration: 0.4s;
+  animation: breathingLight_normal 2s steps(30, start) infinite;
+}
+
+.taskStage_Box_Complete:hover {
+  transition-duration: 0.4s;
+  animation: breathingLight_complete 2s steps(30, start) infinite;
+}
+
+.taskStage_Box_teacherComplete:hover {
+  transition-duration: 0.4s;
+  animation: breathingLight_teacherComplete 2s steps(30, start) infinite;
+}
+
+@keyframes breathingLight_normal {
+  from {
+    background-color: rgba(75, 75, 75, 0.4);
+  }
+  50% {
+    background-color: rgba(255, 255, 255, 0.6);
+  }
+  to {
+    background-color: rgba(75, 75, 75, 0.4);
+  }
+}
+@keyframes breathingLight_complete {
+  from {
+    background-color: rgba(0, 217, 69, 0.6);
+  }
+  50% {
+    background-color: rgba(255, 255, 255, 0.6);
+  }
+  to {
+    background-color: rgba(0, 217, 69, 0.6);
+  }
+}
+@keyframes breathingLight_teacherComplete {
+  from {
+    background-color: rgba(213, 3, 3, 0.4);
+  }
+  50% {
+    background-color: rgba(255, 255, 255, 0.6);
+  }
+  to {
+    background-color: rgba(213, 3, 3, 0.4);
+  }
 }

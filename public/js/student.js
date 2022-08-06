@@ -13,13 +13,16 @@ const renderWeekTaskManager = (week, stage) => {
         '</svg>'
 
     //task外圈
-    const taskOutlineStart = '<div class="taskTitle">'
+    const taskOutlineStart = '<div class="taskContent">'
 
     //task之week
-    const taskWeekTitle = `<h1> Week ${week}</h1>`
+    const taskWeekTitle = `<div class="taskWeekTitle"><h1 id="week_${week}"> Week ${week}</h1></div>`
+
+    //task middle
+    const taskMiddle = `<div class="taskMiddle" id="taskMiddle_${week}">`
 
     //task 進度stage外圈
-    const taskStageStart = '<div class="taskStage">'
+    const taskStageStart = `<div class="taskStage">`
 
     //task 完成Icon
     const taskCompleteIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-check-circle" viewBox="0 0 16 16">' +
@@ -29,54 +32,54 @@ const renderWeekTaskManager = (week, stage) => {
 
     //Stage 1教學資料
     const taskStage_Data_uncomplete =
-        '<div class="taskStage_Box" id="Data">' +
+        `<div class="taskStage_Box" id="Data_${week}">` +
         '<h4>教學資料</h4>' + taskEnd
 
     const taskStage_Data_complete =
-        '<div class="taskStage_Box_Complete" id="Data">' +
+        `<div class="taskStage_Box_Complete" id="Data_${week}">` +
         '<h4>教學資料</h4>' + taskCompleteIcon + taskEnd
 
     //Stage 2本周目標
     const taskStage_Mission_uncomplete =
-        '<div class="taskStage_Box" id="Mission">' +
+        `<div class="taskStage_Box" id="Mission_${week}">` +
         '<h4>本周目標</h4>' + taskEnd
 
     const taskStage_Mission_complete =
-        '<div class="taskStage_Box_Complete" id="Mission">' +
+        `<div class="taskStage_Box_Complete" id="Mission_${week}">` +
         '<h4>本周目標</h4>' + taskCompleteIcon + taskEnd
 
     //Stage 3學習計畫
     const taskStage_Manage_uncomplete =
-        '<div class="taskStage_Box" id="Manage">' +
+        `<div class="taskStage_Box" id="Manage_${week}">` +
         '<h4>學習計畫</h4>' + taskEnd
 
     const taskStage_Manage_complete =
-        '<div class="taskStage_Box_Complete" id="Manage">' +
+        `<div class="taskStage_Box_Complete" id="Manage_${week}">` +
         '<h4>學習計畫</h4>' + taskCompleteIcon + taskEnd
 
     //Stage 4自我反思
     const taskStage_Minding_uncomplete =
-        '<div class="taskStage_Box" id="Minding">' +
+        `<div class="taskStage_Box" id="Minding_${week}">` +
         '<h4>自我反思</h4>' + taskEnd
 
     const taskStage_Minding_complete =
-        '<div class="taskStage_Box_Complete" id="Minding">' +
+        `<div class="taskStage_Box_Complete" id="Minding_${week}">` +
         '<h4>自我反思</h4>' + taskCompleteIcon + taskEnd
 
     //Stage 5老師回饋
     const taskStage_Response_uncomplete =
-        '<div class="taskStage_Box" id="Response">' +
+        `<div class="taskStage_Box" id="Response_${week}">` +
         '<h4>老師回饋</h4>' + taskEnd
 
     const taskStage_Response_teacherComplete =
-        '<div class="taskStage_Box_teacherComplete" id="Response">' +
+        `<div class="taskStage_Box_teacherComplete" id="Response_${week}">` +
         '<h4>老師回饋</h4>' + taskEnd
 
     const taskStage_Response_studentComplete =
-        '<div class="taskStage_Box_Complete" id="Response">' +
+        `<div class="taskStage_Box_Complete" id="Response_${week}">` +
         '<h4>老師回饋</h4>' + taskCompleteIcon + taskEnd
 
-    Model += taskOutlineStart + taskWeekTitle + taskStageStart
+    Model += taskOutlineStart + taskWeekTitle + taskMiddle + taskStageStart
 
     for (let i = 0; i < stage.length; i++) {
         if (stage[i]) {
@@ -120,10 +123,48 @@ const renderWeekTaskManager = (week, stage) => {
         Model += taskStage_Response_studentComplete
     }
 
-    Model += taskEnd + taskEnd
+    Model += taskEnd + taskEnd + taskEnd
 
 
     $('.taskContainer').append(Model);
+    $(`#week_${week}`).click((e)=>{
+        e.preventDefault();
+        if ($(`#taskMiddle_${week}`).css('display') === 'block'){
+            $(`#taskMiddle_${week}`).slideUp(200);
+        }else{
+            $(`#taskMiddle_${week}`).slideDown(200);
+        }
+    })
+    $(`#Data_${week}`).click((e)=>{
+        e.preventDefault()
+        const userId = $('#userId').html()
+        const url = `/dashboard/${userId}/${week}/data`
+        window.location.href = url
+    })
+    $(`#Mission_${week}`).click((e) => {
+        e.preventDefault()
+        const userId = $('#userId').html()
+        const url = `/dashboard/${userId}/${week}/mission`
+        window.location.href = url
+    })
+    $(`#Manage_${week}`).click((e) => {
+        e.preventDefault()
+        const userId = $('#userId').html()
+        const url = `/dashboard/${userId}/${week}/manage`
+        window.location.href = url
+    })
+    $(`#Minding_${week}`).click((e) => {
+        e.preventDefault()
+        const userId = $('#userId').html()
+        const url = `/dashboard/${userId}/${week}/minding`
+        window.location.href = url
+    })
+    $(`#Response_${week}`).click((e) => {
+        e.preventDefault()
+        const userId = $('#userId').html()
+        const url = `/dashboard/${userId}/${week}/Response`
+        window.location.href = url
+    })
 }
 
 const LogoutFunc = (e) =>{
