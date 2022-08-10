@@ -21,7 +21,19 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
-
+.loading{
+  position:absolute;
+  width:100vw;
+  height: 100vh;
+  background-color: rgba(0,0,0,0.3);
+   z-index:10000;
+}
+#loadingImg{
+  position:fixed;
+  top:calc(100vh / 3);
+  left:calc(100vw / 3 + 100px);
+  z-index:10001;
+}
 .weektaskContainer {
   padding: 30px;
 }
@@ -55,7 +67,15 @@ body {
   border-radius: 20px;
   margin-top: 20px;
 }
-.taskContent:hover {
+.taskContent_complete{
+  transition-duration: 0.4s;
+  padding: 10px;
+  border-radius: 20px;
+  margin-top: 20px;
+  background-color: rgba(55, 255, 0, 0.3);
+}
+
+.taskContent:hover, .taskContent_complete:hover {
   transition-duration: 0.4s;
   background-color: rgba(200, 200, 200, 0.3);
 }

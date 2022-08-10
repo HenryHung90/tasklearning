@@ -21,6 +21,20 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+.loading{
+  position:absolute;
+  width:100vw;
+  height: 100vh;
+  background-color: rgba(0,0,0,0.3);
+   z-index:10000;
+}
+#loadingImg{
+  position:fixed;
+  top:calc(100vh / 3);
+  left:calc(100vw / 3 + 100px);
+  z-index:10001;
+}
+
 .stageContainer {
   padding: 30px;
 }

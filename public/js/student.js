@@ -1,9 +1,6 @@
+//渲染每周Stage
 const renderWeekTaskManager = (week, stage) => {
     let Model = ""
-
-
-    let taskStage_final
-
     //外圈收尾
     const taskEnd = '</div>'
 
@@ -13,7 +10,15 @@ const renderWeekTaskManager = (week, stage) => {
         '</svg>'
 
     //task外圈
-    const taskOutlineStart = '<div class="taskContent">'
+    let taskOutlineStart
+    for(let i = 0;i<stage.length;i++) {
+        if(stage[i] === false || stage[i] === 1){
+            taskOutlineStart = '<div class="taskContent">'
+            break
+        }else{
+            taskOutlineStart = '<div class="taskContent_complete">'
+        }
+    }
 
     //task之week
     const taskWeekTitle = `<div class="taskWeekTitle"><h1 id="week_${week}"> Week ${week}</h1></div>`
@@ -84,31 +89,31 @@ const renderWeekTaskManager = (week, stage) => {
     for (let i = 0; i < stage.length; i++) {
         if (stage[i]) {
             switch (i) {
-                case 1:
+                case 0:
                     Model += taskStage_Data_complete
                     break
-                case 2:
+                case 1:
                     Model += taskStage_Mission_complete
                     break
-                case 3:
+                case 2:
                     Model += taskStage_Manage_complete
                     break
-                case 4:
+                case 3:
                     Model += taskStage_Minding_complete
                     break
             }
         } else if (!stage[i]) {
             switch (i) {
-                case 1:
+                case 0:
                     Model += taskStage_Data_uncomplete
                     break
-                case 2:
+                case 1:
                     Model += taskStage_Mission_uncomplete
                     break
-                case 3:
+                case 2:
                     Model += taskStage_Manage_uncomplete
                     break
-                case 4:
+                case 3:
                     Model += taskStage_Minding_uncomplete
                     break
             }
@@ -124,11 +129,20 @@ const renderWeekTaskManager = (week, stage) => {
     }
 
     Model += taskEnd + taskEnd + taskEnd
-
-
     $('.taskContainer').append(Model);
+
+    function weekClick(clickStage, clickWeek) {
+        const userId = $('#userId').html()
+        const url = `/dashboard/${userId}/${clickWeek}/${clickStage}`
+        window.location.href = url
+    }
     $(`#week_${week}`).click((e)=>{
         e.preventDefault();
+        const nowWeek = $('#nowWeek').html().split(" ")
+        if(week > nowWeek[1]){
+            window.alert("進度尚未到該周喔!")
+            return
+        }
         if ($(`#taskMiddle_${week}`).css('display') === 'block'){
             $(`#taskMiddle_${week}`).slideUp(200);
         }else{
@@ -137,37 +151,28 @@ const renderWeekTaskManager = (week, stage) => {
     })
     $(`#Data_${week}`).click((e)=>{
         e.preventDefault()
-        const userId = $('#userId').html()
-        const url = `/dashboard/${userId}/${week}/data`
-        window.location.href = url
+        weekClick("data",week)
     })
     $(`#Mission_${week}`).click((e) => {
         e.preventDefault()
-        const userId = $('#userId').html()
-        const url = `/dashboard/${userId}/${week}/mission`
-        window.location.href = url
+        weekClick("mission", week)
     })
     $(`#Manage_${week}`).click((e) => {
         e.preventDefault()
-        const userId = $('#userId').html()
-        const url = `/dashboard/${userId}/${week}/manage`
-        window.location.href = url
+        weekClick("manage", week)
     })
     $(`#Minding_${week}`).click((e) => {
         e.preventDefault()
-        const userId = $('#userId').html()
-        const url = `/dashboard/${userId}/${week}/minding`
-        window.location.href = url
+        weekClick("minding", week)
     })
     $(`#Response_${week}`).click((e) => {
         e.preventDefault()
-        const userId = $('#userId').html()
-        const url = `/dashboard/${userId}/${week}/Response`
-        window.location.href = url
+        weekClick("response", week)
     })
 }
 
-const LogoutFunc = (e) =>{
+//登出功能
+const logoutFunc = (e) =>{
     axios({
         method: "GET",
         url: '/logout',
@@ -177,18 +182,40 @@ const LogoutFunc = (e) =>{
     })
 }
 
+//從後端取得該人進度條
+async function getStudentWeekStage (userId){
+    let result
+
+    await axios({
+        method: "POST",
+        url: "/student/stage/checkstage",
+        data:{
+            studentId:userId
+        },
+        withCredentials: true
+    }).then(res => {
+        result =  res.data
+    })
+    return result
+}
+
+//等待畫面loadingPage
+function loadingPage(isOpen) {
+    let loadingDiv = $('.loading')
+    loadingDiv.css('display', isOpen ? 'block' : 'none')
+}
+
 $(window).ready(() => {
-    let taskStage = [false, false, false, false, false]
-    for (let i = 1; i <= 10; i++) {
-        taskStage = [false, false, false, false, false]
-        if (i == 1 || i == 2) {
-            taskStage = [true, true, true, true, 1]
-        }
-        if (i == 3) {
-            taskStage = [true, true, true, true, 2]
-        }
-        renderWeekTaskManager(i, taskStage);
-    }
+    const userId = $('#userId').html()
+
+    const studentStage = getStudentWeekStage(userId)
+    studentStage.then(stageStatus=>{
+        stageStatus.map((val) => {
+            let taskStage = [val.Status.Data, val.Status.Mission, val.Status.Manage, val.Status.Minding, val.Status.Response]
+            renderWeekTaskManager(val.Week, taskStage);
+        })
+    })
+    loadingPage(false)
 })
 
-$('#logoutBtn').click((e)=>LogoutFunc(e))
+$('#logoutBtn').click((e) => logoutFunc(e))

@@ -1,0 +1,47 @@
+.mindingManage {
+  margin: 15px;
+  border-radius: 20px;
+  width: 60%;
+  height: 95%;
+  background-color: rgba(255, 113, 177, 0.5);
+}
+
+.targetMission {
+  display: flex;
+  margin: 15px;
+  width: 97%;
+  height: 15%;
+  border-radius: 20px;
+  background-color: rgba(240, 248, 255, 0.8);
+}
+
+.targeMission_uncomplite {
+  margin: 10px;
+  margin-left: 10%;
+  width: 60%;
+}
+
+.missionConclusion {
+  margin: 15px;
+  width: 40%;
+  height: 95%;
+  border-radius: 20px;
+  background-color: rgba(95, 80, 208, 0.5);
+}
+
+.missionCorrection {
+  text-align: center;
+  margin: 2.5%;
+  width: 95%;
+  height: 45%;
+  border-radius: 20px;
+  background-color: rgba(255, 255, 255, 0.6);
+}
+.missionSatisfactionLevel {
+  text-align: center;
+  margin: 2.5%;
+  width: 95%;
+  height: 45%;
+  border-radius: 20px;
+  background-color: rgba(255, 255, 255, 0.6);
+}
