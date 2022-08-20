@@ -56,11 +56,11 @@ const renderWeekTaskManager = (week, stage) => {
     //Stage 3學習計畫
     const taskStage_Manage_uncomplete =
         `<div class="taskStage_Box" id="Manage_${week}">` +
-        '<h4>學習計畫</h4>' + taskEnd
+        '<h4>制定學習計畫</h4>' + taskEnd
 
     const taskStage_Manage_complete =
         `<div class="taskStage_Box_Complete" id="Manage_${week}">` +
-        '<h4>學習計畫</h4>' + taskCompleteIcon + taskEnd
+        '<h4>制定學習計畫</h4>' + taskCompleteIcon + taskEnd
 
     //Stage 4自我反思
     const taskStage_Minding_uncomplete =
@@ -188,7 +188,7 @@ async function getStudentWeekStage (userId){
 
     await axios({
         method: "POST",
-        url: "/student/stage/checkstage",
+        url: "/studentstage/checkstage",
         data:{
             studentId:userId
         },
@@ -199,10 +199,13 @@ async function getStudentWeekStage (userId){
     return result
 }
 
-//等待畫面loadingPage
 function loadingPage(isOpen) {
     let loadingDiv = $('.loading')
-    loadingDiv.css('display', isOpen ? 'block' : 'none')
+    if (isOpen) {
+        loadingDiv.fadeIn(400)
+    } else {
+        loadingDiv.fadeOut(400)
+    }
 }
 
 $(window).ready(() => {

@@ -1,0 +1,31 @@
+.responseTeacher {
+  margin: 15px;
+  width: 50%;
+  height: 95%;
+  background-color: rgba(61, 150, 228, 0.5);
+  border-radius: 20px;
+  text-align: center;
+}
+.responseTeacherContent{
+    margin:0 auto;
+    text-align: center;
+    width: 90%;
+    height: 80%;
+    border:1px solid black;
+}
+.responseStudentInput{
+    margin:0 auto;
+    text-align: center;
+    width: 90%;
+    height: 80%;
+    border:1px solid black;
+    overflow: hidden;
+}
+.responseStudent {
+  margin: 15px;
+  width: 50%;
+  height: 95%;
+  background-color: rgba(61, 150, 228, 0.5);
+  border-radius: 20px;
+  text-align: center;
+}

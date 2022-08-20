@@ -7,19 +7,15 @@ dotenv.config();
 //cors 跨來源資源共用
 const cors = require('cors');
 task.use(cors({
-    origin: 'http://localhost:3000',
+    origin: 'process.env.ROUTER_CORS',
     credentials: true,
 }))
 //設定port 與 host
-const host = "127.0.0.1 "
+const host = process.env.ROUTER_HOST
 const port = process.env.PORT || 3000
 //用於解析json row txt URL-encoded格式
 const bodyParser = require('body-parser');
 const urlencodedParser = bodyParser.urlencoded({ extended: false })
-//bcrypt加密
-const bcrypt = require("bcryptjs");
-const saltRound = 15
-
 //mongodb
 const mongoose = require('mongoose');
 const mongodbconfig = require('./database/mongodb')
@@ -36,7 +32,7 @@ const cookieParser = require('cookie-parser')
 task.use(cookieParser())
 //配置seesion passport
 task.use(session({
-    secret: 'keyboard cat',
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
 }))
@@ -51,6 +47,7 @@ require('./database/passportjs')(passport)
 const stageCheckRoutes = require('./router/stagecheckroutes')
 const dashboardRoutes = require('./router/dashboardroutes')
 const adminRoutes = require('./router/adminroutes')
+const studentRoutes = require('./router/studentroutes')
 
 
 task.use(express.json())
@@ -75,16 +72,16 @@ task.use(urlencodedParser);
 // })
 
 //可以用此方式確認登入狀態
-const login = (req, res, next) => {
-    console.log("登入狀態")
-    next()
-}
-task.get('/user', login, (req, res) => {
-    res.send("Is user")
-})
+// const login = (req, res, next) => {
+//     console.log("登入狀態")
+//     next()
+// }
+// task.get('/user', login, (req, res) => {
+//     res.send("Is user")
+// })
 
 //登入
-task.post('/login', (req, res, next) => {
+task.post(process.env.ROUTER_MAIN_LOGIN, (req, res, next) => {
     passport.authenticate("local", (err, user, info) => {
         if (err) throw err
         if (!user) {
@@ -97,40 +94,15 @@ task.post('/login', (req, res, next) => {
             })
         }
     })(req, res, next)
-    // const studentCheck = require('./models/studentsconfig')
-    // const bcrypt = require('bcryptjs')
-
-
-
-    // studentCheck.findOne({ studentId: req.body.Account }).then((response) => {
-    //     console.log(response.studentName)
-    //     if (response === undefined || response === null) {
-    //         res.send('no user')
-    //         return
-    //     }
-    //     bcrypt.compare(req.body.Password, response.studentPassword).then(isUser => {
-    //         if (isUser) {
-    //             res.send(`/dashboard/${req.body.Account}`)
-    //         } else {
-    //             res.send('login fail')
-    //         }
-
-    //     })
-
-    // })
-
-    // if(isUserAccount == req.body.Account && isUserPassword == req.body.Password){
-    //     res.send(`/dashboard/${req.body.Account}`)
-    // }
 })
 task.get('/', (req, res) => {
     res.render('index')
 })
 //登出
-task.get('/logout', (req, res,next) => {
+task.get(process.env.ROUTER_MAIN_LOGOUT, (req, res,next) => {
     req.logout((err)=>{
         if(err)return next(err)
-        res.redirect('/')
+        res.send('/')
     })
 })
 
@@ -140,15 +112,19 @@ task.get('/logout', (req, res,next) => {
 //     next()
 // })
 let isAuthenticated = function (req, res, next) {
+    console.log(req.isAuthenticated())
     if (req.isAuthenticated()) return next()
     res.redirect('/')
 }
 //Stagepage
-task.use('/dashboard', isAuthenticated, dashboardRoutes)
+task.use(process.env.ROUTER_MAIN_DASHBOARD,/*isAuthenticated,*/ dashboardRoutes)
 //stageCheck
-task.use('/student/stage', stageCheckRoutes);
+task.use(process.env.ROUTER_MAIN_STUDENTSTAGE, /*isAuthenticated,*/ stageCheckRoutes);
+//students
+task.use(process.env.ROUTER_MAIN_STUDENT, /*isAuthenticated,*/ studentRoutes)
 //admin
-task.use('/admin', adminRoutes);
+task.use(process.env.ROUTER_MAIN_ADMIN, adminRoutes);
+
 
 //無此路由
 task.use((req, res, next) => {

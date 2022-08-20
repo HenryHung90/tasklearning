@@ -26,6 +26,7 @@ async function updateStudentDetail(studentId, uploadData) {
 
 //更改stage狀態
 function editStudentDetailStage(data, week, stage) {
+   
     switch (stage) {
         case "Data":
             data[week].Status.Data = true
@@ -50,6 +51,8 @@ function editStudentDetailStage(data, week, stage) {
 
 //完整更新stage function
 const studentStageComplete = async (studentId, changeWeek, stage) => {
+    
+    console.log(studentId, changeWeek, stage)
     //儲存更改之week
     const weekTemp = changeWeek.split(" ")
     const week = parseInt(weekTemp[1]) - 1
@@ -70,38 +73,38 @@ const studentStageComplete = async (studentId, changeWeek, stage) => {
 }
 
 
-router.post('/checkstage', async (req, res) => {
+router.post(process.env.ROUTER_STUDENTSTAGE_CHECK, async (req, res) => {
     studentConfig.findOne({ studentId: req.body.studentId }).then(response => {
         res.send(response.studentDetail)
     })
 })
 
-router.post('/datacomplete', async (req, res) => {
-    studentStageComplete(req.body.studentId, req.body.Week,"Data").then(response=>{
+router.post(process.env.ROUTER_STUDENTSTAGE_DATACHECK, async (req, res) => {
+    studentStageComplete(req.body.studentId, req.body.week,"Data").then(response=>{
         res.send(response)
     })
 })
 
-router.post('/missioncomplete', async (req, res) => {
-    studentStageComplete(req.body.studentId, req.body.Week, "Mission").then(response => {
+router.post(process.env.ROUTER_STUDENTSTAGE_MISSIONCHECK, async (req, res) => {
+    studentStageComplete(req.body.studentId, req.body.week, "Mission").then(response => {
         res.send(response)
     })
 })
 
-router.post('/managecomplete', async (req, res) => {
-    studentStageComplete(req.body.studentId, req.body.Week, "Manage").then(response => {
+router.post(process.env.ROUTER_STUDENTSTAGE_MANAGECHECK, async (req, res) => {
+    studentStageComplete(req.body.studentId, req.body.week, "Manage").then(response => {
         res.send(response)
     })
 })
 
-router.post('/mindingcomplete', async (req, res) => {
-    studentStageComplete(req.body.studentId, req.body.Week, "Minding").then(response => {
+router.post(process.env.ROUTER_STUDENTSTAGE_MINDINGCHECK, async (req, res) => {
+    studentStageComplete(req.body.studentId, req.body.week, "Minding").then(response => {
         res.send(response)
     })
 })
 
-router.post('/responsecomplete', async (req, res) => {
-    studentStageComplete(req.body.studentId, req.body.Week, "Response").then(response => {
+router.post(process.env.ROUTER_STUDENTSTAGE_RESPONSECHECK, async (req, res) => {
+    studentStageComplete(req.body.studentId, req.body.week, "Response").then(response => {
         res.send(response)
     })
 })

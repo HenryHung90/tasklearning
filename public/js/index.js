@@ -1,6 +1,10 @@
-function loadingPage (isOpen) {
+function loadingPage(isOpen) {
     let loadingDiv = $('.loading')
-    loadingDiv.css('display', isOpen ? 'block' : 'none')
+    if (isOpen) {
+        loadingDiv.fadeIn(400)
+    } else {
+        loadingDiv.fadeOut(400)
+    }
 }
 
 const LoginFunc = (e) => {

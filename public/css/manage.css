@@ -1,13 +1,30 @@
 .manageComponents {
-  margin: 15px;
+  margin: 15px 0 15px 15px;
   width: 50%;
   height: 95%;
-  background-color: rgba(78, 78, 78, 0.3);
   text-align: center;
 }
-.manageUserDeside {
-  margin: 15px;
-  width: 50%;
+.manageUserDecide {
+  margin: 15px 15px 15px 0;
+  width: 48%;
   height: 95%;
   text-align: center;
+}
+.missionBox_Data .options{
+  transition-duration: 0.3s;
+  margin-top:10px;
+  user-select: none;
+  width:13%;
+  height:60px;
+  line-height: 50px;
+  border-radius:10px;
+  background-color:rgb(200,200,200);
+}
+.missionBox_Data .options:hover{
+  transition-duration: 0.3s;
+  background-color:rgba(255, 255, 255,1) !important;
+}
+.missionBox_Data .options:active{
+  transition-duration: 0.1s;
+  background-color:rgba(255, 0, 0, 0.5) !important;
 }

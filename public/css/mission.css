@@ -1,16 +1,86 @@
 .missionThisWeek {
   margin: 15px;
-  width: 40%;
+  width: 30%;
   height: 95%;
-  background-color: rgba(61, 150, 228, 0.5);
+  background-color: rgba(67, 67, 68, 0.3);
   border-radius: 20px;
   text-align: center;
 }
+.missionThisWeekContainer{
+  white-space: pre-wrap;
+  margin: 0 auto;
+  margin-top:10px;
+  width: 80%;
+  height: 85%;
+}
+
+.dragging{
+  opacity: 0.5;
+}
+.missionText p{
+  white-space: nowrap;
+  width:300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .missionDecide {
   margin: 15px;
-  width: 60%;
+  width: 70%;
   height: 95%;
-  background-color: rgba(228, 150, 61, 0.5);
+  background-color: rgba(76, 59, 50, 0.3);
   border-radius: 20px;
   text-align: center;
+}
+.missionDecideContainer{
+  display: flex;
+  margin: 0 auto;
+  margin-top:10px;
+  width: 99%;
+  height: 90%;
+}
+.dragMissionDecide{
+  width:33%;
+  background-color:rgba(255,255,255,0.3);
+  height: 95%;
+  border-radius: 20px;
+}
+.dragMissionDecideSteps {
+  text-align: center;
+  width: 70%;
+  height: 95%;
+}
+.stepsSelect{
+  width: 100%;
+  height: 100%;
+}
+.options{
+  user-select: none;
+  margin:10px;
+  padding:15px;
+  width:120px;
+  height:70px;
+  background-color:rgba(23, 102, 135, 0.3);
+  border-radius: 10px;
+}
+.optionBox:hover{
+  transition-duration: 0.3s;
+  background-color:rgba(255,0,0,0.5) !important;
+}
+
+.standardSelect:hover{
+  transition-duration: 0.3s;
+  background-color: white !important;
+}
+
+.dragMissionDecide .missionText{
+  margin: 0 auto;
+  width:80%;
+  height: 100px;
+  border-radius: 20px;
+  background-color: rgba(80, 186, 247, 0.431) !important;
+}
+.dragMissionDecide .missionText:hover{
+  transition-duration: 0.3s;
+  background-color: rgb(200,200,200) !important;
 }

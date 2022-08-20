@@ -2,10 +2,10 @@
 function stageChecktoServer(name) {
     return (axios({
         method: "POST",
-        url: `../../../student/stage/${name}complete`,
+        url: `../../../studentstage/${name}complete`,
         data: {
             studentId: $('#userId').html(),
-            Week: $('.WeekTitle').html(),
+            week: $('.WeekTitle').html(),
         },
         withCredentials: true,
     }))
@@ -30,22 +30,18 @@ function uploadStage(stage){
         window.location.href = res.data
     })
 }
-//等待畫面loadingPage
-function loadingPage(isOpen) {
-    let loadingDiv = $('.loading')
-    loadingDiv.css('display', isOpen ? 'block' : 'none')
-}
 
 $("#stageDataCheck").click((e) => {
     if (confirmFinishStage("觀看教學文件")) {
         uploadStage("data")
     }
 })
-$("#stageMissionCheck").click((e) => {
-    if (confirmFinishStage("確定本周目標")) {
-        uploadStage("mission")
-    }
-})
+//遷移至mission.js
+// $("#stageMissionCheck").click((e) => {
+//     if (confirmFinishStage("確定本周目標")) {
+//         uploadStage("mission")
+//     }
+// })
 $("#stageManageCheck").click((e) => {
     if (confirmFinishStage("完成學習計畫")) {
         uploadStage("manage")
@@ -67,7 +63,3 @@ $('#backBtn').click((e)=>{
 
     window.location.href = `/dashboard/${userId}`
 }) 
-
-$(window).ready(()=>{
-    loadingPage(false)
-})

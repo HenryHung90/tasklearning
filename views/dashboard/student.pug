@@ -1,5 +1,8 @@
 doctype html 
 head 
+    link(rel='preconnect' href='https://fonts.googleapis.com') 
+    link(rel='preconnect' href='https://fonts.gstatic.com' crossorigin) 
+    link(href='https://fonts.googleapis.com/css2?family=Silkscreen&display=swap' rel='stylesheet')
     link(rel="stylesheet" href='../css/student.css')
     
     script(src='https://code.jquery.com/jquery-3.6.0.js' integrity='sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=' crossorigin='anonymous')
@@ -13,11 +16,12 @@ body
     .weektaskContainer
         .taskTitleContiner
             .taskTitleText
-                h1 Task Manager
-                h5=User + " 歡迎回來!"
-                #userId.h5=Id
+                .taskMainTitle
+                    h1 Task Manager
+                    #userId.h5=Id
+                    h5=User + " 歡迎回來!"
             .taskTitle
-                h1 當前進度
+                h5 當前進度
                 h3#nowWeek=Week
             div
                 button#logoutBtn.btn.btn-info(type='button' style='width: 140px;;height: 80%;margin-top: 10px;')
