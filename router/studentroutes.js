@@ -6,7 +6,6 @@ const datacontentmodel = require('../models/datacontentmodel')
 const missioncontentmodel = require('../models/missioncontentmodel')
 const studentmission = require('../models/studentmission')
 const studentmanage = require('../models/studentmanage')
-const { response } = require('express')
 
 
 router.post(process.env.ROUTER_STUDENT_READDATA, async (req, res) => {
@@ -71,7 +70,7 @@ router.post(process.env.ROUTER_STUDENT_READMISSION, async (req, res) => {
 router.post(process.env.ROUTER_STUDENT_READMANAGE, async (req, res) => {
     let isEmpty = false
 
-    studentmission.findOne({ week: req.body.week, studentId: req.body.studentId }).then(response => {
+    studentmanage.findOne({ week: req.body.week, studentId: req.body.studentId }).then(response => {
         if (response === null || response === undefined) {
             res.send('no found')
             isEmpty = true
@@ -112,7 +111,7 @@ router.post(process.env.ROUTER_STUDENT_ADDMISSION, async (req, res) => {
                 })
             }
         })
-        if(req.body.missionCheck == true){
+        if (req.body.manageCheck == true){
             await studentmanage.findOne({ studentId: req.body.studentId, week: req.body.week }).then(async (response) => {
                 //若尚未新增過該周
                 if (response === null || response === undefined) {
@@ -128,6 +127,7 @@ router.post(process.env.ROUTER_STUDENT_ADDMISSION, async (req, res) => {
                 else {
                     await studentmanage.updateOne({ studentId: req.body.studentId, week: req.body.week }, { studentManage: req.body.studentSelect }).then((response) => {
                         isManageComplete = response.acknowledged
+                        console.log('passed_3')
                     })
                 }
             })
@@ -138,7 +138,18 @@ router.post(process.env.ROUTER_STUDENT_ADDMISSION, async (req, res) => {
 })
 
 router.post(process.env.ROUTER_STUDENT_ADDMANAGE, async (req, res) => {
+    const cloud = studentmanage.findOne({week: req.body.week,studentId: req.body.studentId}).exec()
+    let cloudData
+    console.log(req.body)
 
+    await cloud.then((response)=>{
+        cloudData = response.studentManage
+    })
+
+    cloudData[req.body.manageId][req.body.manageStep] = req.body.manageContent
+    await studentmanage.updateOne({week: req.body.week,studentId: req.body.studentId},{studentManage:cloudData}).then(response=>{
+        res.send(response.acknowledged)
+    })
 })
 
 router.post(process.env.ROUTER_STUDENT_ADDMINDING, async (req, res) => {

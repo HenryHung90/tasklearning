@@ -51,8 +51,7 @@ function editStudentDetailStage(data, week, stage) {
 
 //完整更新stage function
 const studentStageComplete = async (studentId, changeWeek, stage) => {
-    
-    console.log(studentId, changeWeek, stage)
+
     //儲存更改之week
     const weekTemp = changeWeek.split(" ")
     const week = parseInt(weekTemp[1]) - 1

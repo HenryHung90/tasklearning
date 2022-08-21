@@ -17,23 +17,24 @@ function switchMissionName(switchData) {
     return switchStudentSelect
 }
 //return 從資料庫抓下的計畫內容
-function loadingManageDetailFromData(mission){
+async function loadingManageDetailFromData(mission) {
     const dataWeek = $('.WeekTitle').html().split(" ")
     const userId = $('#userId').html()
 
     const missionId = mission[1]
     const missionStep = mission[3]
-    axios({
+    let data = []
+    await axios({
         method: 'post',
-        url:'/student/readmanage',
-        data:{
+        url: '/student/readmanage',
+        data: {
             week: dataWeek,
             studentId: userId
         }
-    }).then((response)=>{
-
+    }).then((response) => {
+        data = Object.values(response.data.studentManage)
     })
-
+    return data[missionId][missionStep]
 }
 
 //render 左側計畫選項欄
@@ -60,6 +61,7 @@ function renderManageSchedule(manageData) {
             id: `targetMission_${manageIndex}`,
             innerHTML: manageValue[0]
         })
+        
         const missionData = $('<div>').prop({
             className: 'missionBox_Data',
             innerHTML: renderMissionData(manageValue, manageIndex)
@@ -84,34 +86,36 @@ function renderManageSchedule(manageData) {
     return manageScheduleDiv
 }
 //render 右側寫入執行計畫欄
-function renderManageDecide(currentStepId, currentStepTitle) {
+function renderManageDecide(currentStepId, currentStepTitle, currentContent) {
     const missionName = $(`#targetMission_${currentStepId.split('_')[1]}`).html()
+    const curretnStepTemp = currentStepId.split("_")
 
     //標頭
     const missionDecideTitle = $('<h3>').prop({
-        className:'manageDecideTitle',
-        innerHTML:missionName + "<br>" + currentStepTitle
+        className: 'manageDecideTitle',
+        innerHTML: missionName + "<br>" + currentStepTitle
     }).css({
-        'margin':'10px 0 30px 0'
+        'margin': '10px 0 30px 0'
     })
 
     //內文輸入區
     const missionDecideContent = $('<textarea>').prop({
-        className:'manageDecideContent',
+        className: 'manageDecideContent',
+        innerHTML: currentContent,
         placeholder: '寫下你的學習計畫內容'
     }).css({
-        'width':'100%',
-        'height':'70%',
-        'padding':'15px',
-        'border':'1px dashed rgba(0,0,0,0.3)',
-        'border-radius':'20px',
-        'transition-duration':'0.5s'
-    }).hover((e)=>{
+        'width': '100%',
+        'height': '70%',
+        'padding': '15px',
+        'border': '1px dashed rgba(0,0,0,0.3)',
+        'border-radius': '20px',
+        'transition-duration': '0.5s'
+    }).hover((e) => {
         missionDecideContent.css({
             'transition-duration': '0.5s',
             'border': '1.5px dashed rgba(0,0,0)'
         })
-    },(e)=>{
+    }, (e) => {
         missionDecideContent.css({
             'border': '1px dashed rgba(0,0,0,0.3)'
         })
@@ -119,27 +123,53 @@ function renderManageDecide(currentStepId, currentStepTitle) {
 
     //儲存該項安排
     const missionDecideSubmit = $('<div>').prop({
-        className:'manageDecideSubmit',
+        className: 'manageDecideSubmit',
         innerHTML: '<svg xmlns="http://www.w3.org/2000/svg"  width="25px" height="25px" viewBox="0 0 448 512"><!--! Font Awesome Pro 6.1.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M438.6 105.4C451.1 117.9 451.1 138.1 438.6 150.6L182.6 406.6C170.1 419.1 149.9 419.1 137.4 406.6L9.372 278.6C-3.124 266.1-3.124 245.9 9.372 233.4C21.87 220.9 42.13 220.9 54.63 233.4L159.1 338.7L393.4 105.4C405.9 92.88 426.1 92.88 438.6 105.4H438.6z"/></svg>' +
-                   '確認該項安排'
+            '確認該項安排'
     }).css({
-        'user-select':'none',
-        'margin':'0 auto',
-        'margin-top':'15px',
-        'width':'150px',
-        'height':'50px',
-        'line-height':'50px',
-        'border-radius':'10px',
+        'user-select': 'none',
+        'margin': '0 auto',
+        'margin-top': '15px',
+        'width': '150px',
+        'height': '50px',
+        'line-height': '50px',
+        'border-radius': '10px',
         'transition-duration': '0.3s',
-        'background-color':'#0dcaf0'
-    }).hover((e)=>{
+        'background-color': '#0dcaf0'
+    }).hover((e) => {
         missionDecideSubmit.css({
             'transition-duration': '0.3s',
             'background-color': 'rgb(33, 222, 260)'
         })
-    },(e)=>{
+    }, (e) => {
         missionDecideSubmit.css({
             'background-color': '#0dcaf0'
+        })
+    }).click((e) => {
+        e.stopPropagation()
+        loadingPage(true)
+        const dataWeek = $('.WeekTitle').html().split(" ")[1]
+        const userId = $('#userId').html()
+        const manageId = parseInt(curretnStepTemp[1]) + 1
+        const manageStep = curretnStepTemp[3]
+
+        axios({
+            method: 'post',
+            url: '/student/addmanage',
+            data: {
+                week: dataWeek,
+                studentId: userId,
+                manageId: manageId,
+                manageStep: manageStep,
+                manageContent: $('.manageDecideContent').val()
+            },
+            withCredentials: true
+        }).then((response) => {
+            if (response.data == true) {
+                loadingPage(false)
+            } else {
+                window.alert("網路錯誤，請重新整理")
+            }
         })
     })
 
@@ -170,20 +200,27 @@ function optionsClick() {
     options.click((e) => {
         const targetId = e.currentTarget.id
         const targetTitle = e.currentTarget.innerHTML
-        const targetContent = loadingManageDetailFromData(targetId.split("_"))
-        //option highlighting select
-        $('.options').css({'background-color': 'rgb(200,200,200)'})
-        $(`#${targetId}`).css({'background-color': 'rgba(255, 0, 0, 0.5)'})
+        let targetContent = ""
 
-        //任務安排區域
-        const manageDecide = $('.manageUserDecide')
-        manageDecide.fadeOut(100)
-        setTimeout((e)=>{
-            manageDecide.empty()
-            manageDecide.append(renderManageDecide(targetId, targetTitle, targetContent))
-            manageDecide.fadeIn(300)
-        },300)
-        
+        loadingManageDetailFromData(targetId.split("_")).then(res => {
+            targetContent = res
+        }).then(() => {
+            //任務安排區域
+            const manageDecide = $('.manageUserDecide')
+            manageDecide.fadeOut(100)
+            
+            setTimeout((e) => {
+                manageDecide.empty()
+                manageDecide.append(renderManageDecide(targetId, targetTitle, targetContent))
+                manageDecide.fadeIn(300)
+            }, 200)
+        })
+        //option highlighting select
+        $('.options').css({ 'background-color': 'rgb(200,200,200)' })
+        $(`#${targetId}`).css({ 'background-color': 'rgba(255, 0, 0, 0.5)' })
+
+
+
     })
 }
 //loading Manage main function
