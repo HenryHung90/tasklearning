@@ -1,13 +1,3 @@
-//return 等待畫面loadingPage
-function loadingPage(isOpen) {
-    let loadingDiv = $('.loading')
-    if (isOpen) {
-        loadingDiv.fadeIn(400)
-    } else {
-        loadingDiv.fadeOut(400)
-    }
-}
-
 //return 分辨Option
 //1. getMissionStepsSelected (Id轉文字)
 //2. renderMissionDecidewhenLoading (文字轉Id)
@@ -69,7 +59,6 @@ function getMissionStepsSelected() {
     return selectedMissionObj
 }
 
-
 //return Steps進度條
 //1. renderMissionDecidewhenLoading (進入頁面時使用)
 //2. dragMission -> renderMissionDecideSteps (拖動任務後使用)
@@ -120,6 +109,24 @@ function deleteSelectOption() {
             uploadStudentDecideSteps()
         }, 800)
     })
+}
+
+//Click 確認是否已經完成過
+async function stageBtnEnterForMission() {
+    const dataWeek = parseInt($('.WeekTitle').html().split(" ")[1]) - 1
+
+    let isDone = false
+    await axios({
+        method: "POST",
+        url: '/studentstage/checkstage',
+        data: {
+            week: dataWeek
+        },
+        withCredentials: true,
+    }).then((response) => {
+        isDone = response.data[dataWeek].Status.Mission
+    })
+    return isDone
 }
 
 //本周目標
@@ -219,6 +226,19 @@ function uploadStudentDecideSteps() {
     const userId = $('#userId').html()
     const week = $('.WeekTitle').html().split(" ")[1]
     loadingPage(true)
+
+    axios({
+        method: "POST",
+        url: '/studentstage/missionuncomplete',
+        data: {
+            week: week
+        },
+        withCredentials: true,
+    }).then(response =>{
+        if(response.data == false){
+            window.alert('網路錯誤，請重新整理')
+        }
+    })
     axios({
         method: 'post',
         url: '/student/addmission',
@@ -518,8 +538,15 @@ $(window).ready(() => {
     //若當周有資料 要預先載入執行步驟
     stepsSelectOption()
 })
-$("#stageMissionCheck").click((e) => {
-    if(window.confirm("確定完成 本周目標 進度嗎?")){
-        uploadManage()
-    }
+
+$("#stageMissionCheck").click(async (e) => {
+    await stageBtnEnterForMission().then(response => {
+        if (response == false) {
+            if (window.confirm("確定完成 設定目標 進度嗎?")) {
+                uploadManage()
+            }
+        } else {
+            uploadManage()
+        }
+    })
 })

@@ -17,10 +17,11 @@ body
         .taskTitleContainer
             .taskTitleText
                 h1 Task Manager
-                h5#userId=Id 
+                .taskTitleUser
+                    h5#userId=Id 
             .taskTitle
-                h3.WeekTitle=Week
-                h1 設定目標
+                h3.WeekTitle= Week
+                h3 制定目標
             div
                 button#backBtn.btn.btn-info(type='button' style='width: 140px;;height: 80%;margin-top: 10px;')
                    svg(xmlns='http://www.w3.org/2000/svg' width='50%' height='50%' viewBox='0 0 448 512')

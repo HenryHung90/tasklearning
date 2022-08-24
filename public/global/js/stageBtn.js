@@ -2,7 +2,7 @@
 function stageChecktoServer(name) {
     return (axios({
         method: "POST",
-        url: `../../../studentstage/${name}complete`,
+        url: `/studentstage/${name}complete`,
         data: {
             studentId: $('#userId').html(),
             week: $('.WeekTitle').html(),
@@ -31,10 +31,42 @@ function uploadStage(stage){
     })
 }
 
-$("#stageDataCheck").click((e) => {
-    if (confirmFinishStage("觀看教學文件")) {
-        uploadStage("data")
+function stageBtnEnter(stage,stageName){
+    const dataWeek = parseInt($('.WeekTitle').html().split(" ")[1]) - 1
+    const userId = $('#userId').html()
+
+    axios({
+        method: "POST",
+        url: '/studentstage/checkstage',
+        data: {
+            week: dataWeek
+        },
+        withCredentials: true,
+    }).then(async (response) => {
+        const data = response.data[dataWeek]
+
+        if (data.Status[stage] == true) {
+            window.location.href = `/dashboard/${userId}`
+        } else {
+            if (confirmFinishStage(stageName)) {
+                uploadStage(stage)
+            }
+        }
+    })
+}
+
+//return 等待畫面loadingPage
+function loadingPage(isOpen) {
+    let loadingDiv = $('.loading')
+    if (isOpen) {
+        loadingDiv.fadeIn(400)
+    } else {
+        loadingDiv.fadeOut(400)
     }
+}
+
+$("#stageDataCheck").click((e) => {
+    stageBtnEnter("Data", "觀看教學文件")
 })
 //遷移至mission.js
 // $("#stageMissionCheck").click((e) => {
@@ -43,21 +75,17 @@ $("#stageDataCheck").click((e) => {
 //     }
 // })
 $("#stageManageCheck").click((e) => {
-    if (confirmFinishStage("完成學習計畫")) {
-        uploadStage("manage")
-    }
+    stageBtnEnter("Manage", "完成學習計畫")
 })
-$("#stageMindingCheck").click((e) => {
-    if (confirmFinishStage("完成自我反思")) {
-        uploadStage("minding")
-    }
-})
-$("#stageResponseCheck").click((e) => {
-    if (confirmFinishStage("閱讀完老師回饋")) {
-        uploadStage("response")
-    }
+//遷移至minding.js
+// $("#stageMindingCheck").click((e) => {
+//     stageBtnEnter("Minding", "完成自我反思")
+// })
+//遷移至response.js
+// $("#stageResponseCheck").click((e) => {
+//     stageBtnEnter("Response", "閱讀完老師回饋")
+// })
 
-})
 $('#backBtn').click((e)=>{
     const userId = $('#userId').html()
 

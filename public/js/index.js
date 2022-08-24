@@ -1,12 +1,3 @@
-function loadingPage(isOpen) {
-    let loadingDiv = $('.loading')
-    if (isOpen) {
-        loadingDiv.fadeIn(400)
-    } else {
-        loadingDiv.fadeOut(400)
-    }
-}
-
 const LoginFunc = (e) => {
   
     const Account = $('#Account').val()
@@ -37,6 +28,16 @@ const LoginFunc = (e) => {
         }
         window.location.href = res.data
     })
+}
+
+//return 等待畫面loadingPage
+function loadingPage(isOpen) {
+    let loadingDiv = $('.loading')
+    if (isOpen) {
+        loadingDiv.fadeIn(400)
+    } else {
+        loadingDiv.fadeOut(400)
+    }
 }
 
 $('#loginNormal').click(e => {

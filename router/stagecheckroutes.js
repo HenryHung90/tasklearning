@@ -1,5 +1,7 @@
 const express = require('express')
 const router = express.Router()
+const passport = require('passport')
+require('../database/passportjs')(passport)
 
 const studentConfig = require('../models/studentsconfig')
 
@@ -73,9 +75,28 @@ const studentStageComplete = async (studentId, changeWeek, stage) => {
 
 
 router.post(process.env.ROUTER_STUDENTSTAGE_CHECK, async (req, res) => {
-    studentConfig.findOne({ studentId: req.body.studentId }).then(response => {
+    studentConfig.findOne({ studentId: req.user.studentId }).then(response => {
         res.send(response.studentDetail)
     })
+})
+
+router.post(process.env.ROUTER_STUDENTSTAGE_MISSIONUNCHECK,async(req,res)=>{
+    //存取studentDetil
+    let studentDetail
+    let isSuccess = false
+    //查找目前雲端之studentDetail
+    await findStudentDetail(req.user.studentId).then(cloudData => { studentDetail = cloudData })
+    studentDetail[req.body.week - 1].Status.Mission = false
+    studentDetail[req.body.week - 1].Status.Manage = false
+    studentDetail[req.body.week - 1].Status.Minding = false
+
+    await studentConfig.updateOne({ studentId: req.user.studentId }, {
+        studentDetail: studentDetail
+    }).then((err, result) => {
+        if (err) isSuccess = false
+        else isSuccess = true
+    })
+    return isSuccess
 })
 
 router.post(process.env.ROUTER_STUDENTSTAGE_DATACHECK, async (req, res) => {

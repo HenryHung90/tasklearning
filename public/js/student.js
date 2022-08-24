@@ -199,6 +199,7 @@ async function getStudentWeekStage (userId){
     return result
 }
 
+//return 等待畫面loadingPage
 function loadingPage(isOpen) {
     let loadingDiv = $('.loading')
     if (isOpen) {

@@ -18,10 +18,10 @@
   opacity: 0.5;
 }
 .missionText p{
+  text-overflow: ellipsis;
   white-space: nowrap;
   width:300px;
   overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .missionDecide {

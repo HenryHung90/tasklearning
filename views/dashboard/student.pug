@@ -16,13 +16,13 @@ body
     .weektaskContainer
         .taskTitleContiner
             .taskTitleText
-                .taskMainTitle
-                    h1 Task Manager
+                h1 Task Manager
+                .taskMainTitle    
                     #userId.h5=Id
                     h5=User + " 歡迎回來!"
-            .taskTitle
-                h5 當前進度
-                h3#nowWeek=Week
+                .taskTitle
+                    h5 當前進度
+                    h3#nowWeek=Week
             div
                 button#logoutBtn.btn.btn-info(type='button' style='width: 140px;;height: 80%;margin-top: 10px;')
                     svg.bi.bi-box-arrow-right(xmlns='http://www.w3.org/2000/svg' width='50%' height='50%' fill='currentColor' viewBox='0 0 16 16')

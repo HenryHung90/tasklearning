@@ -1,12 +1,3 @@
-//return 等待畫面loadingPage
-function loadingPage(isOpen) {
-    let loadingDiv = $('.loading')
-    if (isOpen) {
-        loadingDiv.fadeIn(400)
-    } else {
-        loadingDiv.fadeOut(400)
-    }
-}
 //return 換好名稱的studentSelect
 function switchMissionName(switchData) {
     const switchStudentSelect = Object.values(switchData.studentSelect)
@@ -34,6 +25,9 @@ async function loadingManageDetailFromData(mission) {
     }).then((response) => {
         data = Object.values(response.data.studentManage)
     })
+    if(missionStep === 'time'){
+        return data[missionId][data[missionId].length - 1]
+    }
     return data[missionId][missionStep]
 }
 
@@ -52,6 +46,7 @@ function renderManageSchedule(manageData) {
         for (let i = 1; i < data.length; i++) {
             returnData += `<div class="options" id="targetMission_${index}_option_${i}">${i}、${data[i]}</div>`
         }
+        returnData += `<div class="options" id="targetMission_${index}_option_time">${data.length}、時間管理</div>`
         return returnData
     }
 
@@ -109,7 +104,8 @@ function renderManageDecide(currentStepId, currentStepTitle, currentContent) {
         'padding': '15px',
         'border': '1px dashed rgba(0,0,0,0.3)',
         'border-radius': '20px',
-        'transition-duration': '0.5s'
+        'transition-duration': '0.5s',
+        'resize':'none'
     }).hover((e) => {
         missionDecideContent.css({
             'transition-duration': '0.5s',
@@ -129,7 +125,7 @@ function renderManageDecide(currentStepId, currentStepTitle, currentContent) {
     }).css({
         'user-select': 'none',
         'margin': '0 auto',
-        'margin-top': '15px',
+        'margin-top': '1%',
         'width': '150px',
         'height': '50px',
         'line-height': '50px',
@@ -150,7 +146,7 @@ function renderManageDecide(currentStepId, currentStepTitle, currentContent) {
         loadingPage(true)
         const dataWeek = $('.WeekTitle').html().split(" ")[1]
         const userId = $('#userId').html()
-        const manageId = parseInt(curretnStepTemp[1]) + 1
+        const manageId = curretnStepTemp[1]
         const manageStep = curretnStepTemp[3]
 
         axios({
@@ -198,6 +194,22 @@ function renderManagePage(data) {
 function optionsClick() {
     const options = $('.options')
     options.click((e) => {
+        e.preventDefault()
+        //阻止重複點按
+        if(e.currentTarget.className == 'options Clicking'){
+            $('.manageDecide').animate({
+                width:'90%',
+                height:'90%',
+                margin:'5% 5% 5% 5%',
+            }, 100)
+            .animate({
+                width: '100%',
+                height: '100%',
+                margin: '0',
+            }, 100)
+            return
+        }
+
         const targetId = e.currentTarget.id
         const targetTitle = e.currentTarget.innerHTML
         let targetContent = ""
@@ -216,20 +228,27 @@ function optionsClick() {
             }, 200)
         })
         //option highlighting select
-        $('.options').css({ 'background-color': 'rgb(200,200,200)' })
-        $(`#${targetId}`).css({ 'background-color': 'rgba(255, 0, 0, 0.5)' })
-
-
-
+        $('.options').css({ 'background-color': 'rgb(200,200,200)' }).removeClass('Clicking')
+        $(`#${targetId}`).css({ 'background-color': 'rgba(255, 0, 0, 0.5)' }).addClass('Clicking')
     })
 }
 //loading Manage main function
 function loadingManage() {
     loadingPage(true)
-    const dataWeek = $('.WeekTitle').html().split(" ")
+    const dataWeek = $('.WeekTitle').html().split(" ")[1]
     const userId = $('#userId').html()
 
     //讀取已選任務
+    axios({
+        method: 'post',
+        url: '/studentstage/checkstage',
+        withCredentials:true
+    }).then(response=>{
+        if(!response.data[dataWeek - 1].Status.Mission){
+            window.alert("尚未完成本周目標與策略制定\n請在變更本周目標後再次按下 安排完畢")
+            window.location.href = `/dashboard/${userId}`
+        }
+    })
     axios({
         method: 'post',
         url: '/student/readmission',
