@@ -1,11 +1,68 @@
 const express = require('express')
 const router = express.Router()
 const bcrypt = require('bcryptjs')
+const passport = require('passport')
+require('../database/passportjs')(passport)
 
 const studentsConfig = require('../models/studentsconfig')
+
 const datacontentmodel = require('../models/datacontentmodel')
 const missioncontentmodel = require('../models/missioncontentmodel')
+const responsecontentmodel = require('../models/responsecontentmodel')
 
+const studentmission = require('../models/studentmission')
+const studentmanage = require('../models/studentmanage')
+const studentminding = require('../models/studentminding')
+
+router.use((req, res, next)=>{
+    if(req.user != undefined){
+        if(req.user.studentId == "admin"){
+            next()
+            return
+        }
+        res.send("fall")
+    }else{
+        res.send("fall")
+    }
+})
+
+router.post(process.env.ROUTER_ADMIN_READSTUDENTSTATUS,async(req,res)=>{
+    const returnData = {
+        studentsStatus:[],
+        studentsMinding:[],
+        studentsResponse:[]
+    }
+    
+    await studentsConfig.find({}).then(response=>{
+        response.map((value,index)=>{
+            if(value.studentName != 'Admin'){
+                returnData.studentsStatus.push(value.studentDetail)
+            }
+        })
+    })
+    await studentminding.find({}).then(response=>{
+        response.map((value,index)=>{
+            const mindingData = {
+                studentMinding: value.studentMinding,
+                studentRanking: value.studentRanking
+            }
+            returnData.studentsMinding.push(mindingData)
+        })
+    })
+    await responsecontentmodel.find({}).then(response=>{
+        response.map((value,index)=>{
+            const responseData={
+                studentId : value.studentId,
+                week: value.week,
+                studentResponse:value.studentResponse,
+                teacherResponse:value.teacherResponse
+            }
+            returnData.studentsResponse.push(responseData)
+        })
+    })
+
+    res.send(returnData)
+})
 
 router.post(process.env.ROUTER_ADMIN_ADDSTUDENT,async (req,res)=>{   
     const saltRound = 15

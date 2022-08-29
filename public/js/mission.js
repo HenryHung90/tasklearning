@@ -103,11 +103,11 @@ function deleteSelectOption() {
             opacity: 0
         }, 300)
 
-        setTimeout((e) => {
+        setTimeout(async (e) => {
             $(optionDelete.currentTarget).remove()
             //刪除完後上傳
-            uploadStudentDecideSteps()
-        }, 800)
+            await uploadStudentDecideSteps()
+        }, 500)
     })
 }
 
@@ -222,42 +222,52 @@ function renderMissionDecidewhenLoading(studentSelect) {
 }
 
 //上傳策略暫存
-function uploadStudentDecideSteps() {
+async function uploadStudentDecideSteps() {
     const userId = $('#userId').html()
     const week = $('.WeekTitle').html().split(" ")[1]
     loadingPage(true)
 
-    axios({
-        method: "POST",
-        url: '/studentstage/missionuncomplete',
-        data: {
-            week: week
-        },
-        withCredentials: true,
-    }).then(response =>{
-        if(response.data == false){
-            window.alert('網路錯誤，請重新整理')
+
+    await axios.all([uploadDecide(), uncompleteNext()])
+    .then(axios.spread((acct,perms)=>{
+        if(!perms){
+            window.alert("網路錯誤，請重新整理")
         }
-    })
-    axios({
-        method: 'post',
-        url: '/student/addmission',
-        data: {
-            studentId: userId,
-            week: week,
-            studentSelect: getMissionStepsSelected(),
-        },
-        withCredentials: true
-    }).then((response) => {
-        if (!response.data) {
-            window.alert('網路錯誤，請重新整理')
-        } else if (response.data === 'data error') {
-            window.alert('資料錯誤，請重新整理')
-        } else {
-            loadingPage(false)
-        }
-    })
+        loadingPage(false)
+    }))
+
+    function uploadDecide(){
+        return axios({
+            method: 'post',
+            url: '/student/addmission',
+            data: {
+                studentId: userId,
+                week: week,
+                studentSelect: getMissionStepsSelected(),
+            },
+            withCredentials: true
+        }).then((response) => {
+            return response.data
+        })
+    }
+    
+    function uncompleteNext(){
+        return axios({
+            method: "POST",
+            url: '/studentstage/missionuncomplete',
+            data: {
+                week: week
+            },
+            withCredentials: true,
+        }).then(response => {
+            return response.data
+        })
+    }
+    
+
 }
+
+
 //確定整體策略後 調整Manage區域
 function uploadManage() {
     const userId = $('#userId').html()
@@ -394,11 +404,11 @@ function stepsSelectOption() {
         $(block).fadeIn(300)
         $(options).fadeIn(300)
         //建立Option 點擊偵測
-        $('.options').mousedown((e) => {
+        $('.options').mousedown(async (e) => {
             //確定選擇Option以及所屬Mission
             selectedStep(e.target.id, id)
             //上傳Steps
-            uploadStudentDecideSteps()
+            await uploadStudentDecideSteps()
         })
     }
 }
@@ -478,7 +488,7 @@ function dragMission() {
 
         $('.missionStep').fadeOut(100)
 
-        setTimeout(() => {
+        setTimeout(async () => {
             const step = $('.stepsSelect').find('.optionBox')
             //初始化StepsBox
             stepsSelect.empty().prepend(stepsSelectTemp)
@@ -488,7 +498,7 @@ function dragMission() {
             //綁定click事件
             stepsSelectOption()
             //上傳Steps
-            uploadStudentDecideSteps()
+            await uploadStudentDecideSteps()
             //設定刪除執行策略click事件
             deleteSelectOption()
         }, 300)

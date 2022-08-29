@@ -95,9 +95,7 @@ task.post(process.env.ROUTER_MAIN_LOGIN, (req, res, next) => {
         }
     })(req, res, next)
 })
-task.get('/', (req, res) => {
-    res.render('index')
-})
+
 //登出
 task.get(process.env.ROUTER_MAIN_LOGOUT, (req, res,next) => {
     req.logout((err)=>{
@@ -112,16 +110,22 @@ task.get(process.env.ROUTER_MAIN_LOGOUT, (req, res,next) => {
 //     next()
 // })
 let isAuthenticated = function (req, res, next) {
-    console.log(req.isAuthenticated())
     if (req.isAuthenticated()) return next()
     res.redirect('/')
 }
+task.get('/', (req, res) => {
+    if(req.user !== undefined){
+        res.redirect(`/dashboard/${req.user.studentId}`)
+    }else{
+        res.render('index')
+    }
+})
 //Stagepage
-task.use(process.env.ROUTER_MAIN_DASHBOARD,/*isAuthenticated,*/ dashboardRoutes)
+task.use(process.env.ROUTER_MAIN_DASHBOARD,isAuthenticated, dashboardRoutes)
 //stageCheck
-task.use(process.env.ROUTER_MAIN_STUDENTSTAGE, /*isAuthenticated,*/ stageCheckRoutes);
-//students
-task.use(process.env.ROUTER_MAIN_STUDENT, /*isAuthenticated,*/ studentRoutes)
+task.use(process.env.ROUTER_MAIN_STUDENTSTAGE, isAuthenticated ,stageCheckRoutes);
+//student
+task.use(process.env.ROUTER_MAIN_STUDENT, isAuthenticated, studentRoutes)
 //admin
 task.use(process.env.ROUTER_MAIN_ADMIN, adminRoutes);
 

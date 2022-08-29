@@ -26,6 +26,7 @@ const LoginFunc = (e) => {
             loadingPage(false)
             return
         }
+        loadingPage(false)
         window.location.href = res.data
     })
 }
@@ -43,6 +44,7 @@ function loadingPage(isOpen) {
 $('#loginNormal').click(e => {
     loadingPage(true)
     LoginFunc(e)
+    
 })
 
 $(document).ready(e =>{

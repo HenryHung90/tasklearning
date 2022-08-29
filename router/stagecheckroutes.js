@@ -86,17 +86,21 @@ router.post(process.env.ROUTER_STUDENTSTAGE_MISSIONUNCHECK,async(req,res)=>{
     let isSuccess = false
     //查找目前雲端之studentDetail
     await findStudentDetail(req.user.studentId).then(cloudData => { studentDetail = cloudData })
-    studentDetail[req.body.week - 1].Status.Mission = false
-    studentDetail[req.body.week - 1].Status.Manage = false
-    studentDetail[req.body.week - 1].Status.Minding = false
+    if (studentDetail[req.body.week - 1].Status.Manage = false){
+        res.send(true)
+    }else{
+        studentDetail[req.body.week - 1].Status.Mission = false
+        studentDetail[req.body.week - 1].Status.Manage = false
+        studentDetail[req.body.week - 1].Status.Minding = false
 
-    await studentConfig.updateOne({ studentId: req.user.studentId }, {
-        studentDetail: studentDetail
-    }).then((err, result) => {
-        if (err) isSuccess = false
-        else isSuccess = true
-    })
-    return isSuccess
+        await studentConfig.updateOne({ studentId: req.user.studentId }, {
+            studentDetail: studentDetail
+        }).then((result) => {
+            isSuccess = result.acknowledged
+        })
+        res.send(isSuccess)
+    }
+    
 })
 
 router.post(process.env.ROUTER_STUDENTSTAGE_DATACHECK, async (req, res) => {

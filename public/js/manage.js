@@ -25,10 +25,34 @@ async function loadingManageDetailFromData(mission) {
     }).then((response) => {
         data = Object.values(response.data.studentManage)
     })
-    if(missionStep === 'time'){
-        return data[missionId][data[missionId].length - 1]
-    }
+
     return data[missionId][missionStep]
+}
+
+//upload計畫內容
+function uploadManageData(currentStepId) {
+    if(currentStepId === null){
+        return
+    }
+    const curretnStepTemp = currentStepId.split("_")
+
+    const dataWeek = $('.WeekTitle').html().split(" ")[1]
+    const userId = $('#userId').html()
+    const manageId = curretnStepTemp[1]
+    const manageStep = curretnStepTemp[3]
+
+    return (axios({
+        method: 'post',
+        url: '/student/addmanage',
+        data: {
+            week: dataWeek,
+            studentId: userId,
+            manageId: manageId,
+            manageStep: manageStep,
+            manageContent: $('.manageDecideContent').val()
+        },
+        withCredentials: true
+    }))
 }
 
 //render 左側計畫選項欄
@@ -46,7 +70,7 @@ function renderManageSchedule(manageData) {
         for (let i = 1; i < data.length; i++) {
             returnData += `<div class="options" id="targetMission_${index}_option_${i}">${i}、${data[i]}</div>`
         }
-        returnData += `<div class="options" id="targetMission_${index}_option_time">${data.length}、時間管理</div>`
+        returnData += `<div class="options" id="targetMission_${index}_option_${data.length}">${data.length}、時間管理</div>`
         return returnData
     }
 
@@ -56,7 +80,7 @@ function renderManageSchedule(manageData) {
             id: `targetMission_${manageIndex}`,
             innerHTML: manageValue[0]
         })
-        
+
         const missionData = $('<div>').prop({
             className: 'missionBox_Data',
             innerHTML: renderMissionData(manageValue, manageIndex)
@@ -83,7 +107,7 @@ function renderManageSchedule(manageData) {
 //render 右側寫入執行計畫欄
 function renderManageDecide(currentStepId, currentStepTitle, currentContent) {
     const missionName = $(`#targetMission_${currentStepId.split('_')[1]}`).html()
-    const curretnStepTemp = currentStepId.split("_")
+
 
     //標頭
     const missionDecideTitle = $('<h3>').prop({
@@ -105,7 +129,7 @@ function renderManageDecide(currentStepId, currentStepTitle, currentContent) {
         'border': '1px dashed rgba(0,0,0,0.3)',
         'border-radius': '20px',
         'transition-duration': '0.5s',
-        'resize':'none'
+        'resize': 'none'
     }).hover((e) => {
         missionDecideContent.css({
             'transition-duration': '0.5s',
@@ -144,23 +168,7 @@ function renderManageDecide(currentStepId, currentStepTitle, currentContent) {
     }).click((e) => {
         e.stopPropagation()
         loadingPage(true)
-        const dataWeek = $('.WeekTitle').html().split(" ")[1]
-        const userId = $('#userId').html()
-        const manageId = curretnStepTemp[1]
-        const manageStep = curretnStepTemp[3]
-
-        axios({
-            method: 'post',
-            url: '/student/addmanage',
-            data: {
-                week: dataWeek,
-                studentId: userId,
-                manageId: manageId,
-                manageStep: manageStep,
-                manageContent: $('.manageDecideContent').val()
-            },
-            withCredentials: true
-        }).then((response) => {
+        uploadManageData(currentStepId).then((response) => {
             if (response.data == true) {
                 loadingPage(false)
             } else {
@@ -193,14 +201,16 @@ function renderManagePage(data) {
 //點擊option後生成安排區域
 function optionsClick() {
     const options = $('.options')
+    
     options.click((e) => {
         e.preventDefault()
+        const PrevOption = $('.Clicking')[0]
         //阻止重複點按
-        if(e.currentTarget.className == 'options Clicking'){
+        if (e.currentTarget.className == 'options Clicking') {
             $('.manageDecide').animate({
-                width:'90%',
-                height:'90%',
-                margin:'5% 5% 5% 5%',
+                width: '90%',
+                height: '90%',
+                margin: '5% 5% 5% 5%',
             }, 100)
             .animate({
                 width: '100%',
@@ -209,7 +219,9 @@ function optionsClick() {
             }, 100)
             return
         }
-
+        //防止使用者點了忘記儲存
+        uploadManageData(PrevOption ? PrevOption.id : null)
+        
         const targetId = e.currentTarget.id
         const targetTitle = e.currentTarget.innerHTML
         let targetContent = ""
@@ -220,13 +232,14 @@ function optionsClick() {
             //任務安排區域
             const manageDecide = $('.manageUserDecide')
             manageDecide.fadeOut(100)
-            
+
             setTimeout((e) => {
                 manageDecide.empty()
                 manageDecide.append(renderManageDecide(targetId, targetTitle, targetContent))
                 manageDecide.fadeIn(300)
             }, 200)
         })
+
         //option highlighting select
         $('.options').css({ 'background-color': 'rgb(200,200,200)' }).removeClass('Clicking')
         $(`#${targetId}`).css({ 'background-color': 'rgba(255, 0, 0, 0.5)' }).addClass('Clicking')
@@ -242,9 +255,9 @@ function loadingManage() {
     axios({
         method: 'post',
         url: '/studentstage/checkstage',
-        withCredentials:true
-    }).then(response=>{
-        if(!response.data[dataWeek - 1].Status.Mission){
+        withCredentials: true
+    }).then(response => {
+        if (!response.data[dataWeek - 1].Status.Mission) {
             window.alert("尚未完成本周目標與策略制定\n請在變更本周目標後再次按下 安排完畢")
             window.location.href = `/dashboard/${userId}`
         }

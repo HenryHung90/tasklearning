@@ -157,7 +157,8 @@ function loadResponse(){
         },
         withCredentials:true
     }).then(response=>{
-        if(response.data == null){
+        console.log(response.data)
+        if(response.data == null || response.data == ""){
             window.alert("老師尚未給予回饋")
             window.location.href = `/dashboard/${userId}`
         }

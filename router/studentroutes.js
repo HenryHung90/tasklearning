@@ -1,6 +1,5 @@
 const express = require('express')
 const router = express.Router()
-const bcrypt = require('bcryptjs')
 
 const datacontentmodel = require('../models/datacontentmodel')
 const missioncontentmodel = require('../models/missioncontentmodel')
@@ -94,8 +93,8 @@ router.post(process.env.ROUTER_STUDENT_READMINDING, async (req, res) => {
         }
     })
 })
-router.post(process.env.ROUTER_STUDENT_READRESPONSE,async (req,res)=>{
-    responsecontentmodel.findOne({ week: req.body.week, studentId: req.body.studentId}).then(response=>{
+router.post(process.env.ROUTER_STUDENT_READRESPONSE, async (req, res) => {
+    responsecontentmodel.findOne({ week: req.body.week, studentId: req.body.studentId }).then(response => {
         res.send(response)
     })
 })
@@ -196,11 +195,8 @@ router.post(process.env.ROUTER_STUDENT_ADDMANAGE, async (req, res) => {
         cloudData = Object.values(response.studentManage)
     })
 
-    if (req.body.manageStep !== 'time') {
-        cloudData[req.body.manageId][req.body.manageStep] = req.body.manageContent
-    } else {
-        cloudData[req.body.manageId][cloudData[req.body.manageId].length] = req.body.manageContent
-    }
+    cloudData[req.body.manageId][req.body.manageStep] = req.body.manageContent
+
 
     await studentmanage.updateOne({ week: req.body.week, studentId: req.body.studentId }, { studentManage: cloudData }).then(response => {
         res.send(response.acknowledged)
@@ -218,8 +214,8 @@ router.post(process.env.ROUTER_STUDENT_ADDMINDING, async (req, res) => {
         })
 })
 router.post(process.env.ROUTER_STUDENT_ADDRESPONSE, async (req, res) => {
-    responsecontentmodel.updateOne({ studentId: req.body.studentId, week: req.body.week},
-        {studentResponse:req.body.studentResponse}).then((response)=>{
+    responsecontentmodel.updateOne({ studentId: req.body.studentId, week: req.body.week },
+        { studentResponse: req.body.studentResponse }).then((response) => {
             res.send(response.acknowledged)
         })
 })
