@@ -4,7 +4,7 @@ head
     link(rel='preconnect' href='https://fonts.gstatic.com' crossorigin) 
     link(href='https://fonts.googleapis.com/css2?family=Silkscreen&display=swap' rel='stylesheet')
     link(rel="stylesheet" href='../css/admin.css')
-    
+
     script(src='https://code.jquery.com/jquery-3.6.0.js' integrity='sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=' crossorigin='anonymous')
     link(href='https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css' rel='stylesheet' integrity='sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU' crossorigin='anonymous')
     script(src='https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js' integrity='sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ' crossorigin='anonymous')
@@ -16,9 +16,9 @@ body
 .ProgramBar
     .ProgramBtn
         h3.ProgramTitle#Home 管理介面
-        .ProgramDiv#Student 學生名單 
+        .ProgramDiv#Student 學生名單
         .ProgramDiv#Data 資料與任務管理
-        .ProgramDiv#Response 師生回饋 
+        .ProgramDiv#Response 師生回饋
     .ProgramLogout
         .ProgramLogoutBtn 
             button#logoutBtn.btn.btn-info(type='button' style='height:7vh;width:80%')
@@ -30,6 +30,13 @@ body
         span#StatusTitle Total Status Count
     .weekStatus_div 
         span#StatusTitle Week Status Count
-        .weekSelect
-    
+        .weekSelect#weekStatusSelect
+    .weekMission_div 
+        span#StatusTitle Week Task Count
+        .weekSelect#weekMissionSelect
+    .weekMindingScore_div 
+        span#StatusTitle Week Reflection Average
+        .weekSelect#weekMindingScoreSelect
+
 script(src="../js/admin.js") 
+script(src="../js/admin_student.js") 

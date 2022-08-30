@@ -221,22 +221,22 @@ function renderProgressBar(week,stage){
             stageProgress += 0.2
             switch(index){
                 case 0:
-                    targetText.html("Mission").css({
+                    targetText.html("Task").css({
                         'color': 'rgba(84, 10, 163, 0.8)'
                     })
                     break
                 case 1:
-                    targetText.html("Manage").css({
+                    targetText.html("Plane").css({
                         'color': 'rgba(84, 10, 163, 0.8)'
                     })
                     break
                 case 2:
-                    targetText.html("Minding").css({
+                    targetText.html("Reflection").css({
                         'color': 'rgba(84, 10, 163, 0.8)'
                     })
                     break
                 case 3:
-                    targetText.html("Response").css({
+                    targetText.html("Feedback").css({
                         'color': 'rgba(84, 10, 163, 0.8)'
                     })
                     break

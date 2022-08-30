@@ -16,7 +16,8 @@ function logoutFunc() {
         window.location.href = response.data
     })
 }
-function loadingStudentDetail(){
+//取得學生Detail
+function loadingStudentDetail() {
     return (axios({
         method: 'post',
         url: '/admin/readStudentStatus',
@@ -41,6 +42,9 @@ function switchIdtoName(Id) {
             break
         case 'Response':
             text = "師生回饋"
+            break
+        case 'Score':
+            text= ""
             break
     }
     return text
@@ -71,10 +75,10 @@ function renderProgressBarContainer(statusName) {
     }))
 }
 //return ProgressBar生成
-function renderProgressBar(statusName, statusIndex, total, count) {
-    const targetContainer = document.querySelector(statusName)
+function renderProgressBar(name, index, total, count) {
+    const targetContainer = document.querySelector(name)
     const percentageBar = new ProgressBar.SemiCircle(targetContainer, {
-        id:statusName,
+        id: name,
         strokeWidth: 6,
         color: '#F75000',
         trailColor: '#ADADAD',
@@ -101,43 +105,82 @@ function renderProgressBar(statusName, statusIndex, total, count) {
     percentageBar.text.style.fontFamily = '"Silkscreen",cursive';
     percentageBar.text.style.fontSize = '2rem';
 
-    percentageBar.animate(count[statusIndex] / total)
+    if (name.split("_")[0] == '#mission') {
+        //for mission 生成 因為各個任務有個自的母數
+        if (count[index] == 0 && total[index] == 0) {
+            percentageBar.animate(0)
+        } else {
+            percentageBar.animate(count[index] / total[index])
+        }
+    }else if (name.split("_")[0] == '#minding'){
+        //自我評分僅有一項
+        if (count == 0 && total == 0) {
+            percentageBar.animate(0)
+        }else{
+            percentageBar.animate(count / total)
+        }
+    } else {
+        //for status 生成
+        percentageBar.animate(count[index] / total)
+    }
 }
 //return 周status的Selection
-function renderWeekStatusSelection() {
+function renderWeekStatusSelection(Id, target, appendTarget) {
     const weekStatusSwitch = $('<select>').prop({
         className: "form-select",
+        id: Id,
         ariaLabel: "Default select example"
     }).css({
         'width': '20%',
         'margin': '0'
     }).change((e) => {
         changeWeektoRenderProgressBar(weekStatusSwitch.val())
-    }).appendTo($('.weekSelect'))
+    }).appendTo($(appendTarget))
     for (let i = 1; i <= 5; i++) {
-            $('<option>').prop({
-                value: i,
-                innerHTML: `Week ${i}`
-            }).appendTo(weekStatusSwitch)
+        $('<option>').prop({
+            value: i,
+            innerHTML: `Week ${i}`
+        }).appendTo(weekStatusSwitch)
 
     }
     //設定Select到本周
     weekStatusSwitch.val(weekCount())
 
     //選擇Week後重新生成ProgressBar
-    function changeWeektoRenderProgressBar(week){
+    function changeWeektoRenderProgressBar(week) {
         loadingPage(true)
-        $('.week_StatusCompletePercentage').fadeOut(100)
+        $(target).fadeOut(100)
         weekStatusSwitch.prop('disabled', 'disabled')
-
         setTimeout(() => {
-            $('.week_StatusCompletePercentage').remove()
+            $(target).remove()
             weekStatusSwitch.prop('disabled', false)
-            $('.weekStatus_div').append(renderWeek_StatusCompletePercentage())
-            loadingStudentDetail().then(response=>{
-                weekStatusProgress(response.data.studentsStatus,week)
-                loadingPage(false)
-            })
+
+            switch (Id) {
+                case 'week_Status':
+                    $('.weekStatus_div').append(renderWeek_StatusCompletePercentage())
+                    loadingStudentDetail().then(response => {
+                        weekStatusProgress(response.data.studentsStatus, week)
+                        loadingPage(false)
+                    })
+                    break
+                case 'week_MissionConut':
+                    loadingStudentDetail().then(response => {
+                        $('.weekMission_div').append(renderWeek_MissionCompletePercentage(response.data.studentsMission, week))
+                        return response
+                    }).then(response => {
+                        weekMissionProgress(response.data.studentsMission, response.data.studentsMinding, week)
+                        loadingPage(false)
+                    })
+                    break
+                case 'week_mindingSelf':
+                    $('.weekMindingScore_div').append(renderWeek_MindingSelfEvaluationAveraged())
+                    loadingStudentDetail().then(response => {
+                        weekMindingScoreProgress(response.data.studentsMinding, week)
+                        loadingPage(false)
+                    })
+                    break
+            }
+
         }, 300)
     }
 }
@@ -153,13 +196,13 @@ function renderTotal_StatusCompletePercentage() {
     })
     return totalStatusContainer
 }
-//render 周Status完成度
+//render 周Status完成度框架
 function renderWeek_StatusCompletePercentage() {
     //總Status Container
     const weekStatusContainer = renderStatusCountDiv('week_StatusCompletePercentage')
     //Select部分
-    if($('.form-select').html() == undefined){
-        renderWeekStatusSelection()
+    if ($('#week_Status').html() == undefined) {
+        renderWeekStatusSelection('week_Status', '.week_StatusCompletePercentage', '#weekStatusSelect')
     }
     //Status
     const statusId = ['week_Data', 'week_Mission', 'week_Manage', 'week_Minding', 'week_Response']
@@ -169,17 +212,39 @@ function renderWeek_StatusCompletePercentage() {
 
     return weekStatusContainer
 }
-//render 周任務完成度
-function renderWeek_MissionCompletePercentage() {
+//render 周任務完成度框架
+function renderWeek_MissionCompletePercentage(Mission, Week) {
+    const weekMissionContainer = renderStatusCountDiv('week_MissionCompletePercentage')
 
+    if ($('#week_MissionConut').html() == undefined) {
+        renderWeekStatusSelection('week_MissionConut', '.week_MissionCompletePercentage', '#weekMissionSelect')
+    }
+    Mission.map((missionValue, missionIndex) => {
+        if (missionValue.week == Week) {
+            missionValue.mission.map((value, index) => {
+                $('<div>').prop({
+                    className: 'statusProgressDiv',
+                    id: `mission_${index}`,
+                    innerHTML: `<h5>${value.title}</h5>`
+                }).appendTo(weekMissionContainer)
+            })
+        }
+    })
+
+    return weekMissionContainer
 }
-//render 周自我評價均分
+//render 周自我評價均分框架
 function renderWeek_MindingSelfEvaluationAveraged() {
+    //總MindingSelf Container
+    const mindingSelfContainer = renderStatusCountDiv('week_MindingSelfEvaluationAveraged')
+    //Select部分
+    if ($('#week_mindingSelf').html() == undefined) {
+        renderWeekStatusSelection('week_mindingSelf', '.week_MindingSelfEvaluationAveraged', '#weekMindingScoreSelect')
+    }
+    //MindingSelf
+    renderProgressBarContainer('minding_Score').appendTo(mindingSelfContainer)
 
-}
-//render Response
-function renderResponse() {
-
+    return mindingSelfContainer
 }
 ////////////////////////////////////
 //TotalStatus ProgressBar
@@ -231,12 +296,57 @@ function weekStatusProgress(Status, Week) {
     })
 }
 //WeekMission ProgressBar
-function weekMissionProgress(Minding) {
+function weekMissionProgress(Mission, Minding, Week) {
+    //紀錄mission數量及Id
+    let missionId = []
+    //紀錄mission被選次數
+    let missionSelectCount = []
+    //紀錄最後mission完成數量
+    let missionCompleteCount = []
+
+    //建立Model
+    Mission.map((missionValue, missionIndex) => {
+        if (missionValue.week == Week) {
+            missionValue.mission.map((value, index) => {
+                missionId.push(`#mission_${index}`)
+                missionSelectCount.push(0)
+                missionCompleteCount.push(0)
+            })
+        }
+    })
+    //計算數量
+    Minding.map((mindingValue, mindingIndex) => {
+        if (mindingValue.week == Week) {
+            //原studentMinding為Object 轉 Array
+            const targetValue = Object.values(mindingValue.studentMinding)
+            targetValue.map((value, index) => {
+                missionSelectCount[parseInt(value.missionName)]++
+                if (value.missionComplete == true) {
+                    missionCompleteCount[parseInt(value.missionName)]++
+                }
+            })
+        }
+    })
+    missionId.map((missionName, missionIndex) => {
+        renderProgressBar(missionName, missionIndex, missionSelectCount, missionCompleteCount)
+    })
+
 
 }
 //WeekMindingScore ProgressBar
-function weekMindingScoreProgress(Minding) {
-
+function weekMindingScoreProgress(Minding,Week) {
+    let mindingTotal = 0
+    let studentMindingTotal = 0
+    Minding.map((mindingValue,mindingIndex)=>{
+        if(mindingValue.week == Week){
+            mindingTotal += 5
+            if(mindingValue.studentRanking !== undefined){
+                studentMindingTotal += parseInt(mindingValue.studentRanking)
+            }
+        }
+    })
+    console.log(mindingTotal,studentMindingTotal)
+    renderProgressBar('#minding_Score',0,mindingTotal,studentMindingTotal)
 }
 ////////////////////////////////////
 //render AdminMainPage main function
@@ -247,29 +357,26 @@ function renderAdminMainPage(studentData) {
     //周Status完成度
     $('.weekStatus_div').append(renderWeek_StatusCompletePercentage())
     //周任務完成度
-    //totalStatus.append(renderWeek_MissionCompletePercentage())
+    $('.weekMission_div').append(renderWeek_MissionCompletePercentage(studentData.studentsMission, weekCount()))
     //周自我評價均分
-    //totalStatus.append(renderWeek_MindingSelfEvaluationAveraged())
-    //Response
-    //totalStatus.append(renderResponse())
+    $('.weekMindingScore_div').append(renderWeek_MindingSelfEvaluationAveraged())
 }
-
 //loading AdminMainPage main function
 function loadingAdminPage() {
     loadingStudentDetail()
-    .then(response => {
-        renderAdminMainPage(response.data)
-        return response.data
-    }).then(response => {
-        const nowWeek = weekCount()
+        .then(response => {
+            renderAdminMainPage(response.data)
+            return response.data
+        }).then(response => {
+            const nowWeek = weekCount()
 
-        totalStatusProgress(response.studentsStatus)
-        weekStatusProgress(response.studentsStatus, nowWeek)
-        weekMissionProgress(response.studentsMinding, nowWeek)
-        weekMindingScoreProgress(response.studentsMinding, nowWeek)
+            totalStatusProgress(response.studentsStatus)
+            weekStatusProgress(response.studentsStatus, nowWeek)
+            weekMissionProgress(response.studentsMission, response.studentsMinding, nowWeek)
+            weekMindingScoreProgress(response.studentsMinding, nowWeek)
 
-        loadingPage(false)
-    })
+            loadingPage(false)
+        })
 }
 $(window).ready((e) => {
     loadingAdminPage()
@@ -277,4 +384,7 @@ $(window).ready((e) => {
 })
 $(`#logoutBtn`).click(() => {
     logoutFunc()
+})
+$(`#Home`).click((e)=>{
+    location.reload()
 })

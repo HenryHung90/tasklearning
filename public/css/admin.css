@@ -5,7 +5,7 @@ body {
   overflow-x: hidden;
 }
 .loading {
-  position: absolute;
+  position: fixed;
   width: 100vw;
   height: 100vh;
   background-color: rgba(0, 0, 0, 0.3);
@@ -41,6 +41,7 @@ body {
   height: 7vh;
   line-height: 7vh;
   font-weight: 1000;
+  cursor: pointer;
 }
 .ProgramDiv {
   transition-duration: 0.3s;
@@ -51,6 +52,7 @@ body {
   line-height: 7vh;
   font-weight: 1000;
   border-radius: 10px;
+  cursor: pointer;
 }
 .ProgramDiv:hover {
   transition-duration: 0.3s;
@@ -62,21 +64,21 @@ body {
 }
 .adminContainer {
   margin-top: 15px;
+  margin-bottom: 30px;
   width: 100vw;
-  height: 93vh;
 }
-#StatusTitle{
-  font-family: 'Silkscreen', cursive;
+#StatusTitle {
+  font-family: "Silkscreen", cursive;
   font-size: 2em;
-  font-weight:bolder;
+  font-weight: bolder;
 }
 .totalStatus_div {
   margin: 0 auto;
-  width:95vw;
+  width: 95vw;
   padding: 10px 10px;
   height: 300px;
-  background-color: rgba(255,255,255,0.7);
-  text-align:center;
+  background-color: rgba(255, 255, 255, 0.7);
+  text-align: center;
 }
 .statusProgressDiv {
   width: 15%;
@@ -84,14 +86,40 @@ body {
   text-align: center;
 }
 
+.form-select {
+  cursor: pointer;
+}
+
 .weekStatus_div {
   margin: 0 auto;
-  margin-top:30px;
-  width:95vw;
+  margin-top: 30px;
+  width: 95vw;
   padding: 10px 10px;
   height: 340px;
-  background-color: rgba(255,255,255,0.7);
-  text-align:center;
+  background-color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+}
+
+.weekMission_div {
+  margin: 0 auto;
+  margin-top: 30px;
+  width: 95vw;
+  padding: 10px 10px;
+  height: 340px;
+  background-color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+}
+.weekMindingScore_div {
+  margin: 0 auto;
+  margin-top: 30px;
+  width: 50vw;
+  padding: 10px 10px;
+  height: 340px;
+  background-color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+}
+#minding_Score{
+  width: 25% !important;
 }
 
 @media (max-width: 1500px) {
