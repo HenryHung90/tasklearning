@@ -217,7 +217,7 @@ function renderProgressBar(week,stage){
     })
     let stageProgress = 0
     stage.map((val, index) => {
-        if (val == true || val == 2) {
+        if (val === true || val == 2) {
             stageProgress += 0.2
             switch(index){
                 case 0:

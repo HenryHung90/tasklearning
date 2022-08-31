@@ -345,7 +345,6 @@ function weekMindingScoreProgress(Minding,Week) {
             }
         }
     })
-    console.log(mindingTotal,studentMindingTotal)
     renderProgressBar('#minding_Score',0,mindingTotal,studentMindingTotal)
 }
 ////////////////////////////////////

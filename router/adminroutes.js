@@ -75,7 +75,6 @@ router.post(process.env.ROUTER_ADMIN_READSTUDENTSTATUS, async (req, res) => {
 })
 router.post(process.env.ROUTER_ADMIN_READSTUDENTS, async (req, res) => {
     studentsConfig.find({}).then(response => {
-        console.log(response)
         const returnData = []
         response.map((value, index) => {
             if (value.studentName != "Admin") {
@@ -90,6 +89,36 @@ router.post(process.env.ROUTER_ADMIN_READSTUDENTS, async (req, res) => {
         })
         res.send(returnData)
     })
+})
+router.post(process.env.ROUTER_ADMIN_READMANAGESTATUS,async (req, res) => {
+    const returnData = {
+        mission:[],
+        manage:[],
+    }
+    await missioncontentmodel.find({}).then(response=>{
+        response.map((value,index)=>{
+            const missionData ={
+                week: value.week,
+                mission: value.mission
+            }  
+            returnData.mission.push(missionData)
+        })
+    })
+
+    await studentmission.find({}).then(response=>{
+        response.map((value,index)=>{
+            const selectData = {
+                week: value.week,
+                studentId:value.studentId,
+                select:value.studentSelect
+            }
+            returnData.manage.push(selectData)
+        })
+    })
+    await studentmanage.find({}).then(response => {
+        
+    })
+    res.send(returnData)
 })
 
 router.post(process.env.ROUTER_ADMIN_ADDSTUDENT, async (req, res) => {

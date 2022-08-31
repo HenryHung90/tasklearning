@@ -118,8 +118,12 @@ body {
   background-color: rgba(255, 255, 255, 0.7);
   text-align: center;
 }
-#minding_Score{
+#minding_Score {
   width: 25% !important;
+}
+.studentBtnContainer h1 {
+  font-family: "Silkscreen", cursive;
+  font-weight: bolder;
 }
 
 @media (max-width: 1500px) {
