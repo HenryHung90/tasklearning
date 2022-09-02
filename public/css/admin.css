@@ -125,6 +125,42 @@ body {
   font-family: "Silkscreen", cursive;
   font-weight: bolder;
 }
+.studentData_Number {
+  width: 10%;
+  height: 70px;
+  line-height: 65px;
+  font-size: 30px;
+  font-family: "Silkscreen", cursive;
+  font-weight: bolder;
+}
+.studentData_Id {
+  width: 10%;
+  height: 70px;
+  line-height: 65px;
+  font-size: 30px;
+  font-family: "Silkscreen", cursive;
+  font-weight: bolder;
+}
+.studentData_Name {
+  width: 10%;
+  height: 70px;
+  line-height: 70px;
+  font-size: 25px;
+  font-weight: bolder;
+}
+.studentData_Email {
+  width: 12%;
+  height: 70px;
+  line-height: 70px;
+  font-size: 15px;
+}
+.studentData_Setting {
+  width: 15%;
+  height: 50px;
+  margin-top: 15px;
+  display: flex;
+  justify-content: space-around;
+}
 
 @media (max-width: 1500px) {
   .ProgramBtn {

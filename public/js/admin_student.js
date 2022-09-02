@@ -13,9 +13,32 @@ function loadingAllManageStatus() {
         url: '/admin/readmanagestatus'
     }))
 }
+//return deleteStudent
+async function uploadDeleteStudent(studentId) {
+    return (
+        axios({
+            method: 'POST',
+            url: '/admin/deleteStudent',
+            data: {
+                studentId: studentId
+            },
+            withCredentials: true
+        })
+    )
+}
+//return addStudent
+function uploadSingleStudent(studentData) {
+    {
+        return (axios({
+            method: 'POST',
+            url: '/admin/addstudent',
+            data: studentData
+        }))
+    }
+}
 //----------------------------------
-//return stundetList
-function studentListGenerate(studentList){
+//return stundentList
+function studentListGenerate(studentList) {
     let member = []
     studentList.map((listValue, listIndex) => {
         let data = {
@@ -46,55 +69,78 @@ function studentListGenerate(studentList){
     })
     return member
 }
-function studentManageStatusGenerate(Mission,Manage){
-    console.log(Mission,Manage)
+//return studentManage Data
+function studentManageStatusGenerate(Mission, Manage) {
     //最終回傳陣列
     let returnWorkSheet = []
-    //每周資料格式
-    let manageStatusWorkSheet = {
-        studentId: ''
-    }
-    //建立每周資料格式後續格子
-    Mission.mission.map((missionValue,missionIndex)=>{
-        manageStatusWorkSheet[missionValue.title] = ''
+    Manage.map((studentValue, studentIndex) => {
+        //每周資料格式
+        let manageStatusWorkSheet = {
+            "學號": ''
+        }
+        //Manage資料對位使用
+        let missionPostion = []
+        //建立每周資料格式後續格子
+        Mission.mission.map((missionValue, missionIndex) => {
+            manageStatusWorkSheet[missionValue.title] = ''
+            missionPostion.push(missionValue.title)
+        })
+
+        if (studentValue.week == Mission.week) {
+            manageStatusWorkSheet["學號"] = studentValue.studentId
+
+            const manageData = Object.values(studentValue.manage)
+            manageData.map((dataValue, dataIndex) => {
+                const insertData = dataValue.join("").split("\n").join("////")
+
+                manageStatusWorkSheet[missionPostion[dataValue[0]]] = insertData
+            })
+
+            returnWorkSheet.push(manageStatusWorkSheet)
+        }
     })
-    console.log(Mission.week,manageStatusWorkSheet)
-
-
+    return returnWorkSheet
 }
 //return Download xlsx
-function downloadDatatoExcel(workbookTitle, worksheetData, worksheetName){
-    worksheetData.map((dataValue,dataIndex)=>{
-        const worksheet = XLSX.utils.json_to_sheet(dataValue);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, worksheetName[dataIndex]);
-        //Buffer
-        let buffer = XLSX.write(workbook, { book_type: "xlsx", type: "buffer" });
-        //Binary string
-        XLSX.write(workbook, { book_type: "xlsx", type: "binary" });
-        const Month = new Date().getMonth();
-        const Today = new Date().getDate();
-        XLSX.writeFile(workbook, `Student_${workbookTitle}_${Month}\/${Today}.xlsx`);
+async function downloadDatatoExcel(workbookTitle, worksheetData, worksheetName) {
+    worksheetData.map((dataValue, dataIndex) => {
+        if (dataIndex == 0) {
+            console.log(dataValue)
+            const worksheet = XLSX.utils.json_to_sheet(dataValue)
+            const workbook = XLSX.utils.book_new();
+
+            XLSX.utils.book_append_sheet(workbook, worksheet, worksheetName[dataIndex]);
+            //Binary string
+            // XLSX.write(workbook, { book_type: "xlsx", type: "binary" });
+            const Month = new Date().getMonth();
+            const Today = new Date().getDate();
+            XLSX.writeFile(workbook, `Student_${workbookTitle}_${Month}\/${Today}.xlsx`);
+        }
     })
 }
-
+//return window cofirm
+function comfirmClick(Name) {
+    return (
+        window.confirm(`確定 ${Name} ?`)
+    )
+}
+//Click Function----------------------------------
 //下載學員任務資料
-const downloadManageStatus = (manageStatus) =>{
+const downloadManageStatus = (manageStatus) => {
     //每周資料個別推入
     let generateData = []
     //每周資料表頭名稱(週數)推入
     let generateTitle = []
 
-    manageStatus.mission.map((missionValue,missionIndex)=>{
-        generateData.push(studentManageStatusGenerate(missionValue,manageStatus.manage))
+    manageStatus.mission.map((missionValue, missionIndex) => {
+        generateData.push(studentManageStatusGenerate(missionValue, manageStatus.manage))
         generateTitle.push(`周 ${missionValue.week}`)
     })
-
-    // downloadDatatoExcel("Task",generateData,generateTitle)
+    downloadDatatoExcel("Task", generateData, generateTitle)
 }
 //批量下載學員
 const DownloadMember = (studentList) => {
-    downloadDatatoExcel('Detail',[studentListGenerate(studentList)],["學生資料"])
+    downloadDatatoExcel('Detail', [studentListGenerate(studentList)], ["學生資料"])
 };
 //批量上傳學員
 const UploadMember = (e) => {
@@ -130,7 +176,99 @@ const UploadMember = (e) => {
     };
     reader.readAsBinaryString(file);
 };
+//新增學生頁面
+function addNewStudentPage() {
+    let studentId = window.prompt("新增學生學號", '')
+    if (studentId == null) {
+        window.alert("取消")
+        return
+    }
+    let studentPassword = window.prompt("新增學生密碼", '')
+    if (studentPassword == null) {
+        window.alert("取消")
+        return
+    }
+    let studentName = window.prompt("新增學生姓名", '')
+    if (studentName == null) {
+        window.alert("取消")
+        return
+    }
+    let studentEmail = window.prompt("新增學生Email", '')
+    if (studentEmail == null) {
+        window.alert("取消")
+        return
+    }
 
+    if (studentId == null ||
+        studentPassword == null ||
+        studentName == null ||
+        studentEmail == null) {
+        window.alert("有值為空值")
+        return
+    }
+    if (isNaN(studentId)) {
+        window.alert("學生學號應為純數字")
+        return
+    }
+    const studentData = {
+        studentId: studentId,
+        studentName: studentName,
+        studentPassword: studentPassword,
+        studentEmail: studentEmail
+    }
+
+    uploadSingleStudent(studentData).then(response => {
+        if (response.data == 'user exist') {
+            window.alert(`學生 ${studentName} 已存在`)
+            return
+        }
+        let alertText = "新增完成\n" + `學號 : ${studentId}\n` +
+            `姓名 : ${studentName}\n` + `密碼 : ${studentPassword}\n` +
+            `信箱 : ${studentEmail}`
+
+        loadingAllStudent().then(response => {
+            reloadStudentList(response.data, alertText)
+        })
+    })
+}
+//新增 / 修改 / 刪除 後重整StudentList
+function reloadStudentList(studentData, alertText) {
+    $('.studentListDiv').fadeOut(100)
+    loadingPage(true)
+    setTimeout(() => {
+        $('.studentListDiv').remove()
+        $('.adminContainer').append(renderStudentList(studentData))
+        $('.studentListDiv').css({ 'display': 'none' })
+        $('.studentListDiv').fadeIn(200)
+        setTimeout(() => {
+            window.alert(alertText)
+            loadingPage(false)
+        }, 200)
+    }, 200)
+}
+//修改密碼
+function changeStudentPassword(Id) {
+    let newPassword = window.prompt("請輸入新密碼", '')
+    if (newPassword == null) {
+        window.alert("密碼不得為空")
+        return
+    }
+    if (comfirmClick(`新密碼 : ${newPassword}`)) {
+        axios({
+            method: 'POST',
+            url: '/admin/changepassword',
+            data: {
+                studentId:Id,
+                studentPassword: newPassword
+            },
+            withCredentials: true
+        }).then(response=>{
+            console.log(response.data)
+        })
+    }
+}
+//-----------------------------------------------
+//render 上層按鈕列表
 function renderStudentPageBtn() {
     //下載學生Manage資料
     const downloadManageStatusBtn = $('<button>').prop({
@@ -140,7 +278,7 @@ function renderStudentPageBtn() {
     }).css({
         'width': '10%'
     }).click((e) => {
-        loadingAllManageStatus().then(response=>{
+        loadingAllManageStatus().then(response => {
             downloadManageStatus(response.data)
         })
     })
@@ -168,7 +306,7 @@ function renderStudentPageBtn() {
     })
     //學生名單上下載區
     const uploadandDownloadStudentContainer = $('<div>').prop({
-        className:'uploadandDownloadStudentContainer'
+        className: 'uploadandDownloadStudentContainer'
     }).css({
         'width': '35%',
         'display': 'flex'
@@ -180,6 +318,8 @@ function renderStudentPageBtn() {
         innerHTML: '新增學生'
     }).css({
         'width': '8%'
+    }).click((e) => {
+        addNewStudentPage()
     })
 
     //Btn Container
@@ -207,11 +347,112 @@ function renderStudentPageBtn() {
 
     return studentBtnDiv
 }
+//render Student各自的框框
+function renderStudentList(studentDetail) {
+    //學生資料外框
+    const studentListDiv = $('<div>').prop({
+        className: 'studentListDiv',
+    }).css({
+        'width': '100vw',
+        'margin': '0 auto',
+        'margin-top': '30px',
+    })
+    studentDetail.map((studentData, studentIndex) => {
+        //學生序號
+        const studentNumber = $('<div>').prop({
+            className: 'studentData_Number',
+            id: `studentNumber_${studentIndex}`,
+            innerHTML: `S-${studentIndex}`
+        })
+        //學生ID
+        const studentId = $('<div>').prop({
+            className: 'studentData_Id',
+            id: `studentId_${studentIndex}`,
+            innerHTML: studentData.studentId
+        })
+        //學生姓名
+        const studentName = $('<div>').prop({
+            className: 'studentData_Name',
+            id: `studentName_${studentIndex}`,
+            innerHTML: studentData.studentName
+        })
+        //學生Email
+        const studentEmail = $('<div>').prop({
+            className: 'studentData_Email',
+            innerHTML: studentData.studentEmail
+        })
 
-function renderStudentList(studentData) {
-    console.log(studentData)
+
+        const studentPassword = $('<button>').prop({
+            className: 'btn btn-primary',
+            innerHTML: "變更密碼"
+        }).css({
+            'width': '35%',
+            'height': '40px',
+        }).click((e)=>{
+            changeStudentPassword(studentData.studentId)
+        })
+        const studentEdit = $('<button>').prop({
+            className: 'btn btn-secondary',
+            innerHTML: '修改'
+        }).css({
+            'width': '30%',
+            'height': '40px',
+        })
+        const studentDelete = $('<button>').prop({
+            className: 'btn btn-danger',
+            innerHTML: '刪除'
+        }).css({
+            'width': '30%',
+            'height': '40px',
+        }).click((e) => {
+            if (comfirmClick(`刪除 ${studentData.studentName}`)) {
+                uploadDeleteStudent(studentData.studentId).then(response => {
+                    let deleteStatusMsg = "資料刪除狀態\n" +
+                        "學生帳號 : " + response.data.deleteStatus["學生帳號"] +
+                        "\n學生Feedback : " + response.data.deleteStatus["學生Feedback"] +
+                        "\n學生Task : " + response.data.deleteStatus["學生Task"] +
+                        "\n學生Plan : " + response.data.deleteStatus["學生Plan"] +
+                        "\n學生Reflection : " + response.data.deleteStatus["學生Reflection"]
+
+                    reloadStudentList(response.data.newStudentData, deleteStatusMsg)
+                })
+            }
+        })
+        //設定學生//
+        const studentSetting = $('<div>').prop({
+            className: 'studentData_Setting'
+        }).append(studentPassword).append(studentEdit).append(studentDelete)
+
+        //學生資料表格框
+        $('<div>').prop({
+            className: 'studentDataContainer',
+            id: `student_${studentIndex}`
+        }).css({
+            'width': '95vw',
+            'background-color': 'rgba(255,255,255,0.9)',
+            'border': '3px solid rgb(161, 160, 158)',
+            'border-radius': '20px',
+            'height': '70px',
+            'display': 'flex',
+            'justify-content': 'space-around',
+            'margin': '0 auto',
+            'margin-bottom': '15px',
+            'text-align': 'center',
+            'user-select': 'none'
+        })
+            .append(studentNumber)
+            .append(studentId)
+            .append(studentName)
+            .append(studentEmail)
+            .append(studentSetting)
+            .appendTo(studentListDiv)
+    })
+
+    return studentListDiv
 }
-
+//main function---------------------------------
+//render stundetList main function
 function renderAdminStudentPage(studentData) {
     const pageContainer = $('.adminContainer')
 
@@ -220,7 +461,7 @@ function renderAdminStudentPage(studentData) {
     //產生學生列表
     pageContainer.append(renderStudentList(studentData))
 }
-
+//loading stundetList main function
 function loadingStudent() {
     loadingPage(true)
 
@@ -240,3 +481,4 @@ $('#Student').click((e) => {
     }, 300)
 
 })
+//-----------------------------------------------

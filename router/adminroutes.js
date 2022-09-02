@@ -14,17 +14,17 @@ const studentmission = require('../models/studentmission')
 const studentmanage = require('../models/studentmanage')
 const studentminding = require('../models/studentminding')
 
-router.use((req, res, next) => {
-    if (req.user != undefined) {
-        if (req.user.studentId == "admin") {
-            next()
-            return
-        }
-        res.send("fall")
-    } else {
-        res.send("fall")
-    }
-})
+// router.use((req, res, next) => {
+//     if (req.user != undefined) {
+//         if (req.user.studentId == "admin") {
+//             next()
+//             return
+//         }
+//         res.send("fall")
+//     } else {
+//         res.send("fall")
+//     }
+// })
 router.post(process.env.ROUTER_ADMIN_READSTUDENTSTATUS, async (req, res) => {
     const returnData = {
         studentsStatus: [],
@@ -90,69 +90,122 @@ router.post(process.env.ROUTER_ADMIN_READSTUDENTS, async (req, res) => {
         res.send(returnData)
     })
 })
-router.post(process.env.ROUTER_ADMIN_READMANAGESTATUS,async (req, res) => {
+router.post(process.env.ROUTER_ADMIN_READMANAGESTATUS, async (req, res) => {
     const returnData = {
-        mission:[],
-        manage:[],
+        mission: [],
+        manage: [],
     }
-    await missioncontentmodel.find({}).then(response=>{
-        response.map((value,index)=>{
-            const missionData ={
+    await missioncontentmodel.find({}).then(response => {
+        response.map((value, index) => {
+            const missionData = {
                 week: value.week,
                 mission: value.mission
-            }  
+            }
             returnData.mission.push(missionData)
         })
     })
 
-    await studentmission.find({}).then(response=>{
-        response.map((value,index)=>{
+    await studentmission.find({}).then(response => {
+        response.map((value, index) => {
             const selectData = {
                 week: value.week,
-                studentId:value.studentId,
-                select:value.studentSelect
+                studentId: value.studentId,
+                select: value.studentSelect
             }
             returnData.manage.push(selectData)
         })
     })
     await studentmanage.find({}).then(response => {
-        
+        response.map((value, index) => {
+            returnData.manage[index]["manage"] = value.studentManage
+        })
     })
     res.send(returnData)
 })
 
 router.post(process.env.ROUTER_ADMIN_ADDSTUDENT, async (req, res) => {
-    const saltRound = 15
-    bcrypt.hash(req.body.studentPassword, saltRound, (err, hashedPassword) => {
-        const studentDetailInit = new Array()
-        const availableWeek = 7
+    await studentsConfig.find({studentId: req.body.studentId}).then(response=>{
+        console.log(response.length)
+        if (response.length == 0){
+            const saltRound = 15
+            bcrypt.hash(req.body.studentPassword, saltRound, (err, hashedPassword) => {
+                const studentDetailInit = new Array()
+                const availableWeek = 7
 
-        for (let i = 1; i <= availableWeek; i++) {
-            studentDetailInit.push({
-                Week: i,
-                Status: {
-                    Data: false,
-                    Mission: false,
-                    Manage: false,
-                    Minding: false,
-                    Response: false
+                for (let i = 1; i <= availableWeek; i++) {
+                    studentDetailInit.push({
+                        Week: i,
+                        Status: {
+                            Data: false,
+                            Mission: false,
+                            Manage: false,
+                            Minding: false,
+                            Response: false
+                        }
+                    })
                 }
+                const newStudent = new studentsConfig({
+                    studentId: req.body.studentId,
+                    studentPassword: hashedPassword,
+                    studentName: req.body.studentName,
+                    studentEmail: req.body.studentEmail,
+                    studentDetail: studentDetailInit
+                })
+                newStudent.save()
+                res.send(true)
             })
+        }else{
+            res.send('user exist')
         }
+    })
+    
+})
+router.post(process.env.ROUTER_ADMIN_DELETESTUDENT, async (req, res) => {
+    let returnData = {
+        deleteStatus:{
+            "學生帳號":false,
+            "學生Feedback":false,
+            "學生Task":false,
+            "學生Plan":false,
+            "學生Reflection":false,
+        },
+        newStudentData:[]
+    }
 
-        const newStudent = new studentsConfig({
-            studentId: req.body.studentId,
-            studentPassword: hashedPassword,
-            studentName: req.body.studentName,
-            studentEmail: req.body.studentEmail,
-            studentDetail: studentDetailInit
+    await studentsConfig.deleteOne({ studentId: req.body.studentId }).then(response => {
+        returnData.deleteStatus["學生帳號"] = response.acknowledged
+    })
+    await responsecontentmodel.deleteMany({ studentId: req.body.studentId }).then(response => {
+        returnData.deleteStatus["學生回饋"] = response.acknowledged
+    })
+    await studentmission.deleteMany({ studentId: req.body.studentId }).then(response => {
+        returnData.deleteStatus["學生Task"] = response.acknowledged
+    })
+    await studentmanage.deleteMany({ studentId: req.body.studentId }).then(response => {
+        returnData.deleteStatus["學生Plan"] = response.acknowledged
+    })
+    await studentminding.deleteMany({ studentId: req.body.studentId }).then(response => {
+        returnData.deleteStatus["學生Reflection"] = response.acknowledged
+    })
+    await studentsConfig.find({}).then(response => {
+        response.map((value, index) => {
+            if (value.studentName != "Admin") {
+                const studentData = {
+                    studentId: value.studentId,
+                    studentName: value.studentName,
+                    studentEmail: value.studentEmail,
+                    studentDetail: value.studentDetail
+                }
+                returnData.newStudentData.push(studentData)
+            }
         })
-        newStudent.save()
-        res.send('success')
     })
 
-
-
+    res.send(returnData)
+})
+router.post(process.env.ROUTER_ADMIN_CHANGEPASSWORD , async(req, res)=>{
+    console.log(req.body)
+    res.send('success')
 })
 
 router.post(process.env.ROUTER_ADMIN_ADDDATA, async (req, res) => {
