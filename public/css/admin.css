@@ -4,6 +4,7 @@ body {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='250' viewBox='0 0 20 20'%3E%3Cg fill-opacity='0.51'%3E%3Cpolygon fill='%23FFFF52' points='20 10 10 0 0 0 20 20'/%3E%3Cpolygon fill='%23FFFF52' points='0 10 0 20 10 20'/%3E%3C/g%3E%3C/svg%3E");
   overflow-x: hidden;
 }
+
 .loading {
   position: fixed;
   width: 100vw;
@@ -11,6 +12,7 @@ body {
   background-color: rgba(0, 0, 0, 0.3);
   z-index: 10000;
 }
+
 #loadingImg {
   position: fixed;
   top: calc(100vh / 3);
@@ -26,11 +28,13 @@ body {
   justify-content: space-between;
   background-color: rgba(245, 245, 79, 0.902);
 }
+
 .ProgramBtn {
   width: 50%;
   display: flex;
   justify-content: space-around;
 }
+
 .ProgramLogout {
   width: 7%;
 }
@@ -43,6 +47,7 @@ body {
   font-weight: 1000;
   cursor: pointer;
 }
+
 .ProgramDiv {
   transition-duration: 0.3s;
   user-select: none;
@@ -54,24 +59,29 @@ body {
   border-radius: 10px;
   cursor: pointer;
 }
+
 .ProgramDiv:hover {
   transition-duration: 0.3s;
   background-color: rgba(255, 255, 255, 0.6);
 }
+
 .ProgramDiv:active {
   transition-duration: 0.3s;
   background-color: #0dcaf0;
 }
+
 .adminContainer {
   margin-top: 15px;
   margin-bottom: 30px;
   width: 100vw;
 }
+
 #StatusTitle {
   font-family: "Silkscreen", cursive;
   font-size: 2em;
   font-weight: bolder;
 }
+
 .totalStatus_div {
   margin: 0 auto;
   width: 95vw;
@@ -80,6 +90,7 @@ body {
   background-color: rgba(255, 255, 255, 0.7);
   text-align: center;
 }
+
 .statusProgressDiv {
   width: 15%;
   height: 80%;
@@ -109,6 +120,7 @@ body {
   background-color: rgba(255, 255, 255, 0.7);
   text-align: center;
 }
+
 .weekMindingScore_div {
   margin: 0 auto;
   margin-top: 30px;
@@ -118,13 +130,16 @@ body {
   background-color: rgba(255, 255, 255, 0.7);
   text-align: center;
 }
+
 #minding_Score {
   width: 25% !important;
 }
+
 .studentBtnContainer h1 {
   font-family: "Silkscreen", cursive;
   font-weight: bolder;
 }
+
 .studentData_Number {
   width: 10%;
   height: 70px;
@@ -133,6 +148,7 @@ body {
   font-family: "Silkscreen", cursive;
   font-weight: bolder;
 }
+
 .studentData_Id {
   width: 10%;
   height: 70px;
@@ -141,6 +157,7 @@ body {
   font-family: "Silkscreen", cursive;
   font-weight: bolder;
 }
+
 .studentData_Name {
   width: 10%;
   height: 70px;
@@ -148,12 +165,14 @@ body {
   font-size: 25px;
   font-weight: bolder;
 }
+
 .studentData_Email {
   width: 12%;
   height: 70px;
   line-height: 70px;
   font-size: 15px;
 }
+
 .studentData_Setting {
   width: 15%;
   height: 50px;
@@ -162,11 +181,27 @@ body {
   justify-content: space-around;
 }
 
+@media (max-width:414px) {
+  .studentData_Number {
+    width: 5%;
+  }
+
+  .studentData_Id {
+    width: 15%;
+    font-size: 20px;
+  }
+}
+
 @media (max-width: 1500px) {
   .ProgramBtn {
     width: 70%;
   }
+
+  .studentData_Setting {
+    width: 35%;
+  }
 }
+
 @media (max-width: 1073px) {
   .ProgramBtn {
     width: 80%;

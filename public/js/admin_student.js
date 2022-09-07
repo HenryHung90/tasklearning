@@ -253,6 +253,11 @@ function changeStudentPassword(Id) {
         window.alert("密碼不得為空")
         return
     }
+    let checkPassword = window.prompt("再次輸入新密碼",'')
+    if (checkPassword != newPassword) {
+        window.alert("兩次輸入不一")
+        return
+    }
     if (comfirmClick(`新密碼 : ${newPassword}`)) {
         axios({
             method: 'POST',
@@ -263,7 +268,7 @@ function changeStudentPassword(Id) {
             },
             withCredentials: true
         }).then(response=>{
-            console.log(response.data)
+            window.alert(response.data)
         })
     }
 }

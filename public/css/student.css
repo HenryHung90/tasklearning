@@ -205,3 +205,18 @@ body {
     width:15%;
   }
 }
+
+@media (max-width:1500px){
+  .taskContainer{
+    width:90%;
+  }
+  .taskWeekTitle h1{
+    font-size:2em;
+  }
+  .taskStage{
+    height:130px;
+  }
+  .taskStage_Box h4{
+    line-height: 50px;
+  }
+}
