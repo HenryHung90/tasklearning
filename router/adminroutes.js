@@ -124,9 +124,9 @@ router.post(process.env.ROUTER_ADMIN_READMANAGESTATUS, async (req, res) => {
 })
 
 router.post(process.env.ROUTER_ADMIN_ADDSTUDENT, async (req, res) => {
-    await studentsConfig.find({studentId: req.body.studentId}).then(response=>{
+    await studentsConfig.find({ studentId: req.body.studentId }).then(response => {
         console.log(response.length)
-        if (response.length == 0){
+        if (response.length == 0) {
             const saltRound = 15
             bcrypt.hash(req.body.studentPassword, saltRound, (err, hashedPassword) => {
                 const studentDetailInit = new Array()
@@ -154,22 +154,22 @@ router.post(process.env.ROUTER_ADMIN_ADDSTUDENT, async (req, res) => {
                 newStudent.save()
                 res.send(true)
             })
-        }else{
+        } else {
             res.send('user exist')
         }
     })
-    
+
 })
 router.post(process.env.ROUTER_ADMIN_DELETESTUDENT, async (req, res) => {
     let returnData = {
-        deleteStatus:{
-            "學生帳號":false,
-            "學生Feedback":false,
-            "學生Task":false,
-            "學生Plan":false,
-            "學生Reflection":false,
+        deleteStatus: {
+            "學生帳號": false,
+            "學生Feedback": false,
+            "學生Task": false,
+            "學生Plan": false,
+            "學生Reflection": false,
         },
-        newStudentData:[]
+        newStudentData: []
     }
 
     await studentsConfig.deleteOne({ studentId: req.body.studentId }).then(response => {
@@ -203,9 +203,14 @@ router.post(process.env.ROUTER_ADMIN_DELETESTUDENT, async (req, res) => {
 
     res.send(returnData)
 })
-router.post(process.env.ROUTER_ADMIN_CHANGEPASSWORD , async(req, res)=>{
-    console.log(req.body)
-    res.send('success')
+router.post(process.env.ROUTER_ADMIN_CHANGEPASSWORD, async (req, res) => {
+    const saltRound = 15
+    bcrypt.hash(req.body.studentPassword, saltRound, (err, hashedPassword) => {
+        studentsConfig.updateOne({ studentId: req.body.studentId }, 
+            { studentPassword:hashedPassword }).then(response=>{
+            res.send(response.acknowledged)
+        })
+    })
 })
 
 router.post(process.env.ROUTER_ADMIN_ADDDATA, async (req, res) => {
