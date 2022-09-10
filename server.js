@@ -83,7 +83,10 @@ task.use(urlencodedParser);
 //登入
 task.post(process.env.ROUTER_MAIN_LOGIN, (req, res, next) => {
     passport.authenticate("local", (err, user, info) => {
-        if (err) throw err
+        if (err) {
+            res.send('/404')
+            throw err
+        }
         if (!user) {
             res.send("login failed")
         }

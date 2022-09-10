@@ -135,8 +135,10 @@ body {
   width: 25% !important;
 }
 
-.studentBtnContainer h1 , 
-.dataPageBtnContainer h1 {
+.studentBtnContainer h1,
+.dataPageBtnContainer h1,
+.studentBtnContainer h1,
+.responseSearchDiv h1 {
   font-family: "Silkscreen", cursive;
   font-weight: bolder;
 }
@@ -181,7 +183,7 @@ body {
   display: flex;
   justify-content: space-around;
 }
-.Selecting{
+.Selecting {
   background-color: purple !important;
 }
 
@@ -205,5 +207,8 @@ body {
   .studentData_Id {
     width: 15%;
     font-size: 25px;
+  }
+  #responseSetting {
+    width: 45%;
   }
 }
