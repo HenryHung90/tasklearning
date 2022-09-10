@@ -135,7 +135,8 @@ body {
   width: 25% !important;
 }
 
-.studentBtnContainer h1 {
+.studentBtnContainer h1 , 
+.dataPageBtnContainer h1 {
   font-family: "Silkscreen", cursive;
   font-weight: bolder;
 }
@@ -166,7 +167,7 @@ body {
   font-weight: bolder;
 }
 
-.studentData_Email {
+.studentData_Detail {
   width: 12%;
   height: 70px;
   line-height: 70px;
@@ -180,16 +181,8 @@ body {
   display: flex;
   justify-content: space-around;
 }
-
-@media (max-width:414px) {
-  .studentData_Number {
-    width: 5%;
-  }
-
-  .studentData_Id {
-    width: 15%;
-    font-size: 20px;
-  }
+.Selecting{
+  background-color: purple !important;
 }
 
 @media (max-width: 1500px) {
@@ -205,5 +198,12 @@ body {
 @media (max-width: 1073px) {
   .ProgramBtn {
     width: 80%;
+  }
+  .studentData_Number {
+    width: 10%;
+  }
+  .studentData_Id {
+    width: 15%;
+    font-size: 25px;
   }
 }

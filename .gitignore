@@ -1,2 +1,5 @@
 node_modules
 .vs
+test.html
+.gitignore
+testForStage.html
