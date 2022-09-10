@@ -135,7 +135,8 @@ body {
   width: 25% !important;
 }
 
-.studentBtnContainer h1 {
+.studentBtnContainer h1,
+.responseSearchDiv h1 {
   font-family: "Silkscreen", cursive;
   font-weight: bolder;
 }
@@ -205,5 +206,9 @@ body {
 @media (max-width: 1073px) {
   .ProgramBtn {
     width: 80%;
+  }
+
+  #responseSetting {
+    width: 45%;
   }
 }
