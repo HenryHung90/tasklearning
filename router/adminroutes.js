@@ -122,6 +122,22 @@ router.post(process.env.ROUTER_ADMIN_READMANAGESTATUS, async (req, res) => {
     })
     res.send(returnData)
 })
+router.post(process.env.ROUTER_ADMIN_READSTUDENTSTATUSDETAIL, async (req,res)=>{
+    const returnData = {
+        missionName:[],
+        missionContent:[],
+        manageContent:[],
+        mindingContent:{}
+    }
+    await missioncontentmodel.findOne({week:req.body.week}).then(response=>{
+        response.mission.map((missionValue)=>{
+            returnData.missionName.push(missionValue.title)
+        })
+    })
+    await studentmission.findOne({studentId:req.body.studentId,week:req.body.week}).then(response=>{
+        
+    })
+})
 
 router.post(process.env.ROUTER_ADMIN_ADDSTUDENT, async (req, res) => {
     await studentsConfig.find({ studentId: req.body.studentId }).then(response => {

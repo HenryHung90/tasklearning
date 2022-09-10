@@ -87,11 +87,11 @@ module.exports = (passport) => {
         })
     )
     passport.serializeUser((user, done) => {
-        done(null,user._id)
+        done(null, user._id)
     })
     passport.deserializeUser((id, done) => {
-        studentConfig.findOne({ _id:id},(err,user)=>{
-            done(err,user)
+        studentConfig.findOne({ _id: id }, (err, user) => {
+            done(err, user)
         })
     })
 }
