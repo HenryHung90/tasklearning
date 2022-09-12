@@ -6,6 +6,7 @@ require('../database/passportjs')(passport)
 const { v4: uuidv4 } = require('uuid');
 
 const multer = require('multer')
+const fs = require('fs')
 const uploadLocation = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, './public/media/pdf')
@@ -510,12 +511,20 @@ router.post(process.env.ROUTER_ADMIN_ADDDATA, async (req, res) => {
 })
 //上傳PDF
 router.post(process.env.ROUTER_ADMIN_ADDPDF, upload.single('uploadPDF'), async (req, res) => {
-    console.log(req.file)
     const returnData = {
         title: req.file.fieldname,
-        link: 'http://localhost:3000/student/'+req.file.filename
+        link: 'http://localhost:3000/checkdata/'+req.file.filename
     }
     res.send(returnData)
+})
+//刪除PDF
+router.post(process.env.ROUTER_ADMIN_DELTEPDF,async(req,res)=>{
+    try{
+        const fileLocation = req.body.link.split('/')[4]
+        fs.unlinkSync('./public/media/pdf/' + fileLocation)
+    }catch(err){
+        console.error(err)
+    }
 })
 
 router.post(process.env.ROUTER_ADMIN_ADDMISSION, async (req, res) => {

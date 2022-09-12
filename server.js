@@ -53,6 +53,8 @@ const studentRoutes = require('./router/studentroutes')
 task.use(express.json())
 //靜態物件取得從public
 task.use(express.static('public'))
+const path = require('path')
+task.use(express.static(path.join(__dirname, 'public')))
 task.set("view engine", "pug")
 
 task.use(bodyParser.json());
@@ -123,6 +125,7 @@ task.get('/', (req, res) => {
         res.render('index')
     }
 })
+
 //Stagepage
 task.use(process.env.ROUTER_MAIN_DASHBOARD,isAuthenticated, dashboardRoutes)
 //stageCheck
@@ -132,6 +135,9 @@ task.use(process.env.ROUTER_MAIN_STUDENT, isAuthenticated, studentRoutes)
 //admin
 task.use(process.env.ROUTER_MAIN_ADMIN, adminRoutes);
 
+task.get('/checkdata/:filename', async (req, res) => {
+    res.sendFile(`${__dirname}/public/media/pdf/${req.params.filename}`)
+})
 
 //無此路由
 task.use((req, res, next) => {
