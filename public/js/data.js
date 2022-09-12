@@ -13,7 +13,6 @@ const renderText = (text) => {
 
 //教材下載部分
 const renderDownloadPDFandVideo = (pdfLocation, videoLocation) => {
-
     let returnDiv = $('<div>').css({ 'display': 'flex', 'justify-content': 'space-around' })
     pdfLocation.map((val, index) => {
         const downloadDiv = $('<div>').prop({

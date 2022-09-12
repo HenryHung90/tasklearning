@@ -3,7 +3,20 @@ const router = express.Router()
 const bcrypt = require('bcryptjs')
 const passport = require('passport')
 require('../database/passportjs')(passport)
+const { v4: uuidv4 } = require('uuid');
 
+const multer = require('multer')
+const uploadLocation = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, './public/media/pdf')
+    },
+    filename: function (req, file, cb) {
+        cb(null, uuidv4() + '.pdf')
+    }
+})
+const upload = multer({
+    storage: uploadLocation
+})
 const studentsConfig = require('../models/studentsconfig')
 
 const datacontentmodel = require('../models/datacontentmodel')
@@ -25,6 +38,8 @@ const studentminding = require('../models/studentminding')
 //         res.send("fall")
 //     }
 // })
+
+//取得所有學生各項數據
 router.post(process.env.ROUTER_ADMIN_READSTUDENTSTATUS, async (req, res) => {
     const returnData = {
         studentsStatus: [],
@@ -73,6 +88,7 @@ router.post(process.env.ROUTER_ADMIN_READSTUDENTSTATUS, async (req, res) => {
 
     res.send(returnData)
 })
+//取得學生列表
 router.post(process.env.ROUTER_ADMIN_READSTUDENTS, async (req, res) => {
     studentsConfig.find({}).then(response => {
         const returnData = []
@@ -90,6 +106,7 @@ router.post(process.env.ROUTER_ADMIN_READSTUDENTS, async (req, res) => {
         res.send(returnData)
     })
 })
+//取得所有學生Manage資訊
 router.post(process.env.ROUTER_ADMIN_READMANAGESTATUS, async (req, res) => {
     const returnData = {
         mission: [],
@@ -122,10 +139,11 @@ router.post(process.env.ROUTER_ADMIN_READMANAGESTATUS, async (req, res) => {
     })
     res.send(returnData)
 })
-
+//取得所有學生Minding資訊
 router.post(process.env.ROUTER_ADMIN_READMINDINGSTATUS, async (req, res) => {
 
 })
+//取得 單一學生 單周 學習資訊
 router.post(process.env.ROUTER_ADMIN_READSTUDENTSTATUSDETAIL, async (req, res) => {
     const returnData = {
         missionName: [],
@@ -142,7 +160,7 @@ router.post(process.env.ROUTER_ADMIN_READSTUDENTSTATUSDETAIL, async (req, res) =
 
     })
 })
-
+//取得 單一學生 全部 學習資訊
 router.post(process.env.ROUTER_ADMIN_READSTUDENTDATA, async (req, res) => {
     const returnData = {
         studentData: [],
@@ -241,10 +259,21 @@ router.post(process.env.ROUTER_ADMIN_READSTUDENTDATA, async (req, res) => {
 
     res.send(returnData)
 })
+//取得 DATA MISSION 當周 內容
 router.post(process.env.ROUTER_ADMIN_READDATA, async (req, res) => {
-    res.send(true)
+    const returnData = {
+        dataContent: {},
+        missionContent: {},
+    }
+    await datacontentmodel.findOne({ week: req.body.week }).then(response => {
+        returnData.dataContent = response
+    })
+    await missioncontentmodel.findOne({ week: req.body.week }).then(response => {
+        returnData.missionContent = response
+    })
+    res.send(returnData)
 })
-
+//批量修改學生 用於Upload Student
 router.post(process.env.ROUTER_ADMIN_UPLOADMANYSTUDENTS, async (req, res) => {
     req.body.studentList.map(async (studentValue, studentIndex) => {
         //studentValue[0] = newStudentId
@@ -303,6 +332,7 @@ router.post(process.env.ROUTER_ADMIN_UPLOADMANYSTUDENTS, async (req, res) => {
         res.send(returnData)
     })
 })
+//刪除學生(刪除所有資料)
 router.post(process.env.ROUTER_ADMIN_DELETESTUDENT, async (req, res) => {
     let returnData = {
         deleteStatus: {
@@ -346,6 +376,7 @@ router.post(process.env.ROUTER_ADMIN_DELETESTUDENT, async (req, res) => {
 
     res.send(returnData)
 })
+//變更學生密碼
 router.post(process.env.ROUTER_ADMIN_CHANGEPASSWORD, async (req, res) => {
     const saltRound = 15
     bcrypt.hash(req.body.studentPassword, saltRound, (err, hashedPassword) => {
@@ -355,6 +386,7 @@ router.post(process.env.ROUTER_ADMIN_CHANGEPASSWORD, async (req, res) => {
             })
     })
 })
+//變更學生基本資料
 router.post(process.env.ROUTER_ADMIN_UPDATESTUDENTCONFIG, async (req, res) => {
     const returnData = {
         studentConfig: false,
@@ -411,6 +443,7 @@ router.post(process.env.ROUTER_ADMIN_UPDATESTUDENTCONFIG, async (req, res) => {
     })
     res.send(returnData)
 })
+//新增學生
 router.post(process.env.ROUTER_ADMIN_ADDSTUDENT, async (req, res) => {
     await studentsConfig.find({ studentId: req.body.studentId }).then(response => {
         console.log(response.length)
@@ -448,6 +481,7 @@ router.post(process.env.ROUTER_ADMIN_ADDSTUDENT, async (req, res) => {
     })
 
 })
+//新增教學資料
 router.post(process.env.ROUTER_ADMIN_ADDDATA, async (req, res) => {
     const addWeek = req.body.week
     const checkWeek = datacontentmodel.findOne({ week: addWeek })
@@ -473,6 +507,15 @@ router.post(process.env.ROUTER_ADMIN_ADDDATA, async (req, res) => {
         }
     })
     res.send('success')
+})
+//上傳PDF
+router.post(process.env.ROUTER_ADMIN_ADDPDF, upload.single('uploadPDF'), async (req, res) => {
+    console.log(req.file)
+    const returnData = {
+        title: req.file.fieldname,
+        link: 'http://localhost:3000/student/'+req.file.filename
+    }
+    res.send(returnData)
 })
 
 router.post(process.env.ROUTER_ADMIN_ADDMISSION, async (req, res) => {

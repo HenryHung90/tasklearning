@@ -9,6 +9,9 @@ const studentmission = require('../models/studentmission')
 const studentmanage = require('../models/studentmanage')
 const studentminding = require('../models/studentminding')
 
+router.get('/:filename',async(req,res)=>{
+    
+})
 
 router.post(process.env.ROUTER_STUDENT_READDATA, async (req, res) => {
     let thisWeekData

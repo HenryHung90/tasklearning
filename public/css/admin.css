@@ -183,8 +183,15 @@ body {
   display: flex;
   justify-content: space-around;
 }
+#responseSetting {
+  width: 20%;
+}
 .Selecting {
   background-color: purple !important;
+}
+
+.input-group-text{
+  background-color:white;
 }
 
 @media (max-width: 1500px) {
@@ -210,5 +217,18 @@ body {
   }
   #responseSetting {
     width: 45%;
+  }
+  .weekSwitchBtn h1 {
+    font-size: 30px;
+    line-height: 150%;
+  }
+  .dataDetailContainer {
+    display: block !important;
+  }
+  .dataDetail_data {
+    width: 100% !important;
+  }
+  .dataDetail_mission {
+    width: 100% !important;
   }
 }

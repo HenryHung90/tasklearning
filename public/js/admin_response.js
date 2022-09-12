@@ -28,7 +28,7 @@ function renderResponseSearch() {
     const responseBarContainer = $('<div>').prop({
         className: 'btnContainer'
     }).css({
-        'margin-top': '40px',
+        'margin-top': '50px',
         'width': '100%',
         'height': '50px',
         'display': 'flex',
@@ -36,14 +36,32 @@ function renderResponseSearch() {
     })
 
     for (let i = 1; i <= 5; i++) {
-        $('<button>').prop({
-            className: 'btn btn-secondary',
-            innerHTML: `week ${i}`,
-            id: `week_${i}`
+        const weekSwitchBtn = $('<div>').prop({
+            className: 'weekSwitchBtn',
+            id: `week_${i}`,
+            innerHTML: `<h1>${i}</h1>`
         }).css({
-            'width': '10%'
+            'width': '15%',
+            'height': '50px',
+            'line-height': '50px',
+            'text-align': 'center',
+            'background-color': '#6c757d',
+            'border-radius': '20px',
+            'transition-duration': '0.2s',
+            'color': 'white',
+            'user-select': 'none'
+        }).hover((e) => {
+            weekSwitchBtn.css({
+                'transition-duration': '0.2s',
+                'background-color': 'purple',
+            })
+        }, (e) => {
+            weekSwitchBtn.css({
+                'transition-duration': '0.2s',
+                'background-color': '#6c757d',
+            })
         }).click((e) => {
-
+            weekSwitchClickBtn(i)
         }).appendTo(responseBarContainer)
     }
 
@@ -119,7 +137,7 @@ function renderResponseStudentList(studentDetail) {
                 id:'studentResponse',
                 innerHTML: '查看學生回覆'
             }).css({
-                'width': '30%',
+                'width': '35%',
                 'height': '40px',
             })
 
