@@ -114,14 +114,20 @@ async function downloadDatatoExcel(workbookTitle, worksheetData, worksheetName) 
     const workbook = XLSX.utils.book_new();
     worksheetData.map((dataValue, dataIndex) => {
         console.log(dataValue)
-        XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(dataValue), worksheetName[dataIndex]);
-        //Binary string
-        XLSX.write(workbook, { book_type: "xlsx", type: "binary" });
-        if (dataIndex == worksheetData.length - 1) {
-            const Month = new Date().getMonth();
-            const Today = new Date().getDate();
-            XLSX.writeFile(workbook, `Student_${workbookTitle}_${Month}\/${Today}.xlsx`);
+        if(dataIndex == 1){
+            let worksheet = XLSX.utils.json_to_sheet(dataValue);
+            console.log(worksheet)
+            let result = XLSX.utils.book_append_sheet(workbook, worksheet, worksheetName[dataIndex]);
+            // console.log(result);
+            //Binary string
+            XLSX.write(workbook, { book_type: "csv", type: "binary" });
+            if (dataIndex == worksheetData.length - 1) {
+                const Month = new Date().getMonth();
+                const Today = new Date().getDate();
+                XLSX.writeFile(workbook, `Student_${workbookTitle}_${Month}\/${Today}.csv`);
+            }
         }
+       
     })
 }
 //return window cofirm
@@ -566,7 +572,8 @@ function renderAdminStudentPage(studentData) {
 function loadingStudent() {
     loadingPage(true)
 
-    loadingAllStudent().then(response => {
+    loadingAllStudent()
+    .then(response => {
         renderAdminStudentPage(response.data)
     }).then(() => {
         loadingPage(false)

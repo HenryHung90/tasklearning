@@ -28,3 +28,9 @@
   transition-duration: 0.1s;
   background-color:rgba(255, 0, 0, 0.5) !important;
 }
+
+@media (max-width:1500px) {
+  .missionBox_Data .options{
+    width:17%;
+  }
+}

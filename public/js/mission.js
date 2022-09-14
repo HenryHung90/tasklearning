@@ -5,33 +5,29 @@
 function switchOptionName(Id) {
     if (Id.length > 1) {
         switch (Id) {
-            case "處理程序":
+            case "環境結構":
                 return "1"
-            case '尋求協助':
+            case '學習策略':
                 return "2"
-            case '環境結構':
+            case '時間管理':
                 return "3"
-            case '作筆記':
+            case '尋求協助':
                 return "4"
-            case '問題紀錄':
+            case '自我評估':
                 return "5"
-            case '監控過程':
-                return "6"
         }
     } else {
         switch (Id) {
             case '1':
-                return "處理程序"
-            case '2':
-                return "尋求協助"
-            case '3':
                 return "環境結構"
+            case '2':
+                return "學習策略"
+            case '3':
+                return "時間管理"
             case '4':
-                return "作筆記"
+                return "尋求協助"
             case '5':
-                return "問題紀錄"
-            case '6':
-                return "監控過程"
+                return "自我評估"
         }
     }
 }
@@ -267,7 +263,6 @@ async function uploadStudentDecideSteps() {
 
 }
 
-
 //確定整體策略後 調整Manage區域
 function uploadManage() {
     const userId = $('#userId').html()
@@ -364,12 +359,11 @@ function stepsSelectOption() {
             innerHTML: '<div>' +
                 '<h1>策略選擇</h1>' +
                 '<div style="height:70%;display:flex;padding-left:5%;">' +
-                '<div class="options" id="options_1">處理程序</div>' +
-                '<div class="options" id="options_2">尋求協助</div>' +
-                '<div class="options" id="options_3">環境結構</div>' +
-                '<div class="options" id="options_4">作筆記</div>' +
-                '<div class="options" id="options_5">問題紀錄</div>' +
-                '<div class="options" id="options_6">監控過程</div>' +
+                '<div class="options" id="options_1">環境結構</div>' +
+                '<div class="options" id="options_2">學習策略</div>' +
+                '<div class="options" id="options_3">時間管理</div>' +
+                '<div class="options" id="options_4">尋求協助</div>' +
+                '<div class="options" id="options_5">自我評估</div>' +
                 '</div>' +
                 '</div>'
         }).css({
