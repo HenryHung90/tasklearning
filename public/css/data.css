@@ -60,3 +60,9 @@
   height: 50%;
 }
 
+@media (max-width:1500px) {
+  .stageNormalContainer{
+    height: 600px;
+  }
+}
+

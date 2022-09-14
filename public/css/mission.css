@@ -84,3 +84,13 @@
   transition-duration: 0.3s;
   background-color: rgb(200,200,200) !important;
 }
+
+@media (max-width:1500px) {
+  .dragMissionDecide .missionText h3{
+    font-size: 1.5em;
+  }
+  .dragMissionDecide .missionText p{
+    width: auto;
+  }
+  
+}

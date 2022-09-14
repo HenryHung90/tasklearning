@@ -37,14 +37,14 @@ function deletePdf(fileLink) {
     )
 }
 //CRUD week 教學資料
-function updateWeekData(Data){
-    return(
+function updateWeekData(Data) {
+    return (
         axios({
             method: 'post',
             url: '/admin/adddata',
-            data:{
+            data: {
                 week: Data.week,
-                content:Data.content
+                content: Data.content
             },
             withCredentials: true,
         })
@@ -57,20 +57,20 @@ function weekSwitchClickBtn(Week) {
     $('.weekSwitchBtn').removeClass('Selecting')
     $(`#week_${Week}`).addClass('Selecting')
 }
-async function uploadDataDetail(){
+async function uploadDataDetail() {
     //建立模型
     const uploadData = {
         week: $('.Selecting').attr('id').split("_")[1],
-        content:{
+        content: {
             text: $('.dataTextInput').val(),
-            pdf:[],
-            video:[],
+            pdf: [],
+            video: [],
             thisWeekPoint: [...$('.dataMainPoint').val().split("\n")],
         }
     }
 
     //儲存PDF資料
-    $('.dataDiv').find('.pdfIcon').map((index, value)=>{
+    $('.dataDiv').find('.pdfIcon').map((index, value) => {
         console.log($(`#pdfTitle_${index}`).val())
         uploadData.content.pdf.push({
             title: $(`#pdfTitle_${index}`).val(),
@@ -86,14 +86,15 @@ async function uploadDataDetail(){
         })
     })
     let status = 'false'
-    await updateWeekData(uploadData).then(response=>{
+    await updateWeekData(uploadData).then(response => {
         status = response.data
     })
     return status
 }
 //-------------------------------
+//render PDF 以及 Video 圖示
 function renderPDFandVideoIcon(Data, Index, type) {
-    //Data Div
+    //Data Div外框架
     const dataDiv = $("<div>").prop({
         className: 'dataDiv',
     }).css({
@@ -101,7 +102,7 @@ function renderPDFandVideoIcon(Data, Index, type) {
         'height': '150px',
         'margin-left': '10px'
     })
-    //PDF Delete
+    //Ｄata Delete按鈕
     const dataDelete = $("<div>").prop({
         className: 'dataDelete',
         innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" viewBox="0 0 320 512"><!--! Font Awesome Pro 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M310.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L160 210.7 54.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L114.7 256 9.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 301.3 265.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L205.3 256 310.6 150.6z"/></svg>'
@@ -111,15 +112,18 @@ function renderPDFandVideoIcon(Data, Index, type) {
         'width': '30px',
         'height': '30px',
         'border-radius': '10px',
+        'opacity': '0.2'
     }).hover((e) => {
         dataDelete.css({
             'transition-duration': '0.3s',
-            'background-color': 'rgba(255, 0, 0, 0.5)'
+            'background-color': 'rgba(255, 0, 0, 0.5)',
+            'opacity': '1'
         })
     }, (e) => {
         dataDelete.css({
             'transition-duration': '0.3s',
-            'background-color': 'rgba(255, 255, 255, 0)'
+            'background-color': 'rgba(255, 255, 255, 0)',
+            'opacity': '0.2'
         })
     }).click((e) => {
         dataDiv.fadeOut(300)
@@ -292,7 +296,7 @@ function renderDataBtn(weekNumber) {
 //DataContainer位置
 function renderDataDetails(Data) {
     console.log(Data)
-    //教學資料輸入
+    //教學資料輸入外框
     const dataInputDiv = $('<div>').prop({
         className: 'dataDetail_data',
         innerHTML: '<h2>教學資料</h2>'
@@ -328,6 +332,40 @@ function renderDataDetails(Data) {
             'border': '1px dashed rgba(0,0,0,0.3)'
         })
     }).appendTo(dataInputDiv)
+    ////周次重點輸入區
+    const dataMainPointDiv = $('<div>').prop({
+        className: 'dataMainPointDiv',
+        innerHTML: '<h5>本周重點輸入 (以行區分重點)</h5>'
+    }).css({
+        'margin': '0 auto',
+        'width': '95%'
+    }).appendTo(dataInputDiv)
+    ////周次重點 Input area
+    $('<textarea>').prop({
+        className: 'dataMainPoint',
+        placeholder: "以行區分重點",
+        value: Data.dataContent ? Data.dataContent.content.thisWeekPoint.join("\n") : ''
+    }).css({
+        'transition-duration': '0.3s',
+        'padding': '10px',
+        'margin-top': '10px',
+        'margin-bottom': '10px',
+        'width': '95%',
+        'height': '150px',
+        'border-radius': '20px',
+        'border': '1px dashed rgba(0,0,0,0.3)',
+        'resize': 'none'
+    }).hover((e) => {
+        dataText.css({
+            'transition-duration': '0.3s',
+            'border': '1px solid black'
+        })
+    }, (e) => {
+        dataText.css({
+            'border': '1px dashed rgba(0,0,0,0.3)'
+        })
+    }).appendTo(dataMainPointDiv)
+
     ////PDF Input div
     $('<div>').prop({
         className: 'input-group mb-3',
@@ -403,39 +441,7 @@ function renderDataDetails(Data) {
         })
 
     }
-    ////周次重點輸入區
-    const dataMainPointDiv = $('<div>').prop({
-        className: 'dataMainPointDiv',
-        innerHTML: '<h5>本周重點輸入 (以行區分重點)</h5>'
-    }).css({
-        'margin': '0 auto',
-        'width': '95%'
-    }).appendTo(dataInputDiv)
-    ////周次重點 Input area
-    $('<textarea>').prop({
-        className: 'dataMainPoint',
-        placeholder: "以行區分重點",
-        value: Data.dataContent ? Data.dataContent.content.thisWeekPoint.join("\n") : ''
-    }).css({
-        'transition-duration': '0.3s',
-        'padding': '10px',
-        'margin-top': '10px',
-        'margin-bottom': '10px',
-        'width': '95%',
-        'height': '150px',
-        'border-radius': '20px',
-        'border': '1px dashed rgba(0,0,0,0.3)',
-        'resize': 'none'
-    }).hover((e) => {
-        dataText.css({
-            'transition-duration': '0.3s',
-            'border': '1px solid black'
-        })
-    }, (e) => {
-        dataText.css({
-            'border': '1px dashed rgba(0,0,0,0.3)'
-        })
-    }).appendTo(dataMainPointDiv)
+
     ////data儲存按鈕
     $('<button>').prop({
         className: 'btn btn-info',
@@ -446,7 +452,7 @@ function renderDataDetails(Data) {
         'width': '50%'
     }).click((e) => {
         loadingPage(true)
-        uploadDataDetail().then(response=>{
+        uploadDataDetail().then(response => {
             window.alert(response)
             loadingPage(false)
         })
@@ -464,6 +470,39 @@ function renderDataDetails(Data) {
         'border-radius': '20px',
         'background-color': 'rgba(255, 255, 255, 0.5)'
     })
+
+    ////mission 儲存區域
+    const missionBox = $('<div>').prop({
+        className: ' dataMissionBox',
+    }).css({
+        'padding':'10px 10px',
+        'margin':'0 auto',
+        'width':'95%',
+        'height':'100%',
+        'overflow-y':'scroll'
+    }).appendTo(missionInputDiv)
+    ////mission 增加按鈕
+    const missionText = $('<div>').prop({
+        className:'addMission',
+        innerHTML:'<svg xmlns="http://www.w3.org/2000/svg"  width="50px" height="40px" viewBox="0 0 448 512"><!--! Font Awesome Pro 6.1.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M432 256c0 17.69-14.33 32.01-32 32.01H256v144c0 17.69-14.33 31.99-32 31.99s-32-14.3-32-31.99v-144H48c-17.67 0-32-14.32-32-32.01s14.33-31.99 32-31.99H192v-144c0-17.69 14.33-32.01 32-32.01s32 14.32 32 32.01v144h144C417.7 224 432 238.3 432 256z"/></svg>'
+    }).css({
+        'width':'100%',
+        'height':'50px',
+        'padding':'5px 0',
+        'transition-duration':'0.3s',
+        'border-radius':'20px'
+    }).hover((e)=>{
+        missionText.css({
+            'transition-duration':'0.3s',
+            'border':'1px solid black',
+        })
+    },(e)=>{
+        missionText.css({
+            'transition-duration':'0.3s',
+            'border':'0px'
+        })
+    }).appendTo(missionBox)
+
 
 
 

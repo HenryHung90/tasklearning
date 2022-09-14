@@ -161,21 +161,21 @@ router.post(process.env.ROUTER_STUDENT_ADDMISSION, async (req, res) => {
 
             await studentminding.findOne({ studentId: req.body.studentId, week: req.body.week }).then(async (response) => {
                 //若尚未新增過該周
-
-
                 if (response === null || response === undefined) {
 
                     const newStudentMinding = new studentminding({
                         studentId: req.body.studentId,
                         week: req.body.week,
-                        studentMinding: mindingData
+                        studentMinding: mindingData,
+                        studentFixing:'',
+                        studentRanking:''
                     })
                     newStudentMinding.save()
                     isMindingComplete = true
                 }
                 //若已新增過該周
                 else {
-                    await studentminding.updateOne({ studentId: req.body.studentId, week: req.body.week }, { studentMinding: mindingData }).then((response) => {
+                    await studentminding.updateOne({ studentId: req.body.studentId, week: req.body.week }, { studentMinding: mindingData, studentFixing:'', studentRanking:'' }).then((response) => {
                         isMindingComplete = response.acknowledged
                     })
                 }

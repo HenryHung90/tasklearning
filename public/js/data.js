@@ -23,9 +23,9 @@ const renderDownloadPDFandVideo = (pdfLocation, videoLocation) => {
             'text-align': 'center',
             'font-size': '15px',
             'user-select': 'none',
-            'margin': '5px 10px 0 10px',
-            'padding': '5px 5px 0 5px',
-            'border-radius': '10px'
+            'margin':'0 auto',
+            'border-radius': '10px',
+            'height':'80px'
         }).click((e) => {
             const block = $('<div>').prop({
                 className: 'pdfBlock',
@@ -35,7 +35,8 @@ const renderDownloadPDFandVideo = (pdfLocation, videoLocation) => {
                 'height': '100vh',
                 'position': 'absolute',
                 'display': 'none',
-                'z-index': '1000'
+                'z-index': '1000',
+                'overflow':'hidden'
             }).click((e) => {
                 block.fadeOut(300)
                 pdfiFrame.fadeOut(300)
@@ -52,7 +53,8 @@ const renderDownloadPDFandVideo = (pdfLocation, videoLocation) => {
                 'top': '2.5vh',
                 'left': '30vw',
                 'display': 'none',
-                'z-index': '1001'
+                'z-index': '1001',
+                'overflow':'hidden'
             })
 
             $('body').prepend(block).prepend(pdfiFrame)
@@ -74,8 +76,7 @@ const renderDownloadPDFandVideo = (pdfLocation, videoLocation) => {
             'text-align': 'center',
             'font-size': '15px',
             'user-select': 'none',
-            'margin': '5px 10px 0 10px',
-            'padding': '5px 5px 0 5px',
+            'margin':'0 auto',
             'border-radius': '10px'
         }).click((e) => {
             const block = $('<div>').prop({

@@ -47,29 +47,29 @@ const renderWeekTaskManager = (week, stage) => {
     //Stage 2本周目標
     const taskStage_Mission_uncomplete =
         `<div class="taskStage_Box" id="Mission_${week}">` +
-        '<h4>本周目標</h4>' + taskEnd
+        '<h4>準備階段</h4>' + taskEnd
 
     const taskStage_Mission_complete =
         `<div class="taskStage_Box_Complete" id="Mission_${week}">` +
-        '<h4>本周目標</h4>' + taskCompleteIcon + taskEnd
+        '<h4>準備階段</h4>' + taskCompleteIcon + taskEnd
 
     //Stage 3學習計畫
     const taskStage_Manage_uncomplete =
         `<div class="taskStage_Box" id="Manage_${week}">` +
-        '<h4>制定學習計畫</h4>' + taskEnd
+        '<h4>執行階段</h4>' + taskEnd
 
     const taskStage_Manage_complete =
         `<div class="taskStage_Box_Complete" id="Manage_${week}">` +
-        '<h4>制定學習計畫</h4>' + taskCompleteIcon + taskEnd
+        '<h4>執行階段</h4>' + taskCompleteIcon + taskEnd
 
     //Stage 4自我反思
     const taskStage_Minding_uncomplete =
         `<div class="taskStage_Box" id="Minding_${week}">` +
-        '<h4>自我反思</h4>' + taskEnd
+        '<h4>反思階段</h4>' + taskEnd
 
     const taskStage_Minding_complete =
         `<div class="taskStage_Box_Complete" id="Minding_${week}">` +
-        '<h4>自我反思</h4>' + taskCompleteIcon + taskEnd
+        '<h4>反思階段</h4>' + taskCompleteIcon + taskEnd
 
     //Stage 5老師回饋
     const taskStage_Response_uncomplete =

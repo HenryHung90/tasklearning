@@ -68,9 +68,8 @@ function renderManageSchedule(manageData) {
     function renderMissionData(data, index) {
         let returnData = ""
         for (let i = 1; i < data.length; i++) {
-            returnData += `<div class="options" id="targetMission_${index}_option_${i}">${i}、${data[i]}</div>`
+            returnData += `<div class="options" id="targetMission_${index}_option_${i}">${i}- ${data[i]}</div>`
         }
-        returnData += `<div class="options" id="targetMission_${index}_option_${data.length}">${data.length}、時間管理</div>`
         return returnData
     }
 
@@ -121,7 +120,7 @@ function renderManageDecide(currentStepId, currentStepTitle, currentContent) {
     const missionDecideContent = $('<textarea>').prop({
         className: 'manageDecideContent',
         innerHTML: currentContent,
-        placeholder: '寫下你的學習計畫內容'
+        placeholder: '請說明你在該任務計畫做了什麼，越詳細越好'
     }).css({
         'width': '100%',
         'height': '70%',
