@@ -113,21 +113,14 @@ function studentManageStatusGenerate(Mission, Manage) {
 async function downloadDatatoExcel(workbookTitle, worksheetData, worksheetName) {
     const workbook = XLSX.utils.book_new();
     worksheetData.map((dataValue, dataIndex) => {
-        console.log(dataValue)
-        if(dataIndex == 1){
-            let worksheet = XLSX.utils.json_to_sheet(dataValue);
-            console.log(worksheet)
-            let result = XLSX.utils.book_append_sheet(workbook, worksheet, worksheetName[dataIndex]);
-            // console.log(result);
-            //Binary string
-            XLSX.write(workbook, { book_type: "csv", type: "binary" });
-            if (dataIndex == worksheetData.length - 1) {
-                const Month = new Date().getMonth();
-                const Today = new Date().getDate();
-                XLSX.writeFile(workbook, `Student_${workbookTitle}_${Month}\/${Today}.csv`);
-            }
+        XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(dataValue), worksheetName[dataIndex]);
+        //Binary string
+        // XLSX.write(workbook, { book_type: "xlsx", type: "binary" });
+        if (dataIndex == worksheetData.length - 1) {
+            const Month = new Date().getMonth();
+            const Today = new Date().getDate();
+            XLSX.writeFile(workbook, `Student_${workbookTitle}_${Month}\/${Today}.xls`);
         }
-       
     })
 }
 //return window cofirm
@@ -573,12 +566,12 @@ function loadingStudent() {
     loadingPage(true)
 
     loadingAllStudent()
-    .then(response => {
-        renderAdminStudentPage(response.data)
-    }).then(() => {
-        loadingPage(false)
-        $('.adminContainer').fadeIn(300)
-    })
+        .then(response => {
+            renderAdminStudentPage(response.data)
+        }).then(() => {
+            loadingPage(false)
+            $('.adminContainer').fadeIn(300)
+        })
 }
 
 $('#Student').click((e) => {

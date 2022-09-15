@@ -158,8 +158,23 @@ router.post(process.env.ROUTER_ADMIN_READSTUDENTSTATUSDETAIL, async (req, res) =
         })
     })
     await studentmission.findOne({ studentId: req.body.studentId, week: req.body.week }).then(response => {
-
+        const studentSelect = Object.values(response.studentSelect)
+        studentSelect.map((missionSelect) => {
+            returnData.missionContent.push(missionSelect)
+        })
     })
+    await studentmanage.findOne({ studentId: req.body.studentId, week: req.body.week }).then(response => {
+        response.studentManage.map((studentManage)=>{
+            returnData.manageContent.push(studentManage)
+        })
+    })
+    await studentminding.findOne({ studentId: req.body.studentId, week: req.body.week}).then(response=>{
+        const studentMinding = {
+
+        }
+        returnData.mindingContent.push()
+    })
+    return returnData
 })
 //取得 單一學生 全部 學習資訊
 router.post(process.env.ROUTER_ADMIN_READSTUDENTDATA, async (req, res) => {
@@ -513,16 +528,18 @@ router.post(process.env.ROUTER_ADMIN_ADDDATA, async (req, res) => {
 router.post(process.env.ROUTER_ADMIN_ADDPDF, upload.single('uploadPDF'), async (req, res) => {
     const returnData = {
         title: req.file.fieldname,
-        link: 'http://localhost:3000/checkdata/'+req.file.filename
+        link: 'http://localhost:3000/checkdata/' + req.file.filename
     }
     res.send(returnData)
 })
 //刪除PDF
-router.post(process.env.ROUTER_ADMIN_DELTEPDF,async(req,res)=>{
-    try{
+router.post(process.env.ROUTER_ADMIN_DELTEPDF, async (req, res) => {
+    try {
         const fileLocation = req.body.link.split('/')[4]
         fs.unlinkSync('./public/media/pdf/' + fileLocation)
-    }catch(err){
+
+        res.send('success')
+    } catch (err) {
         console.error(err)
     }
 })
@@ -540,8 +557,8 @@ router.post(process.env.ROUTER_ADMIN_ADDMISSION, async (req, res) => {
                 })
                 newWeekMission.save()
             } else {
-                missioncontentmodel.updateOne({ week: addWeek }, { mission: req.body.mission }).then(result => {
-                    console.log(result)
+                missioncontentmodel.updateOne({ week: addWeek }, { mission: req.body.mission }).then(response => {
+                    res.send(response.acknowledged)
                 })
             }
         }
@@ -549,9 +566,7 @@ router.post(process.env.ROUTER_ADMIN_ADDMISSION, async (req, res) => {
             console.log("mongodb has error")
         }
     })
-    res.send('success')
 })
-
 router.post(process.env.ROUTER_ADMIN_ADDRESPONSE, async (req, res) => {
 
 })

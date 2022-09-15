@@ -50,6 +50,20 @@ function updateWeekData(Data) {
         })
     )
 }
+//CRUD week 任務
+function updateWeekMission(Data) {
+    return (
+        axios({
+            method: 'post',
+            url: '/admin/addmission',
+            data: {
+                week: Data.week,
+                mission: Data.mission
+            },
+            withCredentials: true,
+        })
+    )
+}
 //-------------------------------
 //Click function
 //weekSwitchBtn Click
@@ -85,8 +99,30 @@ async function uploadDataDetail() {
             link: value.id
         })
     })
-    let status = 'false'
+    let status = false
     await updateWeekData(uploadData).then(response => {
+        status = response.data
+    })
+    return status
+}
+async function uploadWeekMission() {
+    //建立模型
+    const uploadMission = {
+        week: $('.Selecting').attr('id').split("_")[1],
+        mission: []
+    }
+    //儲存 Mission
+    $('.dataMissionBox').find('.missionInputDiv').map(missionIndex => {
+        const missionText = {
+            title: $('.missionInputDiv').find('#missionTitle')[missionIndex].value,
+            content: $('.missionInputDiv').find('#missionDecription')[missionIndex].value
+        }
+        console.log(missionText)
+        uploadMission.mission.push(missionText)
+    })
+
+    let status = false
+    await updateWeekMission(uploadMission).then(response => {
         status = response.data
     })
     return status
@@ -129,11 +165,12 @@ function renderPDFandVideoIcon(Data, Index, type) {
         dataDiv.fadeOut(300)
         if (type == 'pdf') {
             deletePdf(Data.link).then(response => {
-                console.log(response)
+                window.alert(response.data)
             })
         }
         setTimeout((e) => {
             dataDiv.remove()
+            uploadDataDetail()
         }, 300)
 
     }).appendTo(dataDiv)
@@ -293,9 +330,80 @@ function renderDataBtn(weekNumber) {
     }).append(dataSwitchContainer)
     return dataPageBtnContainer
 }
+//render missionText 的框架
+function renderMissionTextBox(missionData, missionCount) {
+    //mission外框
+    const missionTextDiv = $('<div>').prop({
+        className: 'missionTextDiv',
+        id: `missionTextDiv_${missionCount}`
+    }).css({
+        'width': '100%',
+        'height': '150px',
+        'padding': '5px 0',
+        'border-radius': '20px',
+        'border': '1px dashed rgba(0,0,0,0.3)',
+        'margin': '0 auto',
+        'margin-bottom': '15px',
+        'display': 'none',
+    })
+    if (missionData != "") {
+        missionTextDiv.css({ 'display': 'flex' })
+    }
+    //mission刪除紐
+    const missionDelete = $('<div>').prop({
+        className: 'missionDelete',
+        innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" width="50px" height="50px" viewBox="0 0 320 512"><!--! Font Awesome Pro 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M310.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L160 210.7 54.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L114.7 256 9.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 301.3 265.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L205.3 256 310.6 150.6z"/></svg>'
+    }).css({
+        'margin': '5px 20px',
+        'opacity': '0.2',
+        'height': '150px',
+        'width': '50px',
+        'transition-duration': '0.3s',
+    }).hover((e) => {
+        missionDelete.css({
+            'transition-duration': '0.3s',
+            'opacity': '1'
+        })
+    }, (e) => {
+        missionDelete.css({
+            'transition-duration': '0.3s',
+            'opacity': '0.2'
+        })
+    }).click((e) => {
+        $(`#missionTextDiv_${missionCount}`).slideUp(200);
+        setTimeout((e) => {
+            $(`#missionTextDiv_${missionCount}`).remove()
+        }, 200)
+    }).appendTo(missionTextDiv)
+    //mission輸入區
+    const missionInputDiv = $('<div>').prop({
+        className: 'missionInputDiv',
+    }).css({
+        'width': '80%',
+        'height': '70px',
+    }).appendTo(missionTextDiv)
+    //mission Title輸入
+    $('<div>').prop({
+        className: 'form-floating mb-3',
+        innerHTML: `<input type="text" class="form-control" id="missionTitle" placeholder="任務名稱" value="${missionData.title ? missionData.title : ''}">` +
+            '<label for="floatingInput">任務名稱</label>'
+    }).css({
+        'width': '50%',
+    }).appendTo(missionInputDiv)
+    //missionDecription輸入
+    $('<div>').prop({
+        className: 'form-floating mb-3',
+        innerHTML: `<input type="text" class="form-control" id="missionDecription" placeholder="任務簡易說明"  value="${missionData.content ? missionData.content : ''}">` +
+            '<label for="floatingInput">任務簡易說明</label>'
+    }).css({
+        'margin-top': '10px',
+        'width': '100%',
+    }).appendTo(missionInputDiv)
+
+    return missionTextDiv
+}
 //DataContainer位置
 function renderDataDetails(Data) {
-    console.log(Data)
     //教學資料輸入外框
     const dataInputDiv = $('<div>').prop({
         className: 'dataDetail_data',
@@ -306,8 +414,16 @@ function renderDataDetails(Data) {
         'height': '100%',
         'border-radius': '20px',
         'background-color': 'rgba(255, 255, 255, 0.5)',
-        'overflow-y': 'scroll'
     })
+    const dataBox = $('<div>').prop({
+        className: 'dataBox',
+    }).css({
+        'padding': '10px 10px',
+        'margin': '0 auto',
+        'width': '95%',
+        'height': '82%',
+        'overflow-y': 'auto'
+    }).appendTo(dataInputDiv)
     ////Text Input textarea
     const dataText = $('<textarea>').prop({
         className: 'dataTextInput',
@@ -331,15 +447,16 @@ function renderDataDetails(Data) {
         dataText.css({
             'border': '1px dashed rgba(0,0,0,0.3)'
         })
-    }).appendTo(dataInputDiv)
+    }).appendTo(dataBox)
     ////周次重點輸入區
     const dataMainPointDiv = $('<div>').prop({
         className: 'dataMainPointDiv',
-        innerHTML: '<h5>本周重點輸入 (以行區分重點)</h5>'
+        innerHTML: '<h5><strong>本周重點輸入 (以行區分重點)</strong></h5>'
     }).css({
         'margin': '0 auto',
+        'margin-top': '10px',
         'width': '95%'
-    }).appendTo(dataInputDiv)
+    }).appendTo(dataBox)
     ////周次重點 Input area
     $('<textarea>').prop({
         className: 'dataMainPoint',
@@ -350,7 +467,7 @@ function renderDataDetails(Data) {
         'padding': '10px',
         'margin-top': '10px',
         'margin-bottom': '10px',
-        'width': '95%',
+        'width': '100%',
         'height': '150px',
         'border-radius': '20px',
         'border': '1px dashed rgba(0,0,0,0.3)',
@@ -384,9 +501,10 @@ function renderDataDetails(Data) {
         addNewPdf(formData).then(response => {
             renderPDFandVideoIcon(response.data, $('.pdfIconDiv').find('.dataDiv').length, 'pdf').appendTo(dataPdfDiv)
         }).then(response => {
+            uploadDataDetail()
             loadingPage(false)
         })
-    }).appendTo(dataInputDiv)
+    }).appendTo(dataBox)
     ////Video Input div
     $('<button>').prop({
         className: 'btn btn-secondary',
@@ -411,7 +529,7 @@ function renderDataDetails(Data) {
         }
 
         renderPDFandVideoIcon(videoData, $('.videoIconDiv').find('.dataDiv').length, 'video').appendTo(dataVideoDiv)
-    }).appendTo(dataInputDiv)
+    }).appendTo(dataBox)
     ////PDF圖示區
     const dataPdfDiv = $('<div>').prop({
         className: 'pdfIconDiv',
@@ -420,7 +538,7 @@ function renderDataDetails(Data) {
         'width': '95%',
         'height': '155px',
         'display': 'flex'
-    }).appendTo(dataInputDiv)
+    }).appendTo(dataBox)
     if (Data.dataContent != null) {
         Data.dataContent.content.pdf.map((pdfValue, pdfIndex) => {
             renderPDFandVideoIcon(pdfValue, pdfIndex, 'pdf').appendTo(dataPdfDiv)
@@ -434,7 +552,7 @@ function renderDataDetails(Data) {
         'width': '95%',
         'height': '155px',
         'display': 'flex'
-    }).appendTo(dataInputDiv)
+    }).appendTo(dataBox)
     if (Data.dataContent != null) {
         Data.dataContent.content.video.map((videoValue, videoIndex) => {
             renderPDFandVideoIcon(videoValue, videoIndex, 'video').appendTo(dataVideoDiv)
@@ -475,34 +593,63 @@ function renderDataDetails(Data) {
     const missionBox = $('<div>').prop({
         className: ' dataMissionBox',
     }).css({
-        'padding':'10px 10px',
-        'margin':'0 auto',
-        'width':'95%',
-        'height':'100%',
-        'overflow-y':'scroll'
+        'padding': '10px 10px',
+        'margin': '0 auto',
+        'width': '95%',
+        'height': '82%',
+        'overflow-y': 'auto'
     }).appendTo(missionInputDiv)
     ////mission 增加按鈕
     const missionText = $('<div>').prop({
-        className:'addMission',
-        innerHTML:'<svg xmlns="http://www.w3.org/2000/svg"  width="50px" height="40px" viewBox="0 0 448 512"><!--! Font Awesome Pro 6.1.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M432 256c0 17.69-14.33 32.01-32 32.01H256v144c0 17.69-14.33 31.99-32 31.99s-32-14.3-32-31.99v-144H48c-17.67 0-32-14.32-32-32.01s14.33-31.99 32-31.99H192v-144c0-17.69 14.33-32.01 32-32.01s32 14.32 32 32.01v144h144C417.7 224 432 238.3 432 256z"/></svg>'
+        className: 'addMission',
+        innerHTML: '<svg xmlns="http://www.w3.org/2000/svg"  width="50px" height="40px" viewBox="0 0 448 512"><!--! Font Awesome Pro 6.1.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M432 256c0 17.69-14.33 32.01-32 32.01H256v144c0 17.69-14.33 31.99-32 31.99s-32-14.3-32-31.99v-144H48c-17.67 0-32-14.32-32-32.01s14.33-31.99 32-31.99H192v-144c0-17.69 14.33-32.01 32-32.01s32 14.32 32 32.01v144h144C417.7 224 432 238.3 432 256z"/></svg>'
     }).css({
-        'width':'100%',
-        'height':'50px',
-        'padding':'5px 0',
-        'transition-duration':'0.3s',
-        'border-radius':'20px'
-    }).hover((e)=>{
+        'width': '100%',
+        'height': '50px',
+        'padding': '5px 0',
+        'transition-duration': '0.3s',
+        'border-radius': '20px'
+    }).hover((e) => {
         missionText.css({
-            'transition-duration':'0.3s',
-            'border':'1px solid black',
+            'transition-duration': '0.3s',
+            'border': '1px solid black',
         })
-    },(e)=>{
+    }, (e) => {
         missionText.css({
-            'transition-duration':'0.3s',
-            'border':'0px'
+            'transition-duration': '0.3s',
+            'border': '0px'
         })
+    }).click(async (e) => {
+        //計算 Mission 數量用
+        const missionLength = $('.dataMissionBox').find('.missionTextDiv').length - 1
+        const missionCount = parseInt($('.dataMissionBox').find('.missionTextDiv')[missionLength].id.split("_")[1] )+ 1
+        console.log(missionCount)
+        await renderMissionTextBox("", missionCount).insertBefore(missionText)
+        $(`#missionTextDiv_${missionCount}`).slideDown(200)
+        $(`#missionTextDiv_${missionCount}`).css({ 'display': 'flex' })
+
     }).appendTo(missionBox)
 
+    if (Data.missionContent != null) {
+        Data.missionContent.mission.map((missionValue, missionIndex) => {
+            renderMissionTextBox(missionValue, missionIndex).insertBefore(missionText)
+        })
+    }
+    ////mission 儲存按鈕
+    $('<button>').prop({
+        className: 'btn btn-info',
+        innerHTML: '儲存任務'
+    }).css({
+        'margin': '0 auto',
+        'margin-bottom': '10px',
+        'width': '50%'
+    }).click((e) => {
+        loadingPage(true)
+        uploadWeekMission().then(response => {
+            window.alert(response)
+            loadingPage(false)
+        })
+    }).appendTo(missionInputDiv)
 
 
 

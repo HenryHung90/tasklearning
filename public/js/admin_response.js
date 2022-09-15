@@ -19,12 +19,23 @@ function isDoneThisWeek(studentCheck) {
 //render 學生學習狀況
 function renderStudentStatus(studentId,week){
     getStudentStatusDetail(studentId,week).then(response=>{
-
+        console.log(response.data)
     })
+}
+//變換月份
+function weekSwitchClickBtn(week,studentData){
+    $('.weekSwitchBtn').removeClass('Selecting')
+    $(`#week_${week}`).addClass('Selecting')
+    $('.studentListDiv').fadeOut(200)
+    setTimeout(()=>{
+        $('.studentListDiv').remove()
+        $('.adminContainer').append(renderResponseStudentList(studentData,week))
+        loadingPage(false)
+    },200)
 }
 
 //render 上方搜尋列表
-function renderResponseSearch() {
+function renderResponseSearch(studentData) {
     const responseBarContainer = $('<div>').prop({
         className: 'btnContainer'
     }).css({
@@ -39,7 +50,7 @@ function renderResponseSearch() {
         const weekSwitchBtn = $('<div>').prop({
             className: 'weekSwitchBtn',
             id: `week_${i}`,
-            innerHTML: `<h1>${i}</h1>`
+            innerHTML: `<h1>Week ${i}</h1>`
         }).css({
             'width': '15%',
             'height': '50px',
@@ -61,8 +72,12 @@ function renderResponseSearch() {
                 'background-color': '#6c757d',
             })
         }).click((e) => {
-            weekSwitchClickBtn(i)
+            loadingPage(true)
+            weekSwitchClickBtn(i, studentData)
         }).appendTo(responseBarContainer)
+        if(i == weekCount()){
+            weekSwitchBtn.addClass('Selecting')
+        }
     }
 
     //Btn 外框
@@ -80,7 +95,7 @@ function renderResponseSearch() {
     return responseSearchDiv
 }
 //render 下方學生列表
-function renderResponseStudentList(studentDetail) {
+function renderResponseStudentList(studentDetail,Week) {
     //學生資料外框
     const studentListDiv = $('<div>').prop({
         className: 'studentListDiv',
@@ -92,7 +107,7 @@ function renderResponseStudentList(studentDetail) {
 
     let noOneDownYet = true
     studentDetail.map((studentData, studentIndex) => {
-        if (isDoneThisWeek(studentData.studentDetail[weekCount() - 1])) {
+        if (isDoneThisWeek(studentData.studentDetail[Week - 1])) {
             noOneDownYet = false
             //學生序號
             const studentNumber = $('<div>').prop({
@@ -175,7 +190,7 @@ function renderResponseStudentList(studentDetail) {
         //學生資料表格框
         $('<div>').prop({
             className: 'studentDataContainer',
-            id: `student_${studentIndex}`,
+            id: `student_no_down_yet`,
             innerHTML: '<h1>還沒有人完成該週進度</h1>'
         }).css({
             'width': '95vw',
@@ -200,9 +215,9 @@ function renderResponsePage(studentData) {
     console.log(studentData)
     const pageContainer = $('.adminContainer')
 
-    pageContainer.append(renderResponseSearch())
+    pageContainer.append(renderResponseSearch(studentData))
 
-    pageContainer.append(renderResponseStudentList(studentData))
+    pageContainer.append(renderResponseStudentList(studentData,weekCount()))
 }
 //loading stundetList main function
 function loadingResponse() {
