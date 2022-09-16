@@ -164,17 +164,18 @@ router.post(process.env.ROUTER_ADMIN_READSTUDENTSTATUSDETAIL, async (req, res) =
         })
     })
     await studentmanage.findOne({ studentId: req.body.studentId, week: req.body.week }).then(response => {
-        response.studentManage.map((studentManage)=>{
+        response.studentManage.map((studentManage) => {
             returnData.manageContent.push(studentManage)
         })
     })
-    await studentminding.findOne({ studentId: req.body.studentId, week: req.body.week}).then(response=>{
-        const studentMinding = {
-
+    await studentminding.findOne({ studentId: req.body.studentId, week: req.body.week }).then(response => {
+        returnData.mindingContent = {
+            studentRanking: response.studentRanking,
+            studentFixing: response.studentFixing,
+            studentMinding: response.studentMinding,
         }
-        returnData.mindingContent.push()
     })
-    return returnData
+    res.send(returnData)
 })
 //取得 單一學生 全部 學習資訊
 router.post(process.env.ROUTER_ADMIN_READSTUDENTDATA, async (req, res) => {
