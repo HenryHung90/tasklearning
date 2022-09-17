@@ -35,13 +35,24 @@ async function uploadDeleteStudent(studentId) {
 }
 //return addStudent
 function uploadSingleStudent(studentData) {
-    {
-        return (axios({
-            method: 'POST',
-            url: '/admin/addstudent',
-            data: studentData
-        }))
-    }
+    return (axios({
+        method: 'POST',
+        url: '/admin/addstudent',
+        data: studentData
+    }))
+}
+//return addManyStudents
+async function uploadManyStudents(studentsData){
+    return(
+        axios({
+            method: 'post',
+            url: '/admin/uploadmanystudents',
+            data: {
+                studentList: studentsData
+            },
+            withCredentials: true
+        })
+    )
 }
 //----------------------------------
 //return stundentList
@@ -161,7 +172,7 @@ const DownloadMember = (studentList) => {
     downloadDatatoExcel('Detail', [studentListGenerate(studentList)], ["學生資料"])
 };
 //批量上傳學員
-const UploadMember = (e) => {
+const UploadMember = async (e) => {
     if (e.target.files[0].name.split('_')[1] != 'Detail') {
         window.alert("檔案錯誤")
         return
@@ -170,7 +181,7 @@ const UploadMember = (e) => {
     const [file] = e.target.files;
     const reader = new FileReader();
 
-    reader.onload = (evt) => {
+    reader.onload = async (evt) => {
         const bstr = evt.target.result;
         const wb = XLSX.read(bstr, { type: "binary" });
         const wsname = wb.SheetNames[0];
@@ -194,17 +205,17 @@ const UploadMember = (e) => {
             };
             DataUpdate.push(UploadData);
         }
-
-        axios({
-            method: 'post',
-            url: '/admin/uploadmanystudents',
-            data: {
-                studentList: DataContainer
-            },
-            withCredentials: true
+        console.log(DataContainer)
+        await uploadManyStudents(DataContainer).then(async response => {
+            if(response.data){
+                let nextData = ''
+                await loadingAllStudent().then(response=>{
+                    nextData = response.data
+                })
+                return nextData
+            }
         }).then(response => {
-            reloadStudentList(response.data, "success")
-        }).then(response => {
+            reloadStudentList(response, "success")
             loadingPage(false)
         })
     };
