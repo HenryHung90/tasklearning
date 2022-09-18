@@ -43,7 +43,7 @@ function editStudentDetailStage(data, week, stage) {
             data[week].Status.Minding = true
             break
         case "Response":
-            if(data[week].Status.Response === 1){
+            if(data[week].Status.Response == 1){
                 data[week].Status.Response = 2
             }
             break

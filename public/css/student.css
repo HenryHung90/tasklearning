@@ -74,7 +74,11 @@ body {
   white-space:nowrap;
   animation: typeProgressText 1s steps(60, end);
 }
-
+.taskArrow{
+  width:5%;
+  height:90%; 
+  transform: rotate(-90deg);
+}
 .taskTitle {
   user-select: none;
   text-align: center;
@@ -218,5 +222,13 @@ body {
   }
   .taskStage_Box h4{
     line-height: 50px;
+  }
+}
+@media(max-width:1000px){
+  .taskWeekTitle h1{
+    font-size:1.5em;
+  }
+  .taskProgressText{
+    font-size: 20px;
   }
 }

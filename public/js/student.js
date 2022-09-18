@@ -5,9 +5,7 @@ const renderWeekTaskManager = (week, stage) => {
     const taskEnd = '</div>'
 
     //task之間連接線
-    const taskArrow = '<svg xmlns="http://www.w3.org/2000/svg" width="70px" height="80%" fill="currentColor" class="bi bi-arrow-right-square" viewBox="0 0 16 16">' +
-        '<path fill-rule="evenodd" d="M15 2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2zM0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm4.5 5.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z" />' +
-        '</svg>'
+    const taskArrow = '<img class="taskArrow" src="../../media/img/arrow-gif.gif" alt="arrowRight"/>'
 
     //task外圈
     let taskOutlineStart
@@ -90,16 +88,16 @@ const renderWeekTaskManager = (week, stage) => {
         if (stage[i]) {
             switch (i) {
                 case 0:
-                    Model += taskStage_Data_complete
+                    Model += taskStage_Data_complete + taskArrow
                     break
                 case 1:
-                    Model += taskStage_Mission_complete
+                    Model += taskStage_Mission_complete + taskArrow
                     break
                 case 2:
-                    Model += taskStage_Manage_complete
+                    Model += taskStage_Manage_complete + taskArrow
                     break
                 case 3:
-                    Model += taskStage_Minding_complete
+                    Model += taskStage_Minding_complete + taskArrow
                     break
             }
         } else if (!stage[i]) {
@@ -122,9 +120,9 @@ const renderWeekTaskManager = (week, stage) => {
     if(!stage[4]){
         Model+=taskStage_Response_uncomplete
     }
-    if (stage[4] === 1) {
+    if (stage[4] == 1) {
         Model += taskStage_Response_teacherComplete
-    } else if (stage[4] === 2) {
+    } else if (stage[4] == 2) {
         Model += taskStage_Response_studentComplete
     }
 

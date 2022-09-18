@@ -11,6 +11,31 @@ function getStudentStatusDetail(studentId, week) {
         withCredentials: true
     }))
 }
+//取得老師對學生當周學習狀態回復
+function getTeacherResponse(studentId, week) {
+    return(axios({
+        method: 'post',
+        url:'/admin/readteacherresponse',
+        data:{
+            studentId: studentId,
+            week: week
+        },
+        withCredentials: true
+    }))
+}
+//上傳TeacherResponse
+function uploadResponse(studentId , week){
+    return(axios({
+        method:'post',
+        url:'/admin/addresponse',
+        data:{
+            studentId: studentId,
+            week: week,
+            teacherResponse: $('.teacherResponseText').val()
+        },
+        withCredentials: true
+    }))
+}
 //return function-------------------------------
 function isDoneThisWeek(studentCheck) {
     return studentCheck.Status.Minding
@@ -196,7 +221,7 @@ function renderStudentStatus(studentId, week) {
             'padding': '10px 30px',
             'margin': '10px',
             'border-radius': '10px',
-            'background-color': 'rgba(245,245,79,0.5)',
+            'background-color': 'rgba(0,0,0,0.3)',
             'width': '400px'
         }).appendTo(studentMindingRow)
         ////未完成紀錄Title
@@ -248,6 +273,180 @@ function renderStudentStatus(studentId, week) {
         $('body').prepend(studentStatusBlock).prepend(studentStatusContainer)
         studentStatusBlock.fadeIn(200)
         studentStatusContainer.fadeIn(200)
+        loadingPage(false)
+    })
+}
+//render 回復學生狀態
+function renderTeacherResponse(studentId,week){
+    getTeacherResponse(studentId,week).then(response=>{
+        const responseContainer = $('<div>').prop({
+            className: 'container'
+        }).css({
+            'position': 'absolute',
+            'height': '80vh',
+            'left': '15vw',
+            'top': '10vh',
+            'z-index': '9999',
+            'background-color': 'white',
+            'border-color': 'black',
+            'border': '5px solid black',
+            'border-radius': '20px',
+            'display': 'none',
+            'text-align': 'center',
+            'overflow-y': 'auto',
+        })
+        //標頭
+        $('<div>').prop({
+            className: `studentStatus_${studentId}`,
+            innerHTML: `<h1>Teacher Response</h1><h5>${studentId}</h5>`
+        }).css({
+            'background-color': 'rgba(255,200,200,0.5)',
+            'height': '130px',
+            'font-family': "Silkscreen, cursive",
+            'padding-top': '30px',
+        }).appendTo(responseContainer)
+
+        //任務執行 大標題
+        $('<div>').prop({
+            className: 'teacherResponseTitle',
+            innerHTML: '<h1>給予回覆</h1>'
+        }).css({
+            'margin-top': '10px',
+        }).appendTo(responseContainer)
+
+        $('<textarea>').prop({
+            className:'teacherResponseText',
+            innerHTML: response.data.teacherResponse ? response.data.teacherResponse : '',
+            placeholder: '請寫下對學生的回覆以及評價'
+        }).css({
+            'width': '100%',
+            'height': '60%',
+            'padding': '15px',
+            'border': '1px dashed rgba(0,0,0,0.3)',
+            'border-radius': '20px',
+            'transition-duration': '0.5s',
+            'resize': 'none'
+        }).appendTo(responseContainer)
+
+        ////data儲存按鈕
+        $('<button>').prop({
+            className: 'btn btn-info',
+            innerHTML: '儲存回覆'
+        }).css({
+            'margin': '0 auto',
+            'margin-bottom': '10px',
+            'width': '50%'
+        }).click((e) => {
+            loadingPage(true)
+            uploadResponse(studentId,week).then(response => {
+                window.alert(response.data)
+                loadingPage(false)
+            })
+        }).appendTo(responseContainer)
+
+        const responseBlock = $('<div>').prop({
+            className: 'container-fluid'
+        }).css({
+            'position': 'absolute',
+            'background-color': 'rgba(0,0,0,0.5)',
+            'overflow': 'hidden',
+            'z-index': '9998',
+            'display': 'none',
+            'width': '100vw',
+            'height': '100vh'
+        }).click((e) => {
+            responseBlock.fadeOut(200)
+            responseContainer.fadeOut(200)
+            setTimeout((e) => {
+                responseBlock.remove()
+                responseContainer.remove()
+            }, 200)
+        })
+
+
+        //動畫顯現
+        $('body').prepend(responseBlock).prepend(responseContainer)
+        responseBlock.fadeIn(200)
+        responseContainer.fadeIn(200)
+        loadingPage(false)
+    })
+}
+//render 學生回覆
+function renderStudentResponse(studentId, week){
+    getTeacherResponse(studentId, week).then((response) => {
+        const responseContainer = $('<div>').prop({
+            className: 'container'
+        }).css({
+            'position': 'absolute',
+            'height': '80vh',
+            'left': '15vw',
+            'top': '10vh',
+            'z-index': '9999',
+            'background-color': 'white',
+            'border-color': 'black',
+            'border': '5px solid black',
+            'border-radius': '20px',
+            'display': 'none',
+            'text-align': 'center',
+            'overflow-y': 'auto',
+        })
+        //標頭
+        $('<div>').prop({
+            className: `studentStatus_${studentId}`,
+            innerHTML: `<h1>Student Response</h1><h5>${studentId}</h5>`
+        }).css({
+            'background-color': 'rgba(255,200,200,0.5)',
+            'height': '130px',
+            'font-family': "Silkscreen, cursive",
+            'padding-top': '30px',
+        }).appendTo(responseContainer)
+
+        //任務執行 大標題
+        $('<div>').prop({
+            className: 'teacherResponseTitle',
+            innerHTML: '<h1>學生回覆</h1>'
+        }).css({
+            'margin-top': '10px',
+        }).appendTo(responseContainer)
+
+        $('<div>').prop({
+            className: 'teacherResponseText',
+            innerHTML: response.data.studentResponse ? response.data.studentResponse : '學生無給予回饋',
+        }).css({
+            'width': '100%',
+            'height': '60%',
+            'padding': '15px',
+            'border': '1px dashed rgba(0,0,0,0.3)',
+            'border-radius': '20px',
+            'transition-duration': '0.5s',
+            'font-size': '20px',
+        }).appendTo(responseContainer)
+
+
+        const responseBlock = $('<div>').prop({
+            className: 'container-fluid'
+        }).css({
+            'position': 'absolute',
+            'background-color': 'rgba(0,0,0,0.5)',
+            'overflow': 'hidden',
+            'z-index': '9998',
+            'display': 'none',
+            'width': '100vw',
+            'height': '100vh'
+        }).click((e) => {
+            responseBlock.fadeOut(200)
+            responseContainer.fadeOut(200)
+            setTimeout((e) => {
+                responseBlock.remove()
+                responseContainer.remove()
+            }, 200)
+        })
+
+
+        //動畫顯現
+        $('body').prepend(responseBlock).prepend(responseContainer)
+        responseBlock.fadeIn(200)
+        responseContainer.fadeIn(200)
         loadingPage(false)
     })
 }
@@ -376,14 +575,20 @@ function renderResponseStudentList(studentDetail, Week) {
             }).css({
                 'width': '30%',
                 'height': '40px',
+            }).click((e)=>{
+                loadingPage(true)
+                renderTeacherResponse(studentData.studentId,Week)
             })
             const studentResponse = $('<button>').prop({
-                className: 'btn btn-outline-success',
+                className: studentData.studentDetail[Week - 1].Status.Response == 2 ? 'btn btn-success' : 'btn btn-outline-success' ,
                 id: 'studentResponse',
                 innerHTML: '查看學生回覆'
             }).css({
                 'width': '35%',
                 'height': '40px',
+            }).click((e)=>{
+                loadingPage(true)
+                renderStudentResponse(studentData.studentId,Week)
             })
 
             //設定學生//

@@ -180,6 +180,16 @@ router.post(process.env.ROUTER_ADMIN_READSTUDENTSTATUSDETAIL, async (req, res) =
     })
     res.send(returnData)
 })
+//取得 單一學生 單周 Response 用於 Response
+router.post(process.env.ROUTER_ADMIN_READTEACHERRESPONSE,async(req,res)=>{
+    await responsecontentmodel.findOne({studentId: req.body.studentId,week: req.body.week}).then(response=>{
+        const returnData = {
+            teacherResponse : response ? response.teacherResponse : '',
+            studentResponse : response ? response.studentResponse : ''
+        }
+        res.send(returnData)
+    })
+})
 //取得 單一學生 全部 學習資訊 用於StudentList
 router.post(process.env.ROUTER_ADMIN_READSTUDENTDATA, async (req, res) => {
     const returnData = {
@@ -591,7 +601,35 @@ router.post(process.env.ROUTER_ADMIN_ADDMISSION, async (req, res) => {
     })
 })
 router.post(process.env.ROUTER_ADMIN_ADDRESPONSE, async (req, res) => {
+    let isFirstResponse = false
+    let isSuccess = false
+    let cloudStudentDetail = []
+    await responsecontentmodel.findOne({studentId: req.body.studentId ,week: req.body.week}).then(response=>{
+        response == undefined ? isFirstResponse = true : null
+    })
 
+    if(isFirstResponse) {
+        const newResponse = new responsecontentmodel({
+            studentId: req.body.studentId,
+            week: req.body.week,
+            teacherResponse: req.body.teacherResponse,
+        })
+        await newResponse.save()
+        isSuccess = true
+    }else{
+        await responsecontentmodel.updateOne({studentId: req.body.studentId,week:req.body.week},{teacherResponse:req.body.teacherResponse}).then(response=>{
+            isSuccess = response.acknowledged + ' response'
+        })
+    }
+
+    await studentsConfig.findOne({studentId: req.body.studentId}).then(response=>{
+        cloudStudentDetail = response.studentDetail
+        cloudStudentDetail[req.body.week - 1].Status.Response = 1
+    })
+    await studentsConfig.updateOne({studentId: req.body.studentId},{studentDetail:cloudStudentDetail}).then(response=>{
+        isSuccess = response.acknowledged  + ' done'
+    })
+    res.send(isSuccess)
 })
 
 module.exports = router
