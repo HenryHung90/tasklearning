@@ -32,13 +32,13 @@ function switchIdtoName(Id) {
             text = "教學資料"
             break
         case 'Mission':
-            text = "目標制定"
+            text = "準備階段"
             break
         case 'Manage':
-            text = "任務管理"
+            text = "執行階段"
             break
         case 'Minding':
-            text = "自我省思"
+            text = "省思階段"
             break
         case 'Response':
             text = "師生回饋"

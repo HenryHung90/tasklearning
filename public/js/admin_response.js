@@ -13,10 +13,10 @@ function getStudentStatusDetail(studentId, week) {
 }
 //取得老師對學生當周學習狀態回復
 function getTeacherResponse(studentId, week) {
-    return(axios({
+    return (axios({
         method: 'post',
-        url:'/admin/readteacherresponse',
-        data:{
+        url: '/admin/readteacherresponse',
+        data: {
             studentId: studentId,
             week: week
         },
@@ -24,11 +24,11 @@ function getTeacherResponse(studentId, week) {
     }))
 }
 //上傳TeacherResponse
-function uploadResponse(studentId , week){
-    return(axios({
-        method:'post',
-        url:'/admin/addresponse',
-        data:{
+function uploadResponse(studentId, week) {
+    return (axios({
+        method: 'post',
+        url: '/admin/addresponse',
+        data: {
             studentId: studentId,
             week: week,
             teacherResponse: $('.teacherResponseText').val()
@@ -37,8 +37,55 @@ function uploadResponse(studentId , week){
     }))
 }
 //return function-------------------------------
+//是否為WellDone
 function isDoneThisWeek(studentCheck) {
+    return studentCheck.Status.Response == 2
+}
+//是否為Feedback
+function isFeedBackWeek(studentCheck) {
     return studentCheck.Status.Minding
+}
+//開啟 / 關閉該項學生列表
+function openStudentList(listName, iconTraget) {
+    if ($(listName).length == 0) {
+        window.alert("該項目目前沒有人")
+        return
+    }
+    if ($(listName).attr('class').split(" ")[1] == 'Opening') {
+        $(listName).removeClass('Opening')
+        $(listName).fadeOut(100)
+        $(iconTraget).css({
+            'transition-duration': '0.5s',
+            'transform': 'rotate(0deg)'
+        })
+
+    } else {
+        $(listName).addClass('Opening')
+        $(listName).fadeIn(100)
+        $(listName).css({ 'display': 'flex' })
+        $(iconTraget).css({
+            'transition-duration': '0.5s',
+            'transform': 'rotate(180deg)'
+        })
+    }
+
+}
+//WellDone人數
+function countingMembers(students, week , status) {
+    let counting = 0
+    for (let value of students) {
+        if(status == 'not yet'){
+            isDoneThisWeek(value.studentDetail[week - 1]) ? null : counting++
+        }
+        else if (status == 'feed back') {
+            isFeedBackWeek(value.studentDetail[week - 1]) && !isDoneThisWeek(value.studentDetail[week - 1]) ? counting++ : null
+        }
+        else if (status == 'well done') {
+            isDoneThisWeek(value.studentDetail[week - 1]) ? counting++ : null
+        }
+       
+    }
+    return `<h3> ${counting}</h3>`
 }
 //render function-------------------------------
 //render 學生學習狀況
@@ -76,10 +123,10 @@ function renderStudentStatus(studentId, week) {
         }).appendTo(studentStatusContainer)
         //任務執行 大標題
         $('<div>').prop({
-            className:'missionTitle',
-            innerHTML:'<h1>任務執行狀況</h1>'
+            className: 'missionTitle',
+            innerHTML: '<h1>任務執行狀況</h1>'
         }).css({
-            'margin-top':'10px',
+            'margin-top': '10px',
         }).appendTo(studentStatusContainer)
         //任務Row外框
         const studentMissionRow = $('<div>').prop({
@@ -111,10 +158,10 @@ function renderStudentStatus(studentId, week) {
             //任務名稱
             $('<h3>').prop({
                 className: `missionTitle_${missionIndex}`,
-                innerHTML:`${response.data.missionName[studentMission[0]]}`
+                innerHTML: `${response.data.missionName[studentMission[0]]}`
             }).css({
                 'border-bottom': '1px solid black',
-                'padding':'30px 0',
+                'padding': '30px 0',
                 'font-weight': 'bolder',
             }).appendTo(missionDiv)
 
@@ -133,20 +180,23 @@ function renderStudentStatus(studentId, week) {
                         className: `missionStep_${contentIndex}`,
                         innerHTML: `<h5><strong>${contentIndex}、${contentValue}</strong></h5>`
                     }).css({
-                        'margin': '20px 0'
+                        'margin': '20px 0',
+                        'padding': '10px',
+                        'border': '1px dashed rgba(0,0,0,0.4)',
+                        'border-radius': '10px'
                     }).appendTo(missionText)
                     //mission執行內容˙
                     $('<span>').prop({
                         className: `missionCotent_${contentIndex}`,
                         innerHTML: response.data.manageContent[missionIndex][contentIndex]
                     }).appendTo(missionStep)
-                    if (contentIndex < studentMission.length -1) {
+                    if (contentIndex < studentMission.length - 1) {
                         $('<div>').prop({
                             className: 'arrowDown',
                             innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" width="50px" height="50px" viewBox="0 0 384 512"><!--! Font Awesome Pro 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M169.4 470.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 370.8 224 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 306.7L54.6 265.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"/></svg>'
                         }).css({
-                            'margin-top':'10px',
-                        }).appendTo(missionStep)
+                            'margin-top': '10px',
+                        }).insertAfter(missionStep)
 
                     }
                 }
@@ -188,35 +238,38 @@ function renderStudentStatus(studentId, week) {
         }).css({
             'margin-top': '10px',
         }).appendTo(studentMindingRow)
-        response.data.mindingContent.studentMinding.map((mindingContent,mindingIndex)=>{
-            console.log(missionName)
-            //任務外框
-            const mindingDiv = $('<div>').prop({
-                className: 'mindingDiv',
-                id: `minding_${mindingIndex}`
-            }).css(response.data.mindingContent.studentMinding.length >= 4 ? moreThenFour : lessThenFour).appendTo(studentMindingRow)
-            //任務名稱
-            $('<h3>').prop({
-                className: `mindingTitle_${mindingIndex}`,
-                innerHTML: `${missionName[parseInt(mindingContent.missionName)]}`
-            }).css({
-                'border-bottom': '1px solid black',
-                'padding': '30px 0',
-                'font-weight': 'bolder',
-            }).appendTo(mindingDiv)
-            //未完成原因 or 完成
-            mindingContent.missionComplete ? mindingDiv.addClass('missionComplete') : mindingDiv.addClass('missionUncomplete')
-            $('<h4>').prop({
-                className:`missionReason_${mindingIndex}`,
-                innerHTML: mindingContent.missionComplete ? 
-                    '<svg xmlns="http://www.w3.org/2000/svg" width="50px" height="80px" viewBox="0 0 640 512"><!--! Font Awesome Pro 6.1.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M634 276.8l-9.999-13.88L624 185.7c0-11.88-12.5-19.49-23.12-14.11c-10.88 5.375-19.5 13.5-26.38 23l-65.75-90.92C490.6 78.71 461.8 64 431 64H112C63.37 64 24 103.4 24 152v86.38C9.5 250.1 0 267.9 0 288v32h8c35.38 0 64-28.62 64-64L72 152c0-16.88 10.5-31.12 25.38-37C96.5 119.1 96 123.5 96 128l.0002 304c0 8.875 7.126 16 16 16h63.1c8.875 0 16-7.125 16-16l.0006-112c9.375 9.375 20.25 16.5 32 21.88V368c0 8.875 7.252 16 16 16c8.875 0 15.1-7.125 15.1-16v-17.25c9.125 1 12.88 2.25 32-.125V368c0 8.875 7.25 16 16 16c8.875 0 16-7.125 16-16v-26.12C331.8 336.5 342.6 329.2 352 320l-.0012 112c0 8.875 7.125 16 15.1 16h64c8.75 0 16-7.125 16-16V256l31.1 32l.0006 41.55c0 12.62 3.752 24.95 10.75 35.45l41.25 62C540.8 440.1 555.5 448 571.4 448c22.5 0 41.88-15.88 46.25-38l21.75-108.6C641.1 292.8 639.1 283.9 634 276.8zM377.3 167.4l-22.88 22.75C332.5 211.8 302.9 224 272.1 224S211.5 211.8 189.6 190.1L166.8 167.4C151 151.8 164.4 128 188.9 128h166.2C379.6 128 393 151.8 377.3 167.4zM576 352c-8.875 0-16-7.125-16-16s7.125-16 16-16s16 7.125 16 16S584.9 352 576 352z"/></svg>' +
-                    '<svg xmlns="http://www.w3.org/2000/svg" width="50px" height="80px" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M432 96H384V64c0-17.67-14.33-32-32-32H64C46.33 32 32 46.33 32 64v352c0 35.35 28.65 64 64 64h224c35.35 0 64-28.65 64-64v-32.08l80.66-35.94C493.5 335.1 512 306.5 512 275V176C512 131.8 476.2 96 432 96zM160 368C160 376.9 152.9 384 144 384S128 376.9 128 368v-224C128 135.1 135.1 128 144 128S160 135.1 160 144V368zM224 368C224 376.9 216.9 384 208 384S192 376.9 192 368v-224C192 135.1 199.1 128 208 128S224 135.1 224 144V368zM288 368c0 8.875-7.125 16-16 16S256 376.9 256 368v-224C256 135.1 263.1 128 272 128S288 135.1 288 144V368zM448 275c0 6.25-3.75 12-9.5 14.62L384 313.9V160h48C440.9 160 448 167.1 448 176V275z"/></svg>' : 
-                mindingContent.missionReason
-            }).appendTo(mindingDiv)
-        })
+        if (response.data.mindingContent.studentMinding != undefined) {
+            response.data.mindingContent.studentMinding.map((mindingContent, mindingIndex) => {
+                console.log(missionName)
+                //任務外框
+                const mindingDiv = $('<div>').prop({
+                    className: 'mindingDiv',
+                    id: `minding_${mindingIndex}`
+                }).css(response.data.mindingContent.studentMinding.length >= 4 ? moreThenFour : lessThenFour).appendTo(studentMindingRow)
+                //任務名稱
+                $('<h3>').prop({
+                    className: `mindingTitle_${mindingIndex}`,
+                    innerHTML: `${missionName[parseInt(mindingContent.missionName)]}`
+                }).css({
+                    'border-bottom': '1px solid black',
+                    'padding': '30px 0',
+                    'font-weight': 'bolder',
+                }).appendTo(mindingDiv)
+                //未完成原因 or 完成
+                mindingContent.missionComplete ? mindingDiv.addClass('missionComplete') : mindingDiv.addClass('missionUncomplete')
+                $('<h4>').prop({
+                    className: `missionReason_${mindingIndex}`,
+                    innerHTML: mindingContent.missionComplete ?
+                        '<svg xmlns="http://www.w3.org/2000/svg" width="50px" height="80px" viewBox="0 0 640 512"><!--! Font Awesome Pro 6.1.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M634 276.8l-9.999-13.88L624 185.7c0-11.88-12.5-19.49-23.12-14.11c-10.88 5.375-19.5 13.5-26.38 23l-65.75-90.92C490.6 78.71 461.8 64 431 64H112C63.37 64 24 103.4 24 152v86.38C9.5 250.1 0 267.9 0 288v32h8c35.38 0 64-28.62 64-64L72 152c0-16.88 10.5-31.12 25.38-37C96.5 119.1 96 123.5 96 128l.0002 304c0 8.875 7.126 16 16 16h63.1c8.875 0 16-7.125 16-16l.0006-112c9.375 9.375 20.25 16.5 32 21.88V368c0 8.875 7.252 16 16 16c8.875 0 15.1-7.125 15.1-16v-17.25c9.125 1 12.88 2.25 32-.125V368c0 8.875 7.25 16 16 16c8.875 0 16-7.125 16-16v-26.12C331.8 336.5 342.6 329.2 352 320l-.0012 112c0 8.875 7.125 16 15.1 16h64c8.75 0 16-7.125 16-16V256l31.1 32l.0006 41.55c0 12.62 3.752 24.95 10.75 35.45l41.25 62C540.8 440.1 555.5 448 571.4 448c22.5 0 41.88-15.88 46.25-38l21.75-108.6C641.1 292.8 639.1 283.9 634 276.8zM377.3 167.4l-22.88 22.75C332.5 211.8 302.9 224 272.1 224S211.5 211.8 189.6 190.1L166.8 167.4C151 151.8 164.4 128 188.9 128h166.2C379.6 128 393 151.8 377.3 167.4zM576 352c-8.875 0-16-7.125-16-16s7.125-16 16-16s16 7.125 16 16S584.9 352 576 352z"/></svg>' +
+                        '<svg xmlns="http://www.w3.org/2000/svg" width="50px" height="80px" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M432 96H384V64c0-17.67-14.33-32-32-32H64C46.33 32 32 46.33 32 64v352c0 35.35 28.65 64 64 64h224c35.35 0 64-28.65 64-64v-32.08l80.66-35.94C493.5 335.1 512 306.5 512 275V176C512 131.8 476.2 96 432 96zM160 368C160 376.9 152.9 384 144 384S128 376.9 128 368v-224C128 135.1 135.1 128 144 128S160 135.1 160 144V368zM224 368C224 376.9 216.9 384 208 384S192 376.9 192 368v-224C192 135.1 199.1 128 208 128S224 135.1 224 144V368zM288 368c0 8.875-7.125 16-16 16S256 376.9 256 368v-224C256 135.1 263.1 128 272 128S288 135.1 288 144V368zM448 275c0 6.25-3.75 12-9.5 14.62L384 313.9V160h48C440.9 160 448 167.1 448 176V275z"/></svg>'
+                        : "未完成原因 : " + mindingContent.missionReason
+                }).appendTo(mindingDiv)
+            })
+        }
+
         //未完成紀錄外框
         const uncompleteDiv = $('<div>').prop({
-            className:'minding_UncompleteRemark'
+            className: 'minding_UncompleteRemark'
         }).css({
             'padding': '10px 30px',
             'margin': '10px',
@@ -226,7 +279,7 @@ function renderStudentStatus(studentId, week) {
         }).appendTo(studentMindingRow)
         ////未完成紀錄Title
         $('<h3>').prop({
-            className:'mindingFixingTitle',
+            className: 'mindingFixingTitle',
             innerHTML: '未完成紀錄'
         }).css({
             'border-bottom': '1px solid black',
@@ -235,7 +288,7 @@ function renderStudentStatus(studentId, week) {
         }).appendTo(uncompleteDiv)
         ////未完成紀錄Text
         $('<h4>').prop({
-            className:'mindingFixingText',
+            className: 'mindingFixingText',
             innerHTML: response.data.mindingContent.studentFixing
         }).appendTo(uncompleteDiv)
         ////自我評分分數
@@ -243,11 +296,11 @@ function renderStudentStatus(studentId, week) {
             className: 'mindingRanking',
             innerHTML: '<strong>自我評分 : ' + response.data.mindingContent.studentRanking + " 分</strong>"
         }).css({
-            'margin-top':'10px',
-            'padding':'10px 0',
+            'margin-top': '10px',
+            'padding': '10px 0',
             'border-top': '1px dashed rgba(0,0,0,0.3)',
         }).appendTo(uncompleteDiv)
-        
+
 
         const studentStatusBlock = $('<div>').prop({
             className: 'container-fluid'
@@ -277,8 +330,8 @@ function renderStudentStatus(studentId, week) {
     })
 }
 //render 回復學生狀態
-function renderTeacherResponse(studentId,week){
-    getTeacherResponse(studentId,week).then(response=>{
+function renderTeacherResponse(studentId, week) {
+    getTeacherResponse(studentId, week).then(response => {
         const responseContainer = $('<div>').prop({
             className: 'container'
         }).css({
@@ -315,7 +368,7 @@ function renderTeacherResponse(studentId,week){
         }).appendTo(responseContainer)
 
         $('<textarea>').prop({
-            className:'teacherResponseText',
+            className: 'teacherResponseText',
             innerHTML: response.data.teacherResponse ? response.data.teacherResponse : '',
             placeholder: '請寫下對學生的回覆以及評價'
         }).css({
@@ -338,7 +391,7 @@ function renderTeacherResponse(studentId,week){
             'width': '50%'
         }).click((e) => {
             loadingPage(true)
-            uploadResponse(studentId,week).then(response => {
+            uploadResponse(studentId, week).then(response => {
                 window.alert(response.data)
                 loadingPage(false)
             })
@@ -372,7 +425,7 @@ function renderTeacherResponse(studentId,week){
     })
 }
 //render 學生回覆
-function renderStudentResponse(studentId, week){
+function renderStudentResponse(studentId, week) {
     getTeacherResponse(studentId, week).then((response) => {
         const responseContainer = $('<div>').prop({
             className: 'container'
@@ -531,43 +584,114 @@ function renderResponseStudentList(studentDetail, Week) {
         'width': '100vw',
         'margin': '0 auto',
         'margin-top': '30px',
+        'height': '55vh',
+        'overflow-y': 'auto',
     })
 
-    let noOneDownYet = true
-    studentDetail.map((studentData, studentIndex) => {
-        if (isDoneThisWeek(studentData.studentDetail[Week - 1])) {
-            noOneDownYet = false
-            //學生序號
-            const studentNumber = $('<div>').prop({
-                className: 'studentData_Number',
-                id: `studentNumber_${studentIndex}`,
-                innerHTML: `S-${studentIndex}`
-            })
-            //學生ID
-            const studentId = $('<div>').prop({
-                className: 'studentData_Id',
-                id: `studentId_${studentIndex}`,
-                innerHTML: studentData.studentId
-            })
-            //學生姓名
-            const studentName = $('<div>').prop({
-                className: 'studentData_Name',
-                id: `studentName_${studentIndex}`,
-                innerHTML: studentData.studentName
-            })
+    const studentStatusCss = {
+        'margin': '0 auto',
+        'margin-bottom': '15px',
+        'transition-duration': '0.3s',
+        'border-bottom': '3px solid rgba(0,0,0,0.4)',
+        'width': '95%',
+        'user-select': 'none',
+        'display': 'flex',
+        'font-family': '"Silkscreen", cursive'
+    }
+    //學生已全部完成
+    const studentWellDone = $('<div>').prop({
+        className: 'studentWellDoneLine',
+        innerHTML: '<svg id="ArrowDownIcon_wellDone" xmlns="http://www.w3.org/2000/svg" width="50px" height="50px" style="margin-right:15px" viewBox="0 0 512 512"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"/></svg>' +
+            '<h1 style="margin-right:20px;">Well Done</h1>' +
+            '<svg xmlns="http://www.w3.org/2000/svg" width="30px" height="50px" viewBox="0 0 448 512"><path d="M224 256c70.7 0 128-57.3 128-128S294.7 0 224 0S96 57.3 96 128s57.3 128 128 128zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H418.3c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304H178.3z"/></svg>' +
+            countingMembers(studentDetail, Week, 'well done')
+    }).css(studentStatusCss).hover((e) => {
+        studentWellDone.css({
+            'transition-duration': '0.3s',
+            'background-color': 'rgba(255,255,255,0.8)'
+        })
+    }, (e) => {
+        studentWellDone.css({
+            'transition-duration': '0.3s',
+            'background-color': 'rgba(255,255,255,0)'
+        })
+    }).click((e) => {
+        openStudentList('.studentDataContainer_wellDone', '#ArrowDownIcon_wellDone')
+    }).appendTo(studentListDiv)
+    //學生待回覆
+    const studentFeedBack = $('<div>').prop({
+        className: 'studentFeedBackLine',
+        innerHTML: '<svg id="ArrowDownIcon_feedback" xmlns="http://www.w3.org/2000/svg" width="50px" height="50px" style="margin-right:15px" viewBox="0 0 512 512"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"/></svg>' +
+            '<h1 style="margin-right:20px;">Feedback</h1>' +
+            '<svg xmlns="http://www.w3.org/2000/svg" width="30px" height="50px" viewBox="0 0 448 512"><path d="M224 256c70.7 0 128-57.3 128-128S294.7 0 224 0S96 57.3 96 128s57.3 128 128 128zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H418.3c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304H178.3z"/></svg>' +
+            countingMembers(studentDetail, Week , 'feed back')
+    }).css(studentStatusCss).hover((e) => {
+        studentFeedBack.css({
+            'transition-duration': '0.3s',
+            'background-color': 'rgba(255,255,255,0.8)'
+        })
+    }, (e) => {
+        studentFeedBack.css({
+            'transition-duration': '0.3s',
+            'background-color': 'rgba(255,255,255,0)'
+        })
+    }).click((e) => {
+        openStudentList('.studentDataContainer_feedback', '#ArrowDownIcon_feedback')
+    }).appendTo(studentListDiv)
+    //學生未完成
+    const studentNotYet = $('<div>').prop({
+        className: 'studentNotYet',
+        innerHTML: '<svg id="ArrowDownIcon_notYet" xmlns="http://www.w3.org/2000/svg" width="50px" height="50px" style="margin-right:15px" viewBox="0 0 512 512"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"/></svg>' +
+            '<h1 style="margin-right:20px;">Not Yet</h1>' +
+            '<svg xmlns="http://www.w3.org/2000/svg" width="30px" height="50px" viewBox="0 0 448 512"><path d="M224 256c70.7 0 128-57.3 128-128S294.7 0 224 0S96 57.3 96 128s57.3 128 128 128zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H418.3c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304H178.3z"/></svg>' +
+            countingMembers(studentDetail, Week , 'not yet')
+    }).css(studentStatusCss).hover((e) => {
+        studentNotYet.css({
+            'transition-duration': '0.3s',
+            'background-color': 'rgba(255,255,255,0.8)'
+        })
+    }, (e) => {
+        studentNotYet.css({
+            'transition-duration': '0.3s',
+            'background-color': 'rgba(255,255,255,0)'
+        })
+    }).click((e) => {
+        openStudentList('.studentDataContainer_notYet', '#ArrowDownIcon_notYet')
+    }).appendTo(studentListDiv)
 
-            //設定狀態
-            const studentDetail = $('<button>').prop({
-                className: 'btn btn-outline-primary',
-                id: 'checkStudentStatus',
-                innerHTML: '學習狀況'
-            }).css({
-                'width': '30%',
-                'height': '40px',
-            }).click((e) => {
-                loadingPage(true)
-                renderStudentStatus(studentData.studentId, Week)
-            })
+    studentDetail.map((studentData, studentIndex) => {
+        //學生序號
+        const studentNumber = $('<div>').prop({
+            className: 'studentData_Number',
+            id: `studentNumber_${studentIndex}`,
+            innerHTML: `S-${studentIndex}`
+        })
+        //學生ID
+        const studentId = $('<div>').prop({
+            className: 'studentData_Id',
+            id: `studentId_${studentIndex}`,
+            innerHTML: studentData.studentId
+        })
+        //學生姓名
+        const studentName = $('<div>').prop({
+            className: 'studentData_Name',
+            id: `studentName_${studentIndex}`,
+            innerHTML: studentData.studentName
+        })
+        //設定狀態
+        const studentDetail = $('<button>').prop({
+            className: 'btn btn-outline-primary',
+            id: 'checkStudentStatus',
+            innerHTML: '學習狀況'
+        }).css({
+            'width': '30%',
+            'height': '40px',
+        }).click((e) => {
+            loadingPage(true)
+            renderStudentStatus(studentData.studentId, Week)
+        })
+        //Well Done
+        if (isDoneThisWeek(studentData.studentDetail[Week - 1])) {
             const teacherResponse = $('<button>').prop({
                 className: 'btn btn-outline-success',
                 id: 'teacherResponse',
@@ -575,22 +699,21 @@ function renderResponseStudentList(studentDetail, Week) {
             }).css({
                 'width': '30%',
                 'height': '40px',
-            }).click((e)=>{
+            }).click((e) => {
                 loadingPage(true)
-                renderTeacherResponse(studentData.studentId,Week)
+                renderTeacherResponse(studentData.studentId, Week)
             })
             const studentResponse = $('<button>').prop({
-                className: studentData.studentDetail[Week - 1].Status.Response == 2 ? 'btn btn-success' : 'btn btn-outline-success' ,
+                className: studentData.studentDetail[Week - 1].Status.Response == 2 ? 'btn btn-success' : 'btn btn-outline-success',
                 id: 'studentResponse',
                 innerHTML: '查看學生回覆'
             }).css({
                 'width': '35%',
                 'height': '40px',
-            }).click((e)=>{
+            }).click((e) => {
                 loadingPage(true)
-                renderStudentResponse(studentData.studentId,Week)
+                renderStudentResponse(studentData.studentId, Week)
             })
-
             //設定學生//
             const studentSetting = $('<div>').prop({
                 className: 'studentData_Setting',
@@ -599,7 +722,7 @@ function renderResponseStudentList(studentDetail, Week) {
 
             //學生資料表格框
             $('<div>').prop({
-                className: 'studentDataContainer',
+                className: 'studentDataContainer_wellDone',
                 id: `student_${studentIndex}`
             }).css({
                 'width': '95vw',
@@ -607,7 +730,7 @@ function renderResponseStudentList(studentDetail, Week) {
                 'border': '3px solid rgb(161, 160, 158)',
                 'border-radius': '20px',
                 'height': '70px',
-                'display': 'flex',
+                'display': 'none',
                 'justify-content': 'space-around',
                 'margin': '0 auto',
                 'margin-bottom': '15px',
@@ -618,29 +741,94 @@ function renderResponseStudentList(studentDetail, Week) {
                 .append(studentId)
                 .append(studentName)
                 .append(studentSetting)
-                .appendTo(studentListDiv)
+                .insertAfter(studentWellDone)
+        }
+        //FeedBack
+        else if (isFeedBackWeek(studentData.studentDetail[Week - 1])) {
+            const teacherResponse = $('<button>').prop({
+                className: 'btn btn-outline-success',
+                id: 'teacherResponse',
+                innerHTML: '給予回饋'
+            }).css({
+                'width': '30%',
+                'height': '40px',
+            }).click((e) => {
+                loadingPage(true)
+                renderTeacherResponse(studentData.studentId, Week)
+            })
+            const studentResponse = $('<button>').prop({
+                className: studentData.studentDetail[Week - 1].Status.Response == 2 ? 'btn btn-success' : 'btn btn-outline-success',
+                id: 'studentResponse',
+                innerHTML: '查看學生回覆'
+            }).css({
+                'width': '35%',
+                'height': '40px',
+            }).click((e) => {
+                loadingPage(true)
+                renderStudentResponse(studentData.studentId, Week)
+            })
+            //設定學生//
+            const studentSetting = $('<div>').prop({
+                className: 'studentData_Setting',
+                id: 'responseSetting'
+            }).append(studentDetail).append(teacherResponse).append(studentResponse)
+
+            //學生資料表格框
+            $('<div>').prop({
+                className: 'studentDataContainer_feedback',
+                id: `student_${studentIndex}`
+            }).css({
+                'width': '95vw',
+                'background-color': 'rgba(255,255,255,0.9)',
+                'border': '3px solid rgb(161, 160, 158)',
+                'border-radius': '20px',
+                'height': '70px',
+                'display': 'none',
+                'justify-content': 'space-around',
+                'margin': '0 auto',
+                'margin-bottom': '15px',
+                'text-align': 'center',
+                'user-select': 'none'
+            })
+                .append(studentNumber)
+                .append(studentId)
+                .append(studentName)
+                .append(studentSetting)
+                .insertAfter(studentFeedBack)
+        }
+        //not Yet
+        else {
+            //設定學生//
+            const studentSetting = $('<div>').prop({
+                className: 'studentData_Setting',
+                id: 'responseSetting'
+            }).append(studentDetail)
+
+            //學生資料表格框
+            $('<div>').prop({
+                className: 'studentDataContainer_notYet',
+                id: `student_${studentIndex}`
+            }).css({
+                'width': '95vw',
+                'background-color': 'rgba(255,255,255,0.9)',
+                'border': '3px solid rgb(161, 160, 158)',
+                'border-radius': '20px',
+                'height': '70px',
+                'display': 'none',
+                'justify-content': 'space-around',
+                'margin': '0 auto',
+                'margin-bottom': '15px',
+                'text-align': 'center',
+                'user-select': 'none'
+            })
+                .append(studentNumber)
+                .append(studentId)
+                .append(studentName)
+                .append(studentSetting)
+                .insertAfter(studentNotYet)
         }
     })
-    if (noOneDownYet) {
-        //學生資料表格框
-        $('<div>').prop({
-            className: 'studentDataContainer',
-            id: `student_no_down_yet`,
-            innerHTML: '<h1>還沒有人完成該週進度</h1>'
-        }).css({
-            'width': '95vw',
-            'background-color': 'rgba(255,255,255,0.9)',
-            'border': '3px solid rgb(161, 160, 158)',
-            'border-radius': '20px',
-            'height': '70px',
-            'display': 'flex',
-            'justify-content': 'space-around',
-            'margin': '0 auto',
-            'margin-bottom': '15px',
-            'text-align': 'center',
-            'user-select': 'none'
-        }).appendTo(studentListDiv)
-    }
+
     return studentListDiv
 }
 //----------------------------------------------
