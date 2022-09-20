@@ -160,17 +160,26 @@ router.post(process.env.ROUTER_ADMIN_READSTUDENTSTATUSDETAIL, async (req, res) =
         })
     })
     await studentmission.findOne({ studentId: req.body.studentId, week: req.body.week }).then(response => {
+        if(response == null){
+            return
+        }
         const studentSelect = Object.values(response.studentSelect)
         studentSelect.map((missionSelect) => {
             returnData.missionContent.push(missionSelect)
         })
     })
     await studentmanage.findOne({ studentId: req.body.studentId, week: req.body.week }).then(response => {
+        if(response == null){
+            return
+        }
         response.studentManage.map((studentManage) => {
             returnData.manageContent.push(studentManage)
         })
     })
     await studentminding.findOne({ studentId: req.body.studentId, week: req.body.week }).then(response => {
+        if(response == null){
+            return
+        }
         response.studentMinding = Object.values(response.studentMinding)
         returnData.mindingContent = {
             studentRanking: response.studentRanking,
