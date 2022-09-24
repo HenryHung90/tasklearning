@@ -4,7 +4,6 @@ function stageChecktoServer(name) {
         method: "POST",
         url: `/studentstage/${name}complete`,
         data: {
-            studentId: $('#userId').html(),
             week: $('.WeekTitle').html(),
         },
         withCredentials: true,

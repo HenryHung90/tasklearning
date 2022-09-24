@@ -30,17 +30,17 @@ const studentminding = require('../models/studentminding')
 
 
 const availableWeek = 5
-// router.use((req, res, next) => {
-//     if (req.user != undefined) {
-//         if (req.user.studentId == "admin") {
-//             next()
-//             return
-//         }
-//         res.send("fall")
-//     } else {
-//         res.send("fall")
-//     }
-// })
+router.use((req, res, next) => {
+    if (req.user != undefined) {
+        if (req.user.studentId == "admin") {
+            next()
+            return
+        }
+        res.send("fall")
+    } else {
+        res.send("fall")
+    }
+})
 
 //取得所有學生各項數據
 router.post(process.env.ROUTER_ADMIN_READSTUDENTSTATUS, async (req, res) => {
@@ -169,8 +169,12 @@ router.post(process.env.ROUTER_ADMIN_READSTUDENTSTATUSDETAIL, async (req, res) =
         })
     })
     await studentmanage.findOne({ studentId: req.body.studentId, week: req.body.week }).then(response => {
+        console.log(response)
         if(response == null){
             return
+        }
+        if(typeof response == 'object'){
+            response.studentManage = Object.values(response.studentManage)
         }
         response.studentManage.map((studentManage) => {
             returnData.manageContent.push(studentManage)
@@ -585,7 +589,7 @@ router.post(process.env.ROUTER_ADMIN_DELTEPDF, async (req, res) => {
         console.error(err)
     }
 })
-
+//編輯任務
 router.post(process.env.ROUTER_ADMIN_ADDMISSION, async (req, res) => {
     const addWeek = req.body.week
     const checkWeek = missioncontentmodel.findOne({ week: addWeek })
@@ -609,6 +613,7 @@ router.post(process.env.ROUTER_ADMIN_ADDMISSION, async (req, res) => {
         }
     })
 })
+//新增回覆
 router.post(process.env.ROUTER_ADMIN_ADDRESPONSE, async (req, res) => {
     let isFirstResponse = false
     let isSuccess = false

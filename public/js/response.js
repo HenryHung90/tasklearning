@@ -1,6 +1,5 @@
 //render老師回饋
 function renderTeacherResponse(teacherResponse){
-    
     //teacherResponse內文
     const teacherResponseContent = $('<span>').prop({
         className:'teacherResponseContent',
@@ -98,7 +97,7 @@ async function stageBtnEnterForResponse() {
     let isDone = false
     await axios({
         method: "POST",
-        url: '/studentstage/checkstage',
+        url: process.env.FRONT_STUDENT_STAGECHECK,
         data: {
             week: dataWeek
         },
@@ -115,19 +114,17 @@ async function uploadResponse(){
     loadingPage(true)
     axios({
         method: "POST",
-        url: '/studentstage/responsecomplete',
+        url: process.env.FRONT_STUDENT_RESPONSECOMPLETE,
         data: {
-            studentId: $('#userId').html(),
             week: $('.WeekTitle').html()
         },
         withCredentials: true,
     }).then((response)=>{
         axios({
             method: 'post',
-            url: '/student/addresponse',
+            url: process.env.FRONT_STUDENT_ADDRESPONSE,
             data: {
                 week: dataWeek,
-                studentId: userId,
                 studentResponse: $('.studentResponseTextarea').val()
             },
             withCredentials: true
@@ -150,14 +147,12 @@ function loadResponse(){
 
     axios({
         method:'post',
-        url:'/student/readresponse',
+        url:process.env.FRONT_STUDENT_READRESPONSE,
         data:{
             week:dataWeek,
-            studentId:userId
         },
         withCredentials:true
     }).then(response=>{
-        console.log(response.data)
         if(response.data == null || response.data == ""){
             window.alert("老師尚未給予回饋")
             window.location.href = `/dashboard/${userId}`

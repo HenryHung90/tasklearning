@@ -549,8 +549,7 @@ function renderStudentList(studentDetail) {
             'justify-content': 'space-around',
             'margin': '0 auto',
             'margin-bottom': '15px',
-            'text-align': 'center',
-            'user-select': 'none'
+            'text-align': 'center'
         })
             .append(studentNumber)
             .append(studentId)

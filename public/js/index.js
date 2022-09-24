@@ -41,12 +41,21 @@ function loadingPage(isOpen) {
     }
 }
 
-$('#loginNormal').click(e => {
-    loadingPage(true)
-    LoginFunc(e)
-    
-})
 
 $(document).ready(e =>{
     loadingPage(false)
+
+    $('#loginNormal').click(e => {
+        loadingPage(true)
+        LoginFunc(e)
+        
+    })
+    
+    $(document).keydown((e)=>{
+        if(e.keyCode == 13){
+            loadingPage(true)
+        LoginFunc(e)
+        }
+    })
+    
 })

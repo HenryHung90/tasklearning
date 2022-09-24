@@ -73,13 +73,14 @@ const studentStageComplete = async (studentId, changeWeek, stage) => {
     }
 }
 
-
+//檢查Student 的 Stage 狀態
 router.post(process.env.ROUTER_STUDENTSTAGE_CHECK, async (req, res) => {
     studentConfig.findOne({ studentId: req.user.studentId }).then(response => {
         res.send(response.studentDetail)
     })
 })
 
+//動過 Mission 之後 重新設定 Mission Manage Minding 之State
 router.post(process.env.ROUTER_STUDENTSTAGE_MISSIONUNCHECK,async(req,res)=>{
     //存取studentDetil
     let studentDetail
@@ -103,32 +104,33 @@ router.post(process.env.ROUTER_STUDENTSTAGE_MISSIONUNCHECK,async(req,res)=>{
     
 })
 
+//各項任務階段的Check動作
 router.post(process.env.ROUTER_STUDENTSTAGE_DATACHECK, async (req, res) => {
-    studentStageComplete(req.body.studentId, req.body.week,"Data").then(response=>{
+    studentStageComplete(req.user.studentId, req.body.week,"Data").then(response=>{
         res.send(response)
     })
 })
 
 router.post(process.env.ROUTER_STUDENTSTAGE_MISSIONCHECK, async (req, res) => {
-    studentStageComplete(req.body.studentId, req.body.week, "Mission").then(response => {
+    studentStageComplete(req.user.studentId, req.body.week, "Mission").then(response => {
         res.send(response)
     })
 })
 
 router.post(process.env.ROUTER_STUDENTSTAGE_MANAGECHECK, async (req, res) => {
-    studentStageComplete(req.body.studentId, req.body.week, "Manage").then(response => {
+    studentStageComplete(req.user.studentId, req.body.week, "Manage").then(response => {
         res.send(response)
     })
 })
 
 router.post(process.env.ROUTER_STUDENTSTAGE_MINDINGCHECK, async (req, res) => {
-    studentStageComplete(req.body.studentId, req.body.week, "Minding").then(response => {
+    studentStageComplete(req.user.studentId, req.body.week, "Minding").then(response => {
         res.send(response)
     })
 })
 
 router.post(process.env.ROUTER_STUDENTSTAGE_RESPONSECHECK, async (req, res) => {
-    studentStageComplete(req.body.studentId, req.body.week, "Response").then(response => {
+    studentStageComplete(req.user.studentId, req.body.week, "Response").then(response => {
         res.send(response)
     })
 })

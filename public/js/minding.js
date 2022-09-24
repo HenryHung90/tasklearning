@@ -5,16 +5,13 @@ function renderMindingManage(studentMission) {
     //return 數字Mission轉文字MissionName
     async function switchValuetoName(Id) {
         const dataWeek = $('.WeekTitle').html().split(" ")[1]
-        const userId = $('#userId').html()
 
         let returnData
-
         await axios({
             method: 'post',
             url: '/student/readmission',
             data: {
                 week: dataWeek,
-                studentId: userId,
             },
             withCredentials: true
         }).then((response) => {
@@ -36,12 +33,10 @@ function renderMindingManage(studentMission) {
             url: '/student/addminding',
             data: {
                 week: $('.WeekTitle').html().split(" ")[1],
-                studentId: $('#userId').html(),
                 studentMinding: uploadStudentMission
             },
             withCredentials: true
         }).then((response) => {
-            console.log(response.data)
             isSuccess = response.data
         })
 
@@ -371,7 +366,6 @@ function uploadMinding(data) {
         method: "POST",
         url: '/studentstage/mindingcomplete',
         data: {
-            studentId: $('#userId').html(),
             week: $('.WeekTitle').html()
         },
         withCredentials: true,
@@ -381,7 +375,6 @@ function uploadMinding(data) {
             url: '/student/addminding',
             data: {
                 week: $('.WeekTitle').html().split(" ")[1],
-                studentId: $('#userId').html(),
                 studentFixing: studentFixing,
                 studentRanking: studentRanking,
                 studentMinding: studentMindingData
@@ -433,7 +426,6 @@ function loadingMinding() {
         url: '/student/readminding',
         data: {
             week: dataWeek,
-            studentId: userId
         },
         withCredentials: true
     }).then(response => {

@@ -219,7 +219,6 @@ function renderMissionDecidewhenLoading(studentSelect) {
 
 //上傳策略暫存
 async function uploadStudentDecideSteps() {
-    const userId = $('#userId').html()
     const week = $('.WeekTitle').html().split(" ")[1]
     loadingPage(true)
 
@@ -237,7 +236,6 @@ async function uploadStudentDecideSteps() {
             method: 'post',
             url: '/student/addmission',
             data: {
-                studentId: userId,
                 week: week,
                 studentSelect: getMissionStepsSelected(),
             },
@@ -265,7 +263,6 @@ async function uploadStudentDecideSteps() {
 
 //確定整體策略後 調整Manage區域
 function uploadManage() {
-    const userId = $('#userId').html()
     const week = $('.WeekTitle').html().split(" ")[1]
     loadingPage(true)
 
@@ -273,7 +270,6 @@ function uploadManage() {
         method: "POST",
         url: '/studentstage/missioncomplete',
         data: {
-            studentId: userId,
             week: $('.WeekTitle').html()
         },
         withCredentials: true,
@@ -282,7 +278,6 @@ function uploadManage() {
             method: 'post',
             url: '/student/addmission',
             data: {
-                studentId: userId,
                 week: week,
                 studentSelect: getMissionStepsSelected(),
                 manageCheck: true
@@ -521,7 +516,6 @@ function loadingMission() {
         url: '/student/readmission',
         data: {
             week: dataWeek,
-            studentId: userId
         },
         withCredentials: true
     }).then((response) => {

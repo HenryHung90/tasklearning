@@ -172,15 +172,12 @@ const logoutFunc = (e) =>{
 }
 
 //從後端取得該人進度條
-async function getStudentWeekStage (userId){
+async function getStudentWeekStage (){
     let result
 
     await axios({
         method: "POST",
         url: "/studentstage/checkstage",
-        data:{
-            studentId:userId
-        },
         withCredentials: true
     }).then(res => {
         result =  res.data
@@ -271,10 +268,7 @@ function loadingPage(isOpen) {
 }
 
 $(window).ready(() => {
-    const userId = $('#userId').html()
-    const studentStage = getStudentWeekStage(userId)
-    
-    studentStage.then(stageStatus=>{
+   getStudentWeekStage().then(stageStatus=>{
         stageStatus.map((val) => {
             let taskStage = [val.Status.Data, val.Status.Mission, val.Status.Manage, val.Status.Minding, val.Status.Response]
             renderWeekTaskManager(val.Week, taskStage)
