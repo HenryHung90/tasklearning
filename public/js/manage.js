@@ -10,7 +10,6 @@ function switchMissionName(switchData) {
 //return 從資料庫抓下的計畫內容
 async function loadingManageDetailFromData(mission) {
     const dataWeek = $('.WeekTitle').html().split(" ")
-    const userId = $('#userId').html()
 
     const missionId = mission[1]
     const missionStep = mission[3]
@@ -20,7 +19,6 @@ async function loadingManageDetailFromData(mission) {
         url: '/student/readmanage',
         data: {
             week: dataWeek,
-            studentId: userId
         }
     }).then((response) => {
         data = Object.values(response.data.studentManage)
@@ -46,7 +44,6 @@ function uploadManageData(currentStepId) {
         url: '/student/addmanage',
         data: {
             week: dataWeek,
-            studentId: userId,
             manageId: manageId,
             manageStep: manageStep,
             manageContent: $('.manageDecideContent').val()
@@ -266,7 +263,6 @@ function loadingManage() {
         url: '/student/readmission',
         data: {
             week: dataWeek,
-            studentId: userId,
         },
         withCredentials: true
     }).then((response) => {
