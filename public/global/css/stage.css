@@ -60,8 +60,12 @@ body {
 
 .taskTitleText {
   font-family: 'Silkscreen', cursive;
+  height:50px
 }
 
+.taskTitleBtn{
+  height: 50px;
+}
 .taskTitleUser {
   display: flex;
 }

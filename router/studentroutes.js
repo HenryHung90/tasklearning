@@ -3,6 +3,12 @@ const router = express.Router()
 const passport = require('passport')
 require('../database/passportjs')(passport)
 
+const createDOMPurify = require('dompurify');
+const { JSDOM } = require('jsdom');
+
+const window = new JSDOM('').window;
+const DOMPurify = createDOMPurify(window);
+
 const datacontentmodel = require('../models/datacontentmodel')
 const missioncontentmodel = require('../models/missioncontentmodel')
 const responsecontentmodel = require('../models/responsecontentmodel')
@@ -10,6 +16,26 @@ const responsecontentmodel = require('../models/responsecontentmodel')
 const studentmission = require('../models/studentmission')
 const studentmanage = require('../models/studentmanage')
 const studentminding = require('../models/studentminding')
+
+function converDangerString(string){
+    let clean = DOMPurify.sanitize(string)
+    let outputString = []
+
+    const converString = new Map(
+        [
+            ["\<", "&lt;"],
+            ["\>", "&gt;"],
+            ["\&", "$amp;"],
+            ["\"", "&quot;"],
+            ["\'", "&#039;"]
+        ]
+    )
+
+    clean.split("").map((value)=>{
+        converString.get(value) == undefined ? outputString.push(value) : outputString.push(converString.get(value))
+    })
+    return outputString.join("")
+}
 
 //學生取得 教學資料
 router.post(process.env.ROUTER_STUDENT_READDATA, async (req, res) => {
@@ -81,7 +107,7 @@ router.post(process.env.ROUTER_STUDENT_READMANAGE, async (req, res) => {
             res.send('no found')
             isEmpty = true
         } else {
-            res.send(response)
+            res.send({'studentManage':response.studentManage})
         }
     })
 })
@@ -203,7 +229,7 @@ router.post(process.env.ROUTER_STUDENT_ADDMANAGE, async (req, res) => {
         cloudData = Object.values(response.studentManage)
     })
 
-    cloudData[req.body.manageId][req.body.manageStep] = req.body.manageContent
+    cloudData[req.body.manageId][req.body.manageStep] = converDangerString(req.body.manageContent)
 
 
     await studentmanage.updateOne({ week: req.body.week, studentId: req.user.studentId }, { studentManage: cloudData }).then(response => {

@@ -21,7 +21,7 @@ async function loadingManageDetailFromData(mission) {
             week: dataWeek,
         }
     }).then((response) => {
-        data = Object.values(response.data.studentManage)
+        data = response.data.studentManage
     })
 
     return data[missionId][missionStep]
@@ -29,31 +29,33 @@ async function loadingManageDetailFromData(mission) {
 
 //upload計畫內容
 function uploadManageData(currentStepId) {
-    if(currentStepId === null){
-        return
+    if (currentStepId === null) {
+        return true
     }
     const curretnStepTemp = currentStepId.split("_")
 
     const dataWeek = $('.WeekTitle').html().split(" ")[1]
-    const userId = $('#userId').html()
     const manageId = curretnStepTemp[1]
     const manageStep = curretnStepTemp[3]
+    const manageContent = $('.manageDecideContent').val()
 
-    return (axios({
+    axios({
         method: 'post',
         url: '/student/addmanage',
         data: {
             week: dataWeek,
             manageId: manageId,
             manageStep: manageStep,
-            manageContent: $('.manageDecideContent').val()
+            manageContent: manageContent
         },
         withCredentials: true
-    }))
+    })
+    return true
 }
 
 //render 左側計畫選項欄
 function renderManageSchedule(manageData) {
+    //任務執行外框
     let manageScheduleDiv = $('<div>').prop({
         className: 'missionSchedule',
     }).css({
@@ -62,6 +64,7 @@ function renderManageSchedule(manageData) {
         'padding': '10px',
         'overflow-y': 'auto',
     })
+    //render 各Mission Step框框
     function renderMissionData(data, index) {
         let returnData = ""
         for (let i = 1; i < data.length; i++) {
@@ -71,12 +74,13 @@ function renderManageSchedule(manageData) {
     }
 
     manageData.map((manageValue, manageIndex) => {
+        //選擇之Mission名稱
         const missionTitle = $('<h4>').prop({
             className: 'missionBox_Title',
             id: `targetMission_${manageIndex}`,
             innerHTML: manageValue[0]
         })
-
+        //選擇之Steps
         const missionData = $('<div>').prop({
             className: 'missionBox_Data',
             innerHTML: renderMissionData(manageValue, manageIndex)
@@ -85,6 +89,7 @@ function renderManageSchedule(manageData) {
             'justify-content': 'space-around',
         })
 
+        //任務外框
         let missionDiv = $('<div>').prop({
             className: `mission_${manageIndex}`
         }).css({
@@ -137,42 +142,6 @@ function renderManageDecide(currentStepId, currentStepTitle, currentContent) {
         })
     })
 
-    //儲存該項安排
-    const missionDecideSubmit = $('<div>').prop({
-        className: 'manageDecideSubmit',
-        innerHTML: '<svg xmlns="http://www.w3.org/2000/svg"  width="25px" height="25px" viewBox="0 0 448 512"><!--! Font Awesome Pro 6.1.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M438.6 105.4C451.1 117.9 451.1 138.1 438.6 150.6L182.6 406.6C170.1 419.1 149.9 419.1 137.4 406.6L9.372 278.6C-3.124 266.1-3.124 245.9 9.372 233.4C21.87 220.9 42.13 220.9 54.63 233.4L159.1 338.7L393.4 105.4C405.9 92.88 426.1 92.88 438.6 105.4H438.6z"/></svg>' +
-            '確認該項安排'
-    }).css({
-        'user-select': 'none',
-        'margin': '0 auto',
-        'margin-top': '1%',
-        'width': '150px',
-        'height': '50px',
-        'line-height': '50px',
-        'border-radius': '10px',
-        'transition-duration': '0.3s',
-        'background-color': '#0dcaf0'
-    }).hover((e) => {
-        missionDecideSubmit.css({
-            'transition-duration': '0.3s',
-            'background-color': 'rgb(33, 222, 260)'
-        })
-    }, (e) => {
-        missionDecideSubmit.css({
-            'background-color': '#0dcaf0'
-        })
-    }).click((e) => {
-        e.stopPropagation()
-        loadingPage(true)
-        uploadManageData(currentStepId).then((response) => {
-            if (response.data == true) {
-                loadingPage(false)
-            } else {
-                window.alert("網路錯誤，請重新整理")
-            }
-        })
-    })
-
     const manageDecideDiv = $('<div>').prop({
         className: 'manageDecide',
     }).css({
@@ -181,7 +150,7 @@ function renderManageDecide(currentStepId, currentStepTitle, currentContent) {
         'padding': '10px',
         'background-color': 'rgba(255,255,255,0.5)',
         'border-radius': '20px',
-    }).append(missionDecideTitle).append(missionDecideContent).append(missionDecideSubmit)
+    }).append(missionDecideTitle).append(missionDecideContent)
 
     return manageDecideDiv
 }
@@ -197,7 +166,7 @@ function renderManagePage(data) {
 //點擊option後生成安排區域
 function optionsClick() {
     const options = $('.options')
-    
+
     options.click((e) => {
         e.preventDefault()
         const PrevOption = $('.Clicking')[0]
@@ -208,37 +177,36 @@ function optionsClick() {
                 height: '90%',
                 margin: '5% 5% 5% 5%',
             }, 100)
-            .animate({
-                width: '100%',
-                height: '100%',
-                margin: '0',
-            }, 100)
+                .animate({
+                    width: '100%',
+                    height: '100%',
+                    margin: '0',
+                }, 100)
             return
         }
         //防止使用者點了忘記儲存
-        uploadManageData(PrevOption ? PrevOption.id : null)
-        
-        const targetId = e.currentTarget.id
-        const targetTitle = e.currentTarget.innerHTML
-        let targetContent = ""
+        if (uploadManageData(PrevOption ? PrevOption.id : null)) {
+            const targetId = e.currentTarget.id
+            const targetTitle = e.currentTarget.innerHTML
+            let targetContent = ""
 
-        loadingManageDetailFromData(targetId.split("_")).then(res => {
-            targetContent = res
-        }).then(() => {
-            //任務安排區域
-            const manageDecide = $('.manageUserDecide')
-            manageDecide.fadeOut(100)
+            loadingManageDetailFromData(targetId.split("_")).then(res => {
+                targetContent = res
+            }).then(() => {
+                //任務安排區域
+                const manageDecide = $('.manageUserDecide')
+                manageDecide.fadeOut(100)
 
-            setTimeout((e) => {
-                manageDecide.empty()
-                manageDecide.append(renderManageDecide(targetId, targetTitle, targetContent))
-                manageDecide.fadeIn(300)
-            }, 200)
-        })
-
-        //option highlighting select
-        $('.options').css({ 'background-color': 'rgb(200,200,200)' }).removeClass('Clicking')
-        $(`#${targetId}`).css({ 'background-color': 'rgba(255, 0, 0, 0.5)' }).addClass('Clicking')
+                setTimeout((e) => {
+                    manageDecide.empty()
+                    manageDecide.append(renderManageDecide(targetId, targetTitle, targetContent))
+                    manageDecide.fadeIn(200)
+                }, 100)
+            })
+            //option highlighting select
+            $('.options').css({ 'background-color': 'rgb(200,200,200)' }).removeClass('Clicking')
+            $(`#${targetId}`).css({ 'background-color': 'rgba(255, 0, 0, 0.5)' }).addClass('Clicking')
+        }
     })
 }
 //loading Manage main function
@@ -279,8 +247,77 @@ function loadingManage() {
 
 }
 
+//檢查是否完成Manage
+const checkManageDetail = async (Week) => {
+    let allCheck = false
+    await axios({
+        method: 'post',
+        url: '/student/readmanage',
+        data: {
+            week: Week,
+        },
+        withCredentials: true
+    }).then((response) => {
+        const checkData = response.data.studentManage
+        for (let value of checkData) {
+            for (let checkingIndex in value) {
+                if (checkingIndex > 0) {
+                    if (value[checkingIndex].length < 10) {
+                        window.alert("各項策略至少需填入10個字喔")
+                        return allCheck
+                    }
+                }
+            }
+        }
+        allCheck = true
+    })
+    return allCheck
+}
 
 $(window).ready(() => {
     //取得當周所有資料
     loadingManage()
+
+    $("#stageManageCheck").click((e) => {
+        const dataWeek = parseInt($('.WeekTitle').html().split(" ")[1]) - 1
+        const userId = $('#userId').html()
+        loadingPage(true)
+        axios({
+            method: "POST",
+            url: '/studentstage/checkstage',
+            withCredentials: true,
+        }).then(async (response) => {
+            const data = response.data[`${dataWeek}`]
+
+            if (data.Status.Manage == true) {
+                window.location.href = `/dashboard/${userId}`
+            } else {
+                await checkManageDetail(dataWeek + 1).then(response=>{
+                    console.log(response)
+                    if(response){
+                        if (window.confirm("確定完成 執行階段 嗎?")) {
+                            axios({
+                                method: "POST",
+                                url: `/studentstage/managecomplete`,
+                                data: {
+                                    week: $('.WeekTitle').html(),
+                                },
+                                withCredentials: true,
+                            }).then(response => {
+                                if (response.data === "upload failed") {
+                                    window.alert("更新失敗，請稍後重試或連繫管理員")
+                                    loadingPage(false)
+                                }
+                                window.location.href = response.data
+                            })
+                        }
+                    }
+                    loadingPage(false)
+                })
+                    
+                
+                
+            }
+        })
+    })
 })

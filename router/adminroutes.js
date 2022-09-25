@@ -510,7 +510,6 @@ router.post(process.env.ROUTER_ADMIN_UPDATESTUDENTCONFIG, async (req, res) => {
 //新增學生
 router.post(process.env.ROUTER_ADMIN_ADDSTUDENT, async (req, res) => {
     await studentsConfig.find({ studentId: req.body.studentId }).then(response => {
-        console.log(response.length)
         if (response.length == 0) {
             const saltRound = 15
             bcrypt.hash(req.body.studentPassword, saltRound, (err, hashedPassword) => {
@@ -560,9 +559,7 @@ router.post(process.env.ROUTER_ADMIN_ADDDATA, async (req, res) => {
             }
             //已經新增過，欲進行更改
             else {
-                datacontentmodel.updateOne({ week: addWeek }, { content: req.body.content }).then(result => {
-                    console.log(result)
-                })
+                datacontentmodel.updateOne({ week: addWeek }, { content: req.body.content })
             }
         } catch {
             console.log("mongodb has error")

@@ -31,6 +31,59 @@ function switchOptionName(Id) {
         }
     }
 }
+//return Option 轉 SVG
+function switchOptionIcon(option) {
+    switch (option) {
+        case "環境結構":
+            return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="40px" height="50px"><path d="M57.7 193l9.4 16.4c8.3 14.5 21.9 25.2 38 29.8L163 255.7c17.2 4.9 29 20.6 29 38.5v39.9c0 11 6.2 21 16 25.9s16 14.9 16 25.9v39c0 15.6 14.9 26.9 29.9 22.6c16.1-4.6 28.6-17.5 32.7-33.8l2.8-11.2c4.2-16.9 15.2-31.4 30.3-40l8.1-4.6c15-8.5 24.2-24.5 24.2-41.7v-8.3c0-12.7-5.1-24.9-14.1-33.9l-3.9-3.9c-9-9-21.2-14.1-33.9-14.1H257c-11.1 0-22.1-2.9-31.8-8.4l-34.5-19.7c-4.3-2.5-7.6-6.5-9.2-11.2c-3.2-9.6 1.1-20 10.2-24.5l5.9-3c6.6-3.3 14.3-3.9 21.3-1.5l23.2 7.7c8.2 2.7 17.2-.4 21.9-7.5c4.7-7 4.2-16.3-1.2-22.8l-13.6-16.3c-10-12-9.9-29.5 .3-41.3l15.7-18.3c8.8-10.3 10.2-25 3.5-36.7l-2.4-4.2c-3.5-.2-6.9-.3-10.4-.3C163.1 48 84.4 108.9 57.7 193zM464 256c0-36.8-9.6-71.4-26.4-101.5L412 164.8c-15.7 6.3-23.8 23.8-18.5 39.8l16.9 50.7c3.5 10.4 12 18.3 22.6 20.9l29.1 7.3c1.2-9 1.8-18.2 1.8-27.5zm48 0c0 141.4-114.6 256-256 256S0 397.4 0 256S114.6 0 256 0S512 114.6 512 256z"/></svg>'
+        case '學習策略':
+            return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="40px" height="50px"><path d="M64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V96c0-35.3-28.7-64-64-64H64zm64 64v64h64V96h64v64h64V96h64v64H320v64h64v64H320v64h64v64H320V352H256v64H192V352H128v64H64V352h64V288H64V224h64V160H64V96h64zm64 128h64V160H192v64zm0 64V224H128v64h64zm64 0H192v64h64V288zm0 0h64V224H256v64z"/></svg>'
+        case '時間管理':
+            return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="40px" height="50px"><path d="M256 512C114.6 512 0 397.4 0 256S114.6 0 256 0S512 114.6 512 256s-114.6 256-256 256zM232 120V256c0 8 4 15.5 10.7 20l96 64c11 7.4 25.9 4.4 33.3-6.7s4.4-25.9-6.7-33.3L280 243.2V120c0-13.3-10.7-24-24-24s-24 10.7-24 24z"/></svg>'
+        case '尋求協助':
+            return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" width="40px" height="50px"><path d="M543.9 251.4c0-1.1 .1-2.2 .1-3.4c0-48.6-39.4-88-88-88l-40 0H320l-16 0 0 0v16 72c0 22.1-17.9 40-40 40s-40-17.9-40-40V128h.4c4-36 34.5-64 71.6-64H408c2.8 0 5.6 .2 8.3 .5l40.1-40.1c21.9-21.9 57.3-21.9 79.2 0l78.1 78.1c21.9 21.9 21.9 57.3 0 79.2l-69.7 69.7zM192 128V248c0 39.8 32.2 72 72 72s72-32.2 72-72V192h80l40 0c30.9 0 56 25.1 56 56c0 27.2-19.4 49.9-45.2 55c8.2 8.6 13.2 20.2 13.2 33c0 26.5-21.5 48-48 48h-2.7c1.8 5 2.7 10.4 2.7 16c0 26.5-21.5 48-48 48H224c-.9 0-1.8 0-2.7-.1l-37.7 37.7c-21.9 21.9-57.3 21.9-79.2 0L26.3 407.6c-21.9-21.9-21.9-57.3 0-79.2L96 258.7V224c0-53 43-96 96-96z"/></svg>'
+        case '自我評估':
+            return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="40px" height="50px"><path d="M3.5 3.75a.25.25 0 01.25-.25h13.5a.25.25 0 01.25.25v10a.75.75 0 001.5 0v-10A1.75 1.75 0 0017.25 2H3.75A1.75 1.75 0 002 3.75v16.5c0 .966.784 1.75 1.75 1.75h7a.75.75 0 000-1.5h-7a.25.25 0 01-.25-.25V3.75z"></path><path d="M6.25 7a.75.75 0 000 1.5h8.5a.75.75 0 000-1.5h-8.5zm-.75 4.75a.75.75 0 01.75-.75h4.5a.75.75 0 010 1.5h-4.5a.75.75 0 01-.75-.75zm16.28 4.53a.75.75 0 10-1.06-1.06l-4.97 4.97-1.97-1.97a.75.75 0 10-1.06 1.06l2.5 2.5a.75.75 0 001.06 0l5.5-5.5z"></path></svg>'
+    }
+}
+//return Option 解釋
+function switchOptionText(option) {
+    switch (option) {
+        case '1':
+            return '<h3 style="font-weight:bolder">結構性問題</h3><p>環境結構即是你是在甚麼樣的環境下讀書並完成這件事。</p>'
+        case '2':
+            return '<h3 style="font-weight:bolder">中華碩能考台大博</h3><p>學習策略即是你是如何規畫你的學習方式。</p>'
+        case '3':
+            return '<h3 style="font-weight:bolder">時間管理大師</h3><p>時間管理即是你是如何規劃你的學習時間。</p>'
+        case '4':
+            return '<h3 style="font-weight:bolder">酒肉朋友</h3><p>尋求協助即是你是如何尋求朋友、老師、助教或是上網查資料等等。</p>'
+        case '5':
+            return '<h3 style="font-weight:bolder">贖罪審判</h3><p>自我評估即是你是對於規劃是如何評估的。</p>'
+    }
+}
+//return Option 數量是否符合規範
+function checkStatusisFinish(counting, posititon) {
+    const statusCount = {}
+    $(".missionStep").find('.optionBox').map((index, value) => {
+        if (statusCount[value.id.split("_")[1]] == undefined) {
+            statusCount[value.id.split("_")[1]] = 0
+        }
+        ++statusCount[value.id.split("_")[1]]
+    })
+    for (const [key, value] of Object.entries(statusCount)) {
+        if (posititon == 'end') {
+            if (value < counting) {
+                return false
+            }
+        } else if (posititon == 'add') {
+            if (value >= counting) {
+                return false
+            }
+        }
+
+    }
+    return true
+}
 //return 執行策略
 //1. uploadStudentDecideSteps (上傳策略使用)
 function getMissionStepsSelected() {
@@ -52,9 +105,8 @@ function getMissionStepsSelected() {
 
         selectedMissionObj[missionId].push(stepsName)
     })
-    return selectedMissionObj
+    return Object.values(selectedMissionObj)
 }
-
 //return Steps進度條
 //1. renderMissionDecidewhenLoading (進入頁面時使用)
 //2. dragMission -> renderMissionDecideSteps (拖動任務後使用)
@@ -83,7 +135,8 @@ function stepsSelectBox(missionId) {
         'height': '100px',
         'background-color': 'rgba(255,255,255,0.3)',
         'border-radius': '0 40px 40px 0',
-        'display': 'flex'
+        'display': 'flex',
+        'overflow-x': 'auto'
     })
 
     return stepsSelectDiv
@@ -195,7 +248,7 @@ function renderMissionDecidewhenLoading(studentSelect) {
                 const optionId = switchOptionName(value)
                 const stepBox = $('<div>').prop({
                     className: 'optionBox',
-                    innerHTML: value,
+                    innerHTML: switchOptionIcon(value),
                     id: `targetMission_${aryValue[0]}_options_${optionId}`
                 }).css({
                     'transition-duration': '0.3s',
@@ -208,6 +261,18 @@ function renderMissionDecidewhenLoading(studentSelect) {
                     'padding-top': '15px',
                     'font-size': '15px',
                     'user-select': 'none'
+                }).hover((e) => {
+                    stepBox.html('<svg xmlns="http://www.w3.org/2000/svg" width="50px" height="50px" viewBox="0 0 320 512"><path d="M294.6 166.6L317.3 144 272 98.7l-22.6 22.6L160 210.7 70.6 121.4 48 98.7 2.7 144l22.6 22.6L114.7 256 25.4 345.4 2.7 368 48 413.3l22.6-22.6L160 301.3l89.4 89.4L272 413.3 317.3 368l-22.6-22.6L205.3 256l89.4-89.4z"/></svg>')
+                    stepBox.css({
+                        'transition-duration': '0.3s',
+                        'background-color': 'rgba(255, 0, 0, 0.5)'
+                    })
+                }, (e) => {
+                    stepBox.html(switchOptionIcon(value))
+                    stepBox.css({
+                        'transition-duration': '0.3s',
+                        'background-color': 'rgba(255,255,255,0.4)'
+                    })
                 })
                 stepBox.insertBefore($(`#mission_${aryIndex}`))
             }
@@ -224,14 +289,14 @@ async function uploadStudentDecideSteps() {
 
 
     await axios.all([uploadDecide(), uncompleteNext()])
-    .then(axios.spread((acct,perms)=>{
-        if(!perms){
-            window.alert("網路錯誤，請重新整理")
-        }
-        loadingPage(false)
-    }))
+        .then(axios.spread((acct, perms) => {
+            if (!perms) {
+                window.alert("網路錯誤，請重新整理")
+            }
+            loadingPage(false)
+        }))
 
-    function uploadDecide(){
+    function uploadDecide() {
         return axios({
             method: 'post',
             url: '/student/addmission',
@@ -244,8 +309,8 @@ async function uploadStudentDecideSteps() {
             return response.data
         })
     }
-    
-    function uncompleteNext(){
+
+    function uncompleteNext() {
         return axios({
             method: "POST",
             url: '/studentstage/missionuncomplete',
@@ -257,7 +322,7 @@ async function uploadStudentDecideSteps() {
             return response.data
         })
     }
-    
+
 
 }
 
@@ -287,7 +352,7 @@ function uploadManage() {
             if (!response.data) {
                 window.alert('網路錯誤，請重新上傳')
             } else {
-                window.location.href = `/dashboard/${userId}`
+                window.location.href = `/dashboard/${$('#userId').html()}`
             }
         })
     })
@@ -297,11 +362,11 @@ function uploadManage() {
 function stepsSelectOption() {
     //取消block and Options
     function disableBlockandOptions() {
-        $('.missionBlock').fadeOut(200)
-        $('.missionOptions').fadeOut(200)
+        $('.container-fluid').fadeOut(200)
+        $('.container-sm').fadeOut(200)
         setTimeout(() => {
-            $('.missionBlock').remove()
-            $('.missionOptions').remove()
+            $('.container-fluid').remove()
+            $('.container-sm').remove()
         }, 500)
     }
     //return Option選擇並生成磚塊
@@ -319,7 +384,7 @@ function stepsSelectOption() {
 
         const stepBox = $('<div>').prop({
             className: 'optionBox',
-            innerHTML: `${optionsText}`,
+            innerHTML: switchOptionIcon(optionsText),
             id: newMissionId + "_" + option
         }).css({
             'transition-duration': '0.3s',
@@ -332,6 +397,18 @@ function stepsSelectOption() {
             'padding-top': '15px',
             'font-size': '15px',
             'user-select': 'none'
+        }).hover((e) => {
+            stepBox.html('<svg xmlns="http://www.w3.org/2000/svg" width="50px" height="50px" viewBox="0 0 320 512"><path d="M294.6 166.6L317.3 144 272 98.7l-22.6 22.6L160 210.7 70.6 121.4 48 98.7 2.7 144l22.6 22.6L114.7 256 25.4 345.4 2.7 368 48 413.3l22.6-22.6L160 301.3l89.4 89.4L272 413.3 317.3 368l-22.6-22.6L205.3 256l89.4-89.4z"/></svg>')
+            stepBox.css({
+                'transition-duration': '0.3s',
+                'background-color': 'rgba(255, 0, 0, 0.5)'
+            })
+        }, (e) => {
+            stepBox.html(switchOptionIcon(optionsText))
+            stepBox.css({
+                'transition-duration': '0.3s',
+                'background-color': 'rgba(255,255,255,0.4)'
+            })
         })
 
         //從加號前生成
@@ -344,37 +421,72 @@ function stepsSelectOption() {
     $('.standardSelect').click((e) => {
         e.stopPropagation()
         // console.log(e.currentTarget.id)
+        if (!checkStatusisFinish(7, 'add')) {
+            window.alert("一項任務最多七項策略")
+            return
+        }
         Options(e.currentTarget.id)
     })
 
     //生成Options Page
     function Options(id) {
         const options = $('<div>').prop({
-            className: 'missionOptions',
-            innerHTML: '<div>' +
-                '<h1>策略選擇</h1>' +
-                '<div style="height:70%;display:flex;padding-left:5%;">' +
-                '<div class="options" id="options_1">環境結構</div>' +
-                '<div class="options" id="options_2">學習策略</div>' +
-                '<div class="options" id="options_3">時間管理</div>' +
-                '<div class="options" id="options_4">尋求協助</div>' +
-                '<div class="options" id="options_5">自我評估</div>' +
-                '</div>' +
-                '</div>'
+            className: 'container-sm',
+            innerHTML: '<h1>策略選擇</h1>'
         }).css({
             'text-align': 'center',
-            'width': '50vw',
-            'height': '30vh',
+            'padding': '20px',
             'position': 'absolute',
-            'left': '20%',
             'top': '30%',
+            'left': '12%',
+            'translate': 'transform(50%,50%)',
             'background-color': 'white',
             'z-index': '10001',
             'border-radius': '10px',
             'display': 'none'
         })
+
+        const optionList = $('<div>').prop({
+            className: 'optionsList',
+        }).css({
+            'height': '100px',
+            'display': 'flex',
+            'justify-content': 'space-around',
+        }).appendTo(options)
+
+        for (let i = 1; i <= 5; i++) {
+            const optionsText = $('<div>').prop({
+                className: 'optionsText',
+                id: `optionsText_${i}`,
+                innerHTML: switchOptionText(`${i}`)
+            }).css({
+                'margin-top': '15px',
+                'height': '70px',
+                'display': 'none',
+            }).appendTo(options)
+
+            const option = $('<div>').prop({
+                className: 'options',
+                id: `options_${i}`,
+                innerHTML: switchOptionName(`${i}`)
+            }).hover((e) => {
+                optionsText.slideDown(200)
+                option.html(switchOptionIcon(switchOptionName(`${i}`)))
+                option.css({
+                    'transition-duration': '0.3s',
+                    'background-color': 'rgba(80, 186, 247, 0.431)',
+                })
+            }, (e) => {
+                optionsText.slideUp(50)
+                option.html(switchOptionName(`${i}`))
+                option.css({
+                    'background-color': 'rgba(23, 102, 135, 0.3)',
+                })
+            }).appendTo(optionList)
+        }
+
         const block = $('<div>').prop({
-            className: 'missionBlock',
+            className: 'container-fluid',
             innerHTML: ''
         }).css({
             'width': '100vw',
@@ -395,7 +507,7 @@ function stepsSelectOption() {
         //建立Option 點擊偵測
         $('.options').mousedown(async (e) => {
             //確定選擇Option以及所屬Mission
-            selectedStep(e.target.id, id)
+            selectedStep(e.currentTarget.id, id)
             //上傳Steps
             await uploadStudentDecideSteps()
         })
@@ -537,7 +649,12 @@ $(window).ready(() => {
     stepsSelectOption()
 })
 
+
 $("#stageMissionCheck").click(async (e) => {
+    if(!checkStatusisFinish(2,'end')){
+        window.alert("每項任務至少需安排兩項策略")
+        return
+    }
     await stageBtnEnterForMission().then(response => {
         if (response == false) {
             if (window.confirm("確定完成 設定目標 進度嗎?")) {

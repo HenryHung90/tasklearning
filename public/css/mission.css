@@ -6,6 +6,9 @@
   border-radius: 20px;
   text-align: center;
 }
+.missionThisWeek h1 {
+  font-weight:bolder
+}
 .missionThisWeekContainer{
   white-space: pre-wrap;
   margin: 0 auto;
@@ -32,6 +35,9 @@
   border-radius: 20px;
   text-align: center;
 }
+.missionDecide h1 {
+  font-weight:bolder
+}
 .missionDecideContainer{
   display: flex;
   margin: 0 auto;
@@ -55,6 +61,7 @@
   height: 100%;
 }
 .options{
+  transition-duration: 0.3s;
   user-select: none;
   margin:10px;
   padding:15px;
@@ -62,10 +69,6 @@
   height:70px;
   background-color:rgba(23, 102, 135, 0.3);
   border-radius: 10px;
-}
-.optionBox:hover{
-  transition-duration: 0.3s;
-  background-color:rgba(255,0,0,0.5) !important;
 }
 
 .standardSelect:hover{

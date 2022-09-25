@@ -37,9 +37,6 @@ function stageBtnEnter(stage,stageName){
     axios({
         method: "POST",
         url: '/studentstage/checkstage',
-        data: {
-            week: dataWeek
-        },
         withCredentials: true,
     }).then(async (response) => {
         const data = response.data[dataWeek]
@@ -73,9 +70,10 @@ $("#stageDataCheck").click((e) => {
 //         uploadStage("mission")
 //     }
 // })
-$("#stageManageCheck").click((e) => {
-    stageBtnEnter("Manage", "完成學習計畫")
-})
+//遷移至manage.js
+// $("#stageManageCheck").click((e) => {
+//     stageBtnEnter("Manage", "完成學習計畫")
+// })
 //遷移至minding.js
 // $("#stageMindingCheck").click((e) => {
 //     stageBtnEnter("Minding", "完成自我反思")

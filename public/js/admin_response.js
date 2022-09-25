@@ -186,9 +186,11 @@ function renderStudentStatus(studentId, week) {
                         'border-radius': '10px'
                     }).appendTo(missionText)
                     //mission執行內容˙
-                    $('<span>').prop({
+                    $('<p>').prop({
                         className: `missionCotent_${contentIndex}`,
                         innerHTML: response.data.manageContent[missionIndex][contentIndex]
+                    }).css({
+                        'word-break': 'break-all'
                     }).appendTo(missionStep)
                     if (contentIndex < studentMission.length - 1) {
                         $('<div>').prop({
