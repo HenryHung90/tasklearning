@@ -97,10 +97,7 @@ async function stageBtnEnterForResponse() {
     let isDone = false
     await axios({
         method: "POST",
-        url: process.env.FRONT_STUDENT_STAGECHECK,
-        data: {
-            week: dataWeek
-        },
+        url: '/studentstage/checkstage',
         withCredentials: true,
     }).then((response) => {
         isDone = response.data[dataWeek].Status.Response
@@ -114,7 +111,7 @@ async function uploadResponse(){
     loadingPage(true)
     axios({
         method: "POST",
-        url: process.env.FRONT_STUDENT_RESPONSECOMPLETE,
+        url: '/studentstage/responsecomplete',
         data: {
             week: $('.WeekTitle').html()
         },
@@ -122,7 +119,7 @@ async function uploadResponse(){
     }).then((response)=>{
         axios({
             method: 'post',
-            url: process.env.FRONT_STUDENT_ADDRESPONSE,
+            url: '/student/addresponse',
             data: {
                 week: dataWeek,
                 studentResponse: $('.studentResponseTextarea').val()
@@ -147,7 +144,7 @@ function loadResponse(){
 
     axios({
         method:'post',
-        url:process.env.FRONT_STUDENT_READRESPONSE,
+        url:'/student/readresponse',
         data:{
             week:dataWeek,
         },
@@ -177,4 +174,24 @@ function loadResponse(){
 
 $(window).ready(e=>{
     loadResponse()
+})
+$(document).ready(async () => {
+    function disableDOMevent() {
+        //取消學生回饋輸入
+        $('.studentResponseTextarea').attr('disabled', 'disabled')
+    }
+
+    const dataWeek = parseInt($('.WeekTitle').html().split(" ")[1]) - 1
+    await axios({
+        method: "POST",
+        url: '/studentstage/checkstage',
+        data: {
+            week: dataWeek
+        },
+        withCredentials: true,
+    }).then((response) => {
+        response.data[dataWeek].Status.Response == 2 ?
+            disableDOMevent() :
+            null
+    })
 })

@@ -405,13 +405,13 @@ function renderMindingPage(data) {
 }
 
 //loading Minding main function
-function loadingMinding() {
+async function loadingMinding() {
     loadingPage(true)
     const dataWeek = $('.WeekTitle').html().split(" ")[1]
     const userId = $('#userId').html()
 
     //讀取已選任務
-    axios({
+    await axios({
         method: 'post',
         url: '/studentstage/checkstage',
         withCredentials: true
@@ -421,7 +421,7 @@ function loadingMinding() {
             window.location.href = `/dashboard/${userId}`
         }
     })
-    axios({
+    await axios({
         method: 'post',
         url: '/student/readminding',
         data: {
@@ -447,13 +447,38 @@ function loadingMinding() {
             })
         })
     }).then(() => {
-
         loadingPage(false)
     })
 
 }
 
-$(window).ready((e) => {
+$(window).ready(async (e) => {
     //取得當周所有資料
-    loadingMinding()
+    await loadingMinding()
+
+    function disableDOMevent() {
+        //關閉完成任務勾勾
+        $('.missionBtn').off('mousedown')
+        $('.missionBtn').unbind('mouseenter')
+        //關閉任務檢查輸入
+        $('.missionTextarea').attr('disabled', 'disabled')
+        //關閉未完成紀錄輸入
+        $('.manageFixingTextarea').attr('disabled', 'disabled')
+        //關閉自我評價
+        $('.rankingStar').unbind('mouseenter').unbind('mouseleave')
+    }
+
+    const dataWeek = parseInt($('.WeekTitle').html().split(" ")[1]) - 1
+    await axios({
+        method: "POST",
+        url: '/studentstage/checkstage',
+        data: {
+            week: dataWeek
+        },
+        withCredentials: true,
+    }).then((response) => {
+        response.data[dataWeek].Status.Response == 2 ?
+            disableDOMevent() :
+            null
+    })
 })

@@ -24,6 +24,24 @@ const mongoDbStatus = mongoose.connection
 mongoDbStatus.on('error', err => console.error('connection error', err))
 mongoDbStatus.once('open', (db) => console.log('Connection to mongodb'))
 
+//express helmet
+const helmet = require('helmet')
+
+//開啟DNS預讀取
+task.use(helmet({ dnsPrefetchControl: { allow: true } }))
+//禁止使用iframe
+// task.use(helmet({frameguard: {action: 'deny'}}))
+//CSP
+task.use(
+    helmet.contentSecurityPolicy({
+        directives: {
+            "script-src": ["self", "https://code.jquery.com", 
+            "https://cdn.jsdelivr.net",'http://localhost:3000',
+            'https://cdnjs.cloudflare.com'],
+        },
+    })
+);
+
 //passport
 const passport = require('passport')
 const session = require('express-session')
@@ -102,9 +120,9 @@ task.post(process.env.ROUTER_MAIN_LOGIN, (req, res, next) => {
 })
 
 //登出
-task.get(process.env.ROUTER_MAIN_LOGOUT, (req, res,next) => {
-    req.logout((err)=>{
-        if(err)return next(err)
+task.get(process.env.ROUTER_MAIN_LOGOUT, (req, res, next) => {
+    req.logout((err) => {
+        if (err) return next(err)
         res.send('/')
     })
 })
@@ -119,17 +137,17 @@ let isAuthenticated = function (req, res, next) {
     res.redirect('/')
 }
 task.get('/', (req, res) => {
-    if(req.user !== undefined){
+    if (req.user !== undefined) {
         res.redirect(`/dashboard/${req.user.studentId}`)
-    }else{
+    } else {
         res.render('index')
     }
 })
 
 //Stagepage
-task.use(process.env.ROUTER_MAIN_DASHBOARD,isAuthenticated, dashboardRoutes)
+task.use(process.env.ROUTER_MAIN_DASHBOARD, isAuthenticated, dashboardRoutes)
 //stageCheck
-task.use(process.env.ROUTER_MAIN_STUDENTSTAGE, isAuthenticated ,stageCheckRoutes);
+task.use(process.env.ROUTER_MAIN_STUDENTSTAGE, isAuthenticated, stageCheckRoutes);
 //student
 task.use(process.env.ROUTER_MAIN_STUDENT, isAuthenticated, studentRoutes)
 //admin

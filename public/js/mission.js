@@ -173,7 +173,9 @@ async function stageBtnEnterForMission() {
         },
         withCredentials: true,
     }).then((response) => {
-        isDone = response.data[dataWeek].Status.Mission
+        response.data[dataWeek].Status.Response == 2 ?
+            isDone = response.data[dataWeek].Status.Response :
+            isDone = response.data[dataWeek].Status.Mission
     })
     return isDone
 }
@@ -602,7 +604,7 @@ function dragMission() {
             await uploadStudentDecideSteps()
             //設定刪除執行策略click事件
             deleteSelectOption()
-        }, 300)
+        }, 100)
     }
 }
 
@@ -648,10 +650,34 @@ $(window).ready(() => {
     //若當周有資料 要預先載入執行步驟
     stepsSelectOption()
 })
+$(document).ready(async () => {
+    function disableDOMevent(){
+        //移除新增按鈕
+        $('.standardSelect').remove()
+        //取消option刪除功能
+        $('.optionBox').off('click')
+        //取消dragging屬性
+        $('.missionText').attr('draggable', false)
+    }
+
+    const dataWeek = parseInt($('.WeekTitle').html().split(" ")[1]) - 1
+    await axios({
+        method: "POST",
+        url: '/studentstage/checkstage',
+        data: {
+            week: dataWeek
+        },
+        withCredentials: true,
+    }).then((response) => {
+        response.data[dataWeek].Status.Response == 2 ?
+            disableDOMevent() :
+            null
+    })
+})
 
 
 $("#stageMissionCheck").click(async (e) => {
-    if(!checkStatusisFinish(2,'end')){
+    if (!checkStatusisFinish(2, 'end')) {
         window.alert("每項任務至少需安排兩項策略")
         return
     }
@@ -661,7 +687,11 @@ $("#stageMissionCheck").click(async (e) => {
                 uploadManage()
             }
         } else {
-            uploadManage()
+            if(response != 2){
+                uploadManage()
+            }else{
+                window.location.href = `/dashboard/${$('#userId').html()}`
+            }
         }
     })
 })

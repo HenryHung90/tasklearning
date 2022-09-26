@@ -23,22 +23,23 @@ async function loadingManageDetailFromData(mission) {
     }).then((response) => {
         data = response.data.studentManage
     })
-
     return data[missionId][missionStep]
 }
 
 //upload計畫內容
-function uploadManageData(currentStepId) {
+function uploadManageData(currentStepId,isDisabled) {
     if (currentStepId === null) {
         return true
     }
     const curretnStepTemp = currentStepId.split("_")
 
+    if(isDisabled){
+        return true
+    }
     const dataWeek = $('.WeekTitle').html().split(" ")[1]
     const manageId = curretnStepTemp[1]
     const manageStep = curretnStepTemp[3]
     const manageContent = $('.manageDecideContent').val()
-
     axios({
         method: 'post',
         url: '/student/addmanage',
@@ -50,6 +51,7 @@ function uploadManageData(currentStepId) {
         },
         withCredentials: true
     })
+
     return true
 }
 
@@ -106,7 +108,7 @@ function renderManageSchedule(manageData) {
     return manageScheduleDiv
 }
 //render 右側寫入執行計畫欄
-function renderManageDecide(currentStepId, currentStepTitle, currentContent) {
+function renderManageDecide(currentStepId, currentStepTitle, currentContent, isDisabled) {
     const missionName = $(`#targetMission_${currentStepId.split('_')[1]}`).html()
 
 
@@ -141,7 +143,8 @@ function renderManageDecide(currentStepId, currentStepTitle, currentContent) {
             'border': '1px dashed rgba(0,0,0,0.3)'
         })
     })
-
+    if(isDisabled) missionDecideContent.attr('disabled', 'disabled')
+    
     const manageDecideDiv = $('<div>').prop({
         className: 'manageDecide',
     }).css({
@@ -167,7 +170,7 @@ function renderManagePage(data) {
 function optionsClick() {
     const options = $('.options')
 
-    options.click((e) => {
+    options.click(async (e) => {
         e.preventDefault()
         const PrevOption = $('.Clicking')[0]
         //阻止重複點按
@@ -184,8 +187,11 @@ function optionsClick() {
                 }, 100)
             return
         }
+        let isDisabled = false
+        await preventEditAfterWellDone().then(response=> isDisabled = response)
+        
         //防止使用者點了忘記儲存
-        if (uploadManageData(PrevOption ? PrevOption.id : null)) {
+        if (uploadManageData(PrevOption ? PrevOption.id : null,isDisabled)) {
             const targetId = e.currentTarget.id
             const targetTitle = e.currentTarget.innerHTML
             let targetContent = ""
@@ -199,7 +205,7 @@ function optionsClick() {
 
                 setTimeout((e) => {
                     manageDecide.empty()
-                    manageDecide.append(renderManageDecide(targetId, targetTitle, targetContent))
+                    manageDecide.append(renderManageDecide(targetId, targetTitle, targetContent, isDisabled))
                     manageDecide.fadeIn(200)
                 }, 100)
             })
@@ -292,9 +298,9 @@ $(window).ready(() => {
             if (data.Status.Manage == true) {
                 window.location.href = `/dashboard/${userId}`
             } else {
-                await checkManageDetail(dataWeek + 1).then(response=>{
+                await checkManageDetail(dataWeek + 1).then(response => {
                     console.log(response)
-                    if(response){
+                    if (response) {
                         if (window.confirm("確定完成 執行階段 嗎?")) {
                             axios({
                                 method: "POST",
@@ -314,10 +320,29 @@ $(window).ready(() => {
                     }
                     loadingPage(false)
                 })
-                    
-                
-                
+
+
+
             }
         })
     })
 })
+
+async function preventEditAfterWellDone() {
+    let isPrevent = false
+    const dataWeek = parseInt($('.WeekTitle').html().split(" ")[1]) - 1
+    await axios({
+        method: "POST",
+        url: '/studentstage/checkstage',
+        data: {
+            week: dataWeek
+        },
+        withCredentials: true,
+    }).then((response) => {
+        response.data[dataWeek].Status.Response == 2 ?
+            isPrevent = true :
+            null
+    })
+    return isPrevent
+}
+
