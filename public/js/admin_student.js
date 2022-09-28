@@ -55,71 +55,6 @@ async function uploadManyStudents(studentsData){
     )
 }
 //----------------------------------
-//return stundentList
-function studentListGenerate(studentList) {
-    let member = []
-    studentList.map((listValue, listIndex) => {
-        let data = {
-            "新學號(若要更新再輸入)": '',
-            "當前學號": listValue.studentId,
-            "姓名": listValue.studentName,
-            "密碼(若要更新再輸入)": '',
-            "電子郵件": listValue.studentEmail
-        }
-        listValue.studentDetail.map((statusValue, statusIndex) => {
-            data[`周 ${statusValue.Week} 進度`] = 'unchecked'
-            if (statusValue.Status.Data == true) {
-                data[`周 ${statusValue.Week} 進度`] = 'Task'
-            }
-            if (statusValue.Status.Mission == true) {
-                data[`周 ${statusValue.Week} 進度`] = 'Plane'
-            }
-            if (statusValue.Status.Manage == true) {
-                data[`周 ${statusValue.Week} 進度`] = 'Reflection'
-            }
-            if (statusValue.Status.Minding == true) {
-                data[`周 ${statusValue.Week} 進度`] = 'Feedback'
-            }
-            if (statusValue.Status.Response == 1) {
-                data[`周 ${statusValue.Week} 進度`] = 'Done'
-            }
-        })
-        member.push(data)
-    })
-    return member
-}
-//return studentManage Data
-function studentManageStatusGenerate(Mission, Manage) {
-    //最終回傳陣列
-    let returnWorkSheet = []
-    Manage.map((studentValue, studentIndex) => {
-        //每周資料格式
-        let manageStatusWorkSheet = {
-            "學號": ''
-        }
-        //Manage資料對位使用
-        let missionPostion = []
-        //建立每周資料格式後續格子
-        Mission.mission.map((missionValue, missionIndex) => {
-            manageStatusWorkSheet[missionValue.title] = ''
-            missionPostion.push(missionValue.title)
-        })
-
-        if (studentValue.week == Mission.week) {
-            manageStatusWorkSheet["學號"] = studentValue.studentId
-
-            const manageData = Object.values(studentValue.manage)
-            manageData.map((dataValue, dataIndex) => {
-                const insertData = dataValue.join("").split("\n").join(" -> ")
-
-                manageStatusWorkSheet[missionPostion[dataValue[0]]] = insertData
-            })
-
-            returnWorkSheet.push(manageStatusWorkSheet)
-        }
-    })
-    return returnWorkSheet
-}
 //return Download xlsx
 async function downloadDatatoExcel(workbookTitle, worksheetData, worksheetName) {
     const workbook = XLSX.utils.book_new();
@@ -357,31 +292,6 @@ function changeStudentConfig(Id) {
 //-----------------------------------------------
 //render 上層按鈕列表
 function renderStudentPageBtn() {
-    //下載學生Minding資料
-    const downloadMindingStatusBtn = $('<button>').prop({
-        className: 'btn btn-secondary',
-        id: '',
-        innerHTML: '下載Reflection'
-    }).css({
-        'width': '10%'
-    }).click((e) => {
-        loadingAllMindingStatus().then(response => {
-            downloadMindingStatus(response.data)
-        })
-    })
-    //下載學生Manage資料
-    const downloadManageStatusBtn = $('<button>').prop({
-        className: 'btn btn-secondary',
-        id: '',
-        innerHTML: '下載Plan'
-    }).css({
-        'width': '10%'
-    }).click((e) => {
-        loadingAllManageStatus().then(response => {
-            downloadManageStatus(response.data)
-        })
-    })
-
     //上傳學生名單
     const uploadStudents = $('<div>').prop({
         className: 'input-group mb-3',
@@ -429,9 +339,8 @@ function renderStudentPageBtn() {
         'width': '100%',
         'height': '38px',
         'display': 'flex',
-        'justify-content': 'space-between',
-    }).append(addNewStudent).append(uploadandDownloadStudentContainer).append(downloadManageStatusBtn).append(downloadMindingStatusBtn)
-
+        'justify-content': 'space-around',
+    }).append(addNewStudent).append(uploadandDownloadStudentContainer)
     //Btn 外框
     const studentBtnDiv = $('<div>').prop({
         className: 'studentBtnContainer',
