@@ -75,6 +75,40 @@ function comfirmClick(Name) {
         window.confirm(`確定 ${Name} ?`)
     )
 }
+//return stundentList
+function studentListGenerate(studentList) {
+    let member = []
+    studentList.map((listValue, listIndex) => {
+        let data = {
+            "屆數":listValue.studentSession,
+            "新學號(若要更新再輸入)": '',
+            "當前學號": listValue.studentId,
+            "姓名": listValue.studentName,
+            "密碼(若要更新再輸入)": '',
+            "電子郵件": listValue.studentEmail
+        }
+        listValue.studentDetail.map((statusValue, statusIndex) => {
+            data[`周 ${statusValue.Week} 進度`] = 'unchecked'
+            if (statusValue.Status.Data == true) {
+                data[`周 ${statusValue.Week} 進度`] = 'Task'
+            }
+            if (statusValue.Status.Mission == true) {
+                data[`周 ${statusValue.Week} 進度`] = 'Plane'
+            }
+            if (statusValue.Status.Manage == true) {
+                data[`周 ${statusValue.Week} 進度`] = 'Reflection'
+            }
+            if (statusValue.Status.Minding == true) {
+                data[`周 ${statusValue.Week} 進度`] = 'Feedback'
+            }
+            if (statusValue.Status.Response == 1) {
+                data[`周 ${statusValue.Week} 進度`] = 'Done'
+            }
+        })
+        member.push(data)
+    })
+    return member
+}
 //Click Function----------------------------------
 //下載所有任務資料
 const downloadManageStatus = (manageStatus) => {
@@ -101,6 +135,9 @@ const downloadStudentDetail = (studentId) => {
     }).then(response => {
         downloadDatatoExcel(studentId, response.data.studentData, response.data.dataTitle)
     })
+}
+const downloadStudentUsingRecord = (studentId) =>{
+
 }
 //批量下載學員
 const DownloadMember = (studentList) => {
@@ -133,15 +170,17 @@ const UploadMember = async (e) => {
 
         for (let i = 0; i < DataContainer.length; i++) {
             const UploadData = {
-                studentId: DataContainer[i][1],
-                StudentName: DataContainer[i][2],
-                StudentPassword: DataContainer[i][3],
-                studentEmail: DataContainer[i][4]
+                studentSession:DataContainer[i][0],
+                newStudentId:DataContainer[i][1],
+                currentStudentId: DataContainer[i][2],
+                studentName: DataContainer[i][3],
+                studentPassword: DataContainer[i][4],
+                studentEmail: DataContainer[i][5]
             };
             DataUpdate.push(UploadData);
         }
-        console.log(DataContainer)
-        await uploadManyStudents(DataContainer).then(async response => {
+        console.log(DataUpdate)
+        await uploadManyStudents(DataUpdate).then(async response => {
             if(response.data){
                 let nextData = ''
                 await loadingAllStudent().then(response=>{
@@ -331,6 +370,16 @@ function renderStudentPageBtn() {
         addNewStudentPage()
     })
 
+    //選擇屆數
+    const changeStudentsSession = $('<select>').prop({
+        className: "form-select",
+        ariaLabel: "Default select example"
+    }).css({
+        'width': '20%',
+        'margin': '0'
+    }).change((e) => {
+
+    })
     //Btn Container
     const btnContainer = $('<div>').prop({
         className: 'btnContainer'
@@ -340,7 +389,7 @@ function renderStudentPageBtn() {
         'height': '38px',
         'display': 'flex',
         'justify-content': 'space-around',
-    }).append(addNewStudent).append(uploadandDownloadStudentContainer)
+    }).append(changeStudentsSession).append(addNewStudent).append(uploadandDownloadStudentContainer)
     //Btn 外框
     const studentBtnDiv = $('<div>').prop({
         className: 'studentBtnContainer',
@@ -388,6 +437,7 @@ function renderStudentList(studentDetail) {
         const studentDetail = $('<div>').prop({
             className: 'studentData_Detail'
         })
+        //學習檔案
         $('<button>').prop({
             className: 'btn btn-primary',
             innerHTML: "學習檔案"
@@ -395,9 +445,19 @@ function renderStudentList(studentDetail) {
             'width': '100%',
             'height': '40px',
             'background-color': 'purple'
-        }).click((e) => {
+        }).click(e => {
             downloadStudentDetail(studentData.studentId)
         }).appendTo(studentDetail)
+        //事件紀錄
+        $('<button>').prop({
+            className: 'btn btn-primary',
+            innerrHTML:'事件紀錄'
+        }).css({
+            'height':'40px',
+            'background-color':'purple'
+        }).click(e=>{
+            downloadStudentUsingRecord(studentData.studentId)
+        })
 
 
         const studentPassword = $('<button>').prop({

@@ -319,56 +319,63 @@ router.post(process.env.ROUTER_ADMIN_READDATA, async (req, res) => {
 //批量修改學生 用於Upload Student
 router.post(process.env.ROUTER_ADMIN_UPLOADMANYSTUDENTS, async (req, res) => {
     await req.body.studentList.map(async (studentValue, studentIndex) => {
-        if (studentValue.length !== 12) {
+        if (studentIndex == req.body.studentList.length - 1){
             return
         }
-        //studentValue[0] = newStudentId
-        //studentValue[1] = currentStudentId
-        //studentValue[2] = studentName
-        //studentValue[3] = studentPassword
-        //studentValue[4] = studentEmail
+        //studentSession
+        //newStudentId
+        //currentStudentId
+        //studentName
+        //studentPassword
+        //studentEmail
         let isNewStudent = false
-        await studentsConfig.findOne({ studentId: studentValue[1] }).then(response => {
+        await studentsConfig.findOne({ studentId: studentValue.currentStudentId }).then(response => {
             response == null ? isNewStudent = true : null
         })
         if (!isNewStudent) {
-            if (studentValue[3] != '') {
+            if (studentValue.studentPassword != '') {
                 const saltRound = 15
-                bcrypt.hash(studentValue[3], saltRound, async (err, hashedPassword) => {
-                    await studentsConfig.updateOne({ studentId: studentValue[1] },
+                bcrypt.hash(studentValue.studentPassword, saltRound, async (err, hashedPassword) => {
+                    await studentsConfig.updateOne({ studentId: studentValue.currentStudentId },
                         {
-                            studentId: studentValue[0] == '' ? studentValue[1] : studentValue[0],
+                            studentSession:studentValue.studentSession,
+                            studentId: studentValue.newStudentId == '' ? studentValue.currentStudentId : studentValue.newStudentId,
                             studentPassword: hashedPassword,
-                            studentName: studentValue[2],
-                            studentEmail: studentValue[4]
+                            studentName: studentValue.studentName,
+                            studentEmail: studentValue.studentEmail
                         })
                 })
             } else {
-                await studentsConfig.updateOne({ studentId: studentValue[1] },
+                await studentsConfig.updateOne({ studentId: studentValue.currentStudentId },
                     {
-                        studentId: studentValue[0] == '' ? studentValue[1] : studentValue[0],
-                        studentName: studentValue[2],
-                        studentEmail: studentValue[4]
+                        studentId: studentValue.newStudentId == '' ? studentValue.currentStudentId : studentValue.newStudentId,
+                        studentName: studentValue.studentName,
+                        studentEmail: studentValue.studentEmail
                     })
             }
             //學生Task
-            await studentmission.updateMany({ studentId: studentValue[1] },
-                { studentId: studentValue[0] == '' ? studentValue[1] : studentValue[0] })
+            if(studentValue.newStudentId != ''){
+                await studentmission.updateMany({ studentId: studentValue.currentStudentId },
+                    { studentId: studentValue.newStudentId })
 
-            //學生Plan
-            await studentmanage.updateMany({ studentId: studentValue[1] },
-                { studentId: studentValue[0] == '' ? studentValue[1] : studentValue[0] })
+                //學生Plan
+                await studentmanage.updateMany({ studentId: studentValue.currentStudentId },
+                    { studentId: studentValue.newStudentId })
 
-            //學生Reflection
-            await studentminding.updateMany({ studentId: studentValue[1] },
-                { studentId: studentValue[0] == '' ? studentValue[1] : studentValue[0] })
-            //學生Feedback
-            await responsecontentmodel.updateMany({ studentId: studentValue[1] },
-                { studentId: studentValue[0] == '' ? studentValue[1] : studentValue[0] })
+                //學生Reflection
+                await studentminding.updateMany({ studentId: studentValue.currentStudentId },
+                    { studentId: studentValue.newStudentId })
+
+                //學生Feedback
+                await responsecontentmodel.updateMany({ studentId: studentValue.currentStudentId },
+                    { studentId: studentValue.newStudentId })
+            }
+           
+
         } else {
             const saltRound = 15
-            studentValue[3] == '' ? studentValue[3] = studentValue[1] : null
-            bcrypt.hash(studentValue[3], saltRound, async (err, hashedPassword) => {
+            studentValue.studentPassword == '' ? studentValue.studentPassword = studentValue.currentStudentId : null
+            bcrypt.hash(studentValue.studentPassword, saltRound, async (err, hashedPassword) => {
                 const studentDetailInit = new Array()
 
                 for (let i = 1; i <= availableWeek; i++) {
@@ -384,10 +391,11 @@ router.post(process.env.ROUTER_ADMIN_UPLOADMANYSTUDENTS, async (req, res) => {
                     })
                 }
                 const newStudent = new studentsConfig({
-                    studentId: studentValue[1],
+                    studentSession: studentValue.studentSession,
+                    studentId: studentValue.currentStudentId,
                     studentPassword: hashedPassword,
-                    studentName: studentValue[2],
-                    studentEmail: studentValue[4],
+                    studentName: studentValue.studentName,
+                    studentEmail: studentValue.studentEmail,
                     studentDetail: studentDetailInit
                 })
                 await newStudent.save()
