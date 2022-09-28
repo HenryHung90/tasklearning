@@ -1,6 +1,10 @@
 const mongoose =require('mongoose');
 
 const studentsConfig = new mongoose.Schema({
+    studentSession:{
+        type:'string',
+        required:true,
+    },
     studentId:{
         type:'string',
         required:true,

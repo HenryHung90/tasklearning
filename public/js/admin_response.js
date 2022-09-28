@@ -71,10 +71,10 @@ function openStudentList(listName, iconTraget) {
 
 }
 //WellDone人數
-function countingMembers(students, week , status) {
+function countingMembers(students, week, status) {
     let counting = 0
     for (let value of students) {
-        if(status == 'not yet'){
+        if (status == 'not yet') {
             isDoneThisWeek(value.studentDetail[week - 1]) ? null : counting++
         }
         else if (status == 'feed back') {
@@ -83,9 +83,19 @@ function countingMembers(students, week , status) {
         else if (status == 'well done') {
             isDoneThisWeek(value.studentDetail[week - 1]) ? counting++ : null
         }
-       
+
     }
     return `<h3> ${counting}</h3>`
+}
+//是否有回覆老師
+async function isResendToTeacher(studentId,week){
+    let result = false
+    await getTeacherResponse(studentId,week).then(response=>{
+        if(response.data.studentResponse != ''){
+            result = true
+        }
+    })
+    return result
 }
 //render function-------------------------------
 //render 學生學習狀況
@@ -332,7 +342,7 @@ function renderStudentStatus(studentId, week) {
     })
 }
 //render 回復學生狀態
-function renderTeacherResponse(studentId, week) {
+function renderTeacherandStudentResponse(studentId, week) {
     getTeacherResponse(studentId, week).then(response => {
         const responseContainer = $('<div>').prop({
             className: 'container'
@@ -361,12 +371,15 @@ function renderTeacherResponse(studentId, week) {
             'padding-top': '30px',
         }).appendTo(responseContainer)
 
-        //任務執行 大標題
-        $('<div>').prop({
-            className: 'teacherResponseTitle',
-            innerHTML: '<h1>給予回覆</h1>'
+
+        const responseTextDiv = $('<div>').prop({
+            className: 'responseText'
         }).css({
-            'margin-top': '10px',
+            'width': '100%',
+            'height': '60%',
+            'display': 'flex',
+            'margin': '20px auto',
+            'justify-content': 'space-around'
         }).appendTo(responseContainer)
 
         $('<textarea>').prop({
@@ -374,14 +387,28 @@ function renderTeacherResponse(studentId, week) {
             innerHTML: response.data.teacherResponse ? response.data.teacherResponse : '',
             placeholder: '請寫下對學生的回覆以及評價'
         }).css({
-            'width': '100%',
-            'height': '60%',
+            'width': '40%',
+            'height': '100%',
             'padding': '15px',
             'border': '1px dashed rgba(0,0,0,0.3)',
             'border-radius': '20px',
             'transition-duration': '0.5s',
             'resize': 'none'
-        }).appendTo(responseContainer)
+        }).appendTo(responseTextDiv)
+
+        $('<textarea>').prop({
+            className: 'studentResponseText',
+            innerHTML: response.data.studentResponse ? `${response.data.studentResponse}` : '學生無回覆',
+            disabled: 'disabled'
+        }).css({
+            'width': '40%',
+            'height': '100%',
+            'padding': '15px',
+            'border': '1px solid rgba(0,0,0,0.3)',
+            'border-radius': '20px',
+            'transition-duration': '0.5s',
+            'resize': 'none'
+        }).appendTo(responseTextDiv)
 
         ////data儲存按鈕
         $('<button>').prop({
@@ -396,6 +423,12 @@ function renderTeacherResponse(studentId, week) {
             uploadResponse(studentId, week).then(response => {
                 window.alert(response.data)
                 loadingPage(false)
+                responseBlock.fadeOut(200)
+                responseContainer.fadeOut(200)
+                setTimeout((e) => {
+                    responseBlock.remove()
+                    responseContainer.remove()
+                }, 200)
             })
         }).appendTo(responseContainer)
 
@@ -600,68 +633,43 @@ function renderResponseStudentList(studentDetail, Week) {
         'display': 'flex',
         'font-family': '"Silkscreen", cursive'
     }
+    const studentOutline = (className, svgId, Name, countingData, countingWeek, countingName, listClass, listArrow) => {
+        return (
+            $('<div>').prop({
+                className: className,
+                innerHTML: `<svg id="${svgId}" xmlns="http://www.w3.org/2000/svg" width="50px" height="50px" style="margin-right:15px" viewBox="0 0 512 512"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"/></svg>` +
+                    `<h1 style="margin-right:20px;">${Name}</h1>` +
+                    '<svg xmlns="http://www.w3.org/2000/svg" width="30px" height="50px" viewBox="0 0 448 512"><path d="M224 256c70.7 0 128-57.3 128-128S294.7 0 224 0S96 57.3 96 128s57.3 128 128 128zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H418.3c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304H178.3z"/></svg>' +
+                    countingMembers(countingData, countingWeek, countingName)
+            }).css(studentStatusCss).hover((e) => {
+                studentWellDone.css({
+                    'transition-duration': '0.3s',
+                    'background-color': 'rgba(255,255,255,0.8)'
+                })
+            }, (e) => {
+                studentWellDone.css({
+                    'transition-duration': '0.3s',
+                    'background-color': 'rgba(255,255,255,0)'
+                })
+            }).click((e) => {
+                openStudentList(listClass, listArrow)
+            })
+        )
+    }
     //學生已全部完成
-    const studentWellDone = $('<div>').prop({
-        className: 'studentWellDoneLine',
-        innerHTML: '<svg id="ArrowDownIcon_wellDone" xmlns="http://www.w3.org/2000/svg" width="50px" height="50px" style="margin-right:15px" viewBox="0 0 512 512"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"/></svg>' +
-            '<h1 style="margin-right:20px;">Well Done</h1>' +
-            '<svg xmlns="http://www.w3.org/2000/svg" width="30px" height="50px" viewBox="0 0 448 512"><path d="M224 256c70.7 0 128-57.3 128-128S294.7 0 224 0S96 57.3 96 128s57.3 128 128 128zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H418.3c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304H178.3z"/></svg>' +
-            countingMembers(studentDetail, Week, 'well done')
-    }).css(studentStatusCss).hover((e) => {
-        studentWellDone.css({
-            'transition-duration': '0.3s',
-            'background-color': 'rgba(255,255,255,0.8)'
-        })
-    }, (e) => {
-        studentWellDone.css({
-            'transition-duration': '0.3s',
-            'background-color': 'rgba(255,255,255,0)'
-        })
-    }).click((e) => {
-        openStudentList('.studentDataContainer_wellDone', '#ArrowDownIcon_wellDone')
-    }).appendTo(studentListDiv)
+    const studentWellDone = studentOutline('studentWellDoneLine', "ArrowDownIcon_wellDone", 'Well Done',
+        studentDetail, Week, 'well done',
+        '.studentDataContainer_wellDone', '#ArrowDownIcon_wellDone').appendTo(studentListDiv)
     //學生待回覆
-    const studentFeedBack = $('<div>').prop({
-        className: 'studentFeedBackLine',
-        innerHTML: '<svg id="ArrowDownIcon_feedback" xmlns="http://www.w3.org/2000/svg" width="50px" height="50px" style="margin-right:15px" viewBox="0 0 512 512"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"/></svg>' +
-            '<h1 style="margin-right:20px;">Feedback</h1>' +
-            '<svg xmlns="http://www.w3.org/2000/svg" width="30px" height="50px" viewBox="0 0 448 512"><path d="M224 256c70.7 0 128-57.3 128-128S294.7 0 224 0S96 57.3 96 128s57.3 128 128 128zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H418.3c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304H178.3z"/></svg>' +
-            countingMembers(studentDetail, Week , 'feed back')
-    }).css(studentStatusCss).hover((e) => {
-        studentFeedBack.css({
-            'transition-duration': '0.3s',
-            'background-color': 'rgba(255,255,255,0.8)'
-        })
-    }, (e) => {
-        studentFeedBack.css({
-            'transition-duration': '0.3s',
-            'background-color': 'rgba(255,255,255,0)'
-        })
-    }).click((e) => {
-        openStudentList('.studentDataContainer_feedback', '#ArrowDownIcon_feedback')
-    }).appendTo(studentListDiv)
+    const studentFeedBack = studentOutline('studentFeedBackLine', "ArrowDownIcon_feedback", 'Feedback',
+        studentDetail, Week, 'feed back',
+        '.studentDataContainer_feedback', '#ArrowDownIcon_feedback').appendTo(studentListDiv)
     //學生未完成
-    const studentNotYet = $('<div>').prop({
-        className: 'studentNotYet',
-        innerHTML: '<svg id="ArrowDownIcon_notYet" xmlns="http://www.w3.org/2000/svg" width="50px" height="50px" style="margin-right:15px" viewBox="0 0 512 512"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"/></svg>' +
-            '<h1 style="margin-right:20px;">Not Yet</h1>' +
-            '<svg xmlns="http://www.w3.org/2000/svg" width="30px" height="50px" viewBox="0 0 448 512"><path d="M224 256c70.7 0 128-57.3 128-128S294.7 0 224 0S96 57.3 96 128s57.3 128 128 128zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H418.3c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304H178.3z"/></svg>' +
-            countingMembers(studentDetail, Week , 'not yet')
-    }).css(studentStatusCss).hover((e) => {
-        studentNotYet.css({
-            'transition-duration': '0.3s',
-            'background-color': 'rgba(255,255,255,0.8)'
-        })
-    }, (e) => {
-        studentNotYet.css({
-            'transition-duration': '0.3s',
-            'background-color': 'rgba(255,255,255,0)'
-        })
-    }).click((e) => {
-        openStudentList('.studentDataContainer_notYet', '#ArrowDownIcon_notYet')
-    }).appendTo(studentListDiv)
+    const studentNotYet = studentOutline('studentNotYet', "ArrowDownIcon_notYet", 'Not Yet',
+        studentDetail, Week, 'not yet',
+        '.studentDataContainer_notYet', '#ArrowDownIcon_notYet').appendTo(studentListDiv)
 
-    studentDetail.map((studentData, studentIndex) => {
+    studentDetail.map(async (studentData, studentIndex) => {
         //學生序號
         const studentNumber = $('<div>').prop({
             className: 'studentData_Number',
@@ -692,35 +700,29 @@ function renderResponseStudentList(studentDetail, Week) {
             loadingPage(true)
             renderStudentStatus(studentData.studentId, Week)
         })
+        //學生回覆
+        let isResponse = false
+        await isResendToTeacher(studentData.studentId,Week).then(response=>{
+            isResponse = response
+        })
+        const studentResponse = $('<button>').prop({
+            className: isResponse ? 'btn btn-success' : 'btn btn-outline-success',
+            id: 'studentResponse',
+            innerHTML: '師生回覆'
+        }).css({
+            'width': '35%',
+            'height': '40px',
+        }).click((e) => {
+            loadingPage(true)
+            renderTeacherandStudentResponse(studentData.studentId, Week)
+        })
         //Well Done
         if (isDoneThisWeek(studentData.studentDetail[Week - 1])) {
-            const teacherResponse = $('<button>').prop({
-                className: 'btn btn-outline-success',
-                id: 'teacherResponse',
-                innerHTML: '給予回饋'
-            }).css({
-                'width': '30%',
-                'height': '40px',
-            }).click((e) => {
-                loadingPage(true)
-                renderTeacherResponse(studentData.studentId, Week)
-            })
-            const studentResponse = $('<button>').prop({
-                className: studentData.studentDetail[Week - 1].Status.Response == 2 ? 'btn btn-success' : 'btn btn-outline-success',
-                id: 'studentResponse',
-                innerHTML: '查看學生回覆'
-            }).css({
-                'width': '35%',
-                'height': '40px',
-            }).click((e) => {
-                loadingPage(true)
-                renderStudentResponse(studentData.studentId, Week)
-            })
             //設定學生//
             const studentSetting = $('<div>').prop({
                 className: 'studentData_Setting',
                 id: 'responseSetting'
-            }).append(studentDetail).append(teacherResponse).append(studentResponse)
+            }).append(studentDetail).append(studentResponse)
 
             //學生資料表格框
             $('<div>').prop({
@@ -747,33 +749,11 @@ function renderResponseStudentList(studentDetail, Week) {
         }
         //FeedBack
         else if (isFeedBackWeek(studentData.studentDetail[Week - 1])) {
-            const teacherResponse = $('<button>').prop({
-                className: 'btn btn-outline-success',
-                id: 'teacherResponse',
-                innerHTML: '給予回饋'
-            }).css({
-                'width': '30%',
-                'height': '40px',
-            }).click((e) => {
-                loadingPage(true)
-                renderTeacherResponse(studentData.studentId, Week)
-            })
-            const studentResponse = $('<button>').prop({
-                className: studentData.studentDetail[Week - 1].Status.Response == 2 ? 'btn btn-success' : 'btn btn-outline-success',
-                id: 'studentResponse',
-                innerHTML: '查看學生回覆'
-            }).css({
-                'width': '35%',
-                'height': '40px',
-            }).click((e) => {
-                loadingPage(true)
-                renderStudentResponse(studentData.studentId, Week)
-            })
             //設定學生//
             const studentSetting = $('<div>').prop({
                 className: 'studentData_Setting',
                 id: 'responseSetting'
-            }).append(studentDetail).append(teacherResponse).append(studentResponse)
+            }).append(studentDetail).append(studentResponse)
 
             //學生資料表格框
             $('<div>').prop({
@@ -804,7 +784,7 @@ function renderResponseStudentList(studentDetail, Week) {
             const studentSetting = $('<div>').prop({
                 className: 'studentData_Setting',
                 id: 'responseSetting'
-            }).append(studentDetail)
+            }).append(studentDetail).append(studentResponse)
 
             //學生資料表格框
             $('<div>').prop({
