@@ -649,31 +649,32 @@ $(window).ready(() => {
     loadingMission()
     //若當周有資料 要預先載入執行步驟
     stepsSelectOption()
-})
-$(document).ready(async () => {
-    function disableDOMevent(){
-        //移除新增按鈕
-        $('.standardSelect').remove()
-        //取消option刪除功能
-        $('.optionBox').off('click')
-        //取消dragging屬性
-        $('.missionText').attr('draggable', false)
-    }
+    $(document).ready(async () => {
+        function disableDOMevent() {
+            //移除新增按鈕
+            $('.standardSelect').remove()
+            //取消option刪除功能
+            $('.optionBox').off('click')
+            //取消dragging屬性
+            $('.missionText').attr('draggable', false)
+        }
 
-    const dataWeek = parseInt($('.WeekTitle').html().split(" ")[1]) - 1
-    await axios({
-        method: "POST",
-        url: '/studentstage/checkstage',
-        data: {
-            week: dataWeek
-        },
-        withCredentials: true,
-    }).then((response) => {
-        response.data[dataWeek].Status.Response == 2 ?
-            disableDOMevent() :
-            null
+        const dataWeek = parseInt($('.WeekTitle').html().split(" ")[1]) - 1
+        await axios({
+            method: "POST",
+            url: '/studentstage/checkstage',
+            data: {
+                week: dataWeek
+            },
+            withCredentials: true,
+        }).then((response) => {
+            response.data[dataWeek].Status.Response == 2 ?
+                disableDOMevent() :
+                null
+        })
     })
 })
+
 
 
 $("#stageMissionCheck").click(async (e) => {

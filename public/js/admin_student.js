@@ -1,9 +1,12 @@
 //axios function -------------------
 //return studentStatus Data
-function loadingAllStudent() {
+function loadingAllStudent(studentSession) {
     return (axios({
         method: 'POST',
-        url: '/admin/readstudents'
+        url: '/admin/readstudents',
+        data: {
+            studentSession: studentSession
+        }
     }))
 }
 //return ManageStatus Data
@@ -27,6 +30,7 @@ async function uploadDeleteStudent(studentId) {
             method: 'POST',
             url: '/admin/deleteStudent',
             data: {
+                studentSession: $('.form-select').val(),
                 studentId: studentId
             },
             withCredentials: true
@@ -42,8 +46,8 @@ function uploadSingleStudent(studentData) {
     }))
 }
 //return addManyStudents
-async function uploadManyStudents(studentsData){
-    return(
+async function uploadManyStudents(studentsData) {
+    return (
         axios({
             method: 'post',
             url: '/admin/uploadmanystudents',
@@ -80,7 +84,7 @@ function studentListGenerate(studentList) {
     let member = []
     studentList.map((listValue, listIndex) => {
         let data = {
-            "屆數":listValue.studentSession,
+            "屆數": listValue.studentSession,
             "新學號(若要更新再輸入)": '',
             "當前學號": listValue.studentId,
             "姓名": listValue.studentName,
@@ -136,12 +140,12 @@ const downloadStudentDetail = (studentId) => {
         downloadDatatoExcel(studentId, response.data.studentData, response.data.dataTitle)
     })
 }
-const downloadStudentUsingRecord = (studentId) =>{
+const downloadStudentUsingRecord = (studentId) => {
 
 }
 //批量下載學員
-const DownloadMember = (studentList) => {
-    downloadDatatoExcel('Detail', [studentListGenerate(studentList)], ["學生資料"])
+const DownloadMember = (studentList, studentSession) => {
+    downloadDatatoExcel(`Detail_${studentSession}`, [studentListGenerate(studentList)], ["學生資料"])
 };
 //批量上傳學員
 const UploadMember = async (e) => {
@@ -159,6 +163,7 @@ const UploadMember = async (e) => {
         const wsname = wb.SheetNames[0];
         const ws = wb.Sheets[wsname];
         const data = XLSX.utils.sheet_to_csv(ws, { header: 1 });
+        const session = $('.form-select').val()
 
         let SPdata = data.split("\n");
 
@@ -167,11 +172,16 @@ const UploadMember = async (e) => {
         for (let i = 1; i < SPdata.length; i++) {
             DataContainer[i - 1] = SPdata[i].split(",");
         }
-
-        for (let i = 0; i < DataContainer.length; i++) {
+        for (let i = 0; i < DataContainer.length - 1; i++) {
+            if (DataContainer[i][0] != session) {
+                if (!window.confirm("上傳屆數似乎與目前選擇屆數不相同，是否繼續上傳?")) {
+                    loadingPage(false)
+                    return
+                }
+            }
             const UploadData = {
-                studentSession:DataContainer[i][0],
-                newStudentId:DataContainer[i][1],
+                studentSession: DataContainer[i][0],
+                newStudentId: DataContainer[i][1],
                 currentStudentId: DataContainer[i][2],
                 studentName: DataContainer[i][3],
                 studentPassword: DataContainer[i][4],
@@ -179,11 +189,11 @@ const UploadMember = async (e) => {
             };
             DataUpdate.push(UploadData);
         }
-        console.log(DataUpdate)
         await uploadManyStudents(DataUpdate).then(async response => {
-            if(response.data){
+            if (response.data) {
                 let nextData = ''
-                await loadingAllStudent().then(response=>{
+
+                await loadingAllStudent(session).then(response => {
                     nextData = response.data
                 })
                 return nextData
@@ -192,9 +202,9 @@ const UploadMember = async (e) => {
             reloadStudentList(response, "success")
             loadingPage(false)
         })
-    };
+    }
     reader.readAsBinaryString(file);
-};
+}
 //新增學生頁面
 function addNewStudentPage() {
     let studentId = window.prompt("新增學生學號", '')
@@ -229,7 +239,9 @@ function addNewStudentPage() {
         window.alert("學生學號應為純數字")
         return
     }
+    const session = $('.form-select').val()
     const studentData = {
+        studentSession: session,
         studentId: studentId,
         studentName: studentName,
         studentPassword: studentPassword,
@@ -237,6 +249,7 @@ function addNewStudentPage() {
     }
 
     uploadSingleStudent(studentData).then(response => {
+        loadingPage(true)
         if (response.data == 'user exist') {
             window.alert(`學生 ${studentName} 已存在`)
             return
@@ -245,7 +258,7 @@ function addNewStudentPage() {
             `姓名 : ${studentName}\n` + `密碼 : ${studentPassword}\n` +
             `信箱 : ${studentEmail}`
 
-        loadingAllStudent().then(response => {
+        loadingAllStudent(session).then(response => {
             reloadStudentList(response.data, alertText)
         })
     })
@@ -308,6 +321,7 @@ function changeStudentConfig(Id) {
             method: 'POST',
             url: '/admin/updatestudentconfig',
             data: {
+                studentSession: $('.form-select').val(),
                 originStudentId: Id.studentId,
                 studentId: studentId,
                 studentName: studentName
@@ -327,6 +341,15 @@ function changeStudentConfig(Id) {
         window.alert("取消")
         return
     }
+}
+//轉換學生屆數
+async function changeStudentList(studentSession) {
+    loadingPage(true)
+    await loadingAllStudent(studentSession).then(response => {
+        reloadStudentList(response.data, studentSession)
+    }).then(() => {
+    })
+    loadingPage(false)
 }
 //-----------------------------------------------
 //render 上層按鈕列表
@@ -348,8 +371,9 @@ function renderStudentPageBtn() {
     }).css({
         'width': '40%'
     }).click((e) => {
-        loadingAllStudent().then(response => {
-            DownloadMember(response.data)
+        const session = $('.form-select').val()
+        loadingAllStudent(session).then(response => {
+            DownloadMember(response.data, session)
         })
     })
     //學生名單上下載區
@@ -365,7 +389,7 @@ function renderStudentPageBtn() {
         className: 'btn btn-secondary',
         innerHTML: '新增學生'
     }).css({
-        'width': '8%'
+        'width': '10%'
     }).click((e) => {
         addNewStudentPage()
     })
@@ -378,8 +402,15 @@ function renderStudentPageBtn() {
         'width': '20%',
         'margin': '0'
     }).change((e) => {
-
+        changeStudentList(e.target.value)
     })
+    //108~111屆 (暫定 可以再做更改 )
+    for (let i = 108; i < sessionCount(); i++) {
+        $('<option>').prop({
+            value: i,
+            innerHTML: `第 ${i} 屆`
+        }).appendTo(changeStudentsSession)
+    }
     //Btn Container
     const btnContainer = $('<div>').prop({
         className: 'btnContainer'
@@ -395,7 +426,8 @@ function renderStudentPageBtn() {
         className: 'studentBtnContainer',
         innerHTML: '<h1>Student List</h1>'
     }).css({
-        'background-color': 'rgba(255, 255, 255, 0.5)',
+        'background-color': 'rgba(0, 0, 0, 0.3)',
+        'border-radius': '20px',
         'width': '95vw',
         'height': '160px',
         'text-align': 'center',
@@ -419,7 +451,7 @@ function renderStudentList(studentDetail) {
         const studentNumber = $('<div>').prop({
             className: 'studentData_Number',
             id: `studentNumber_${studentIndex}`,
-            innerHTML: `S-${studentIndex}`
+            innerHTML: `${studentIndex}`
         })
         //學生ID
         const studentId = $('<div>').prop({
@@ -442,7 +474,7 @@ function renderStudentList(studentDetail) {
             className: 'btn btn-primary',
             innerHTML: "學習檔案"
         }).css({
-            'width': '100%',
+            'width': '45%',
             'height': '40px',
             'background-color': 'purple'
         }).click(e => {
@@ -451,13 +483,15 @@ function renderStudentList(studentDetail) {
         //事件紀錄
         $('<button>').prop({
             className: 'btn btn-primary',
-            innerrHTML:'事件紀錄'
+            innerHTML: "事件紀錄"
         }).css({
-            'height':'40px',
-            'background-color':'purple'
-        }).click(e=>{
+            'width': '45%',
+            'margin-left':'5px',
+            'height': '40px',
+            'background-color': 'purple'
+        }).click(e => {
             downloadStudentUsingRecord(studentData.studentId)
-        })
+        }).appendTo(studentDetail)
 
 
         const studentPassword = $('<button>').prop({
@@ -544,7 +578,8 @@ function renderAdminStudentPage(studentData) {
 function loadingStudent() {
     loadingPage(true)
 
-    loadingAllStudent()
+    //預設Loading 108 屆學生
+    loadingAllStudent(108)
         .then(response => {
             renderAdminStudentPage(response.data)
         }).then(() => {

@@ -93,11 +93,12 @@ router.post(process.env.ROUTER_ADMIN_READSTUDENTSTATUS, async (req, res) => {
 })
 //取得學生列表
 router.post(process.env.ROUTER_ADMIN_READSTUDENTS, async (req, res) => {
-    studentsConfig.find({}).then(response => {
+    studentsConfig.find({ studentSession: req.body.studentSession }).then(response => {
         const returnData = []
         response.map((value, index) => {
             if (value.studentName != "Admin") {
                 const studentData = {
+                    studentSession: value.studentSession,
                     studentId: value.studentId,
                     studentName: value.studentName,
                     studentEmail: value.studentEmail,
@@ -160,7 +161,7 @@ router.post(process.env.ROUTER_ADMIN_READSTUDENTSTATUSDETAIL, async (req, res) =
         })
     })
     await studentmission.findOne({ studentId: req.body.studentId, week: req.body.week }).then(response => {
-        if(response == null){
+        if (response == null) {
             return
         }
         const studentSelect = Object.values(response.studentSelect)
@@ -170,10 +171,10 @@ router.post(process.env.ROUTER_ADMIN_READSTUDENTSTATUSDETAIL, async (req, res) =
     })
     await studentmanage.findOne({ studentId: req.body.studentId, week: req.body.week }).then(response => {
         console.log(response)
-        if(response == null){
+        if (response == null) {
             return
         }
-        if(typeof response == 'object'){
+        if (typeof response == 'object') {
             response.studentManage = Object.values(response.studentManage)
         }
         response.studentManage.map((studentManage) => {
@@ -181,7 +182,7 @@ router.post(process.env.ROUTER_ADMIN_READSTUDENTSTATUSDETAIL, async (req, res) =
         })
     })
     await studentminding.findOne({ studentId: req.body.studentId, week: req.body.week }).then(response => {
-        if(response == null){
+        if (response == null) {
             return
         }
         response.studentMinding = Object.values(response.studentMinding)
@@ -194,11 +195,11 @@ router.post(process.env.ROUTER_ADMIN_READSTUDENTSTATUSDETAIL, async (req, res) =
     res.send(returnData)
 })
 //取得 單一學生 單周 Response 用於 Response
-router.post(process.env.ROUTER_ADMIN_READTEACHERRESPONSE,async(req,res)=>{
-    await responsecontentmodel.findOne({studentId: req.body.studentId,week: req.body.week}).then(response=>{
+router.post(process.env.ROUTER_ADMIN_READTEACHERRESPONSE, async (req, res) => {
+    await responsecontentmodel.findOne({ studentId: req.body.studentId, week: req.body.week }).then(response => {
         const returnData = {
-            teacherResponse : response ? response.teacherResponse : '',
-            studentResponse : response ? response.studentResponse : ''
+            teacherResponse: response ? response.teacherResponse : '',
+            studentResponse: response ? response.studentResponse : ''
         }
         res.send(returnData)
     })
@@ -308,10 +309,10 @@ router.post(process.env.ROUTER_ADMIN_READDATA, async (req, res) => {
         dataContent: {},
         missionContent: {},
     }
-    await datacontentmodel.findOne({ week: req.body.week }).then(response => {
+    await datacontentmodel.findOne({ week: req.body.week, session: req.body.session }).then(response => {
         returnData.dataContent = response
     })
-    await missioncontentmodel.findOne({ week: req.body.week }).then(response => {
+    await missioncontentmodel.findOne({ week: req.body.week, session: req.body.session }).then(response => {
         returnData.missionContent = response
     })
     res.send(returnData)
@@ -319,7 +320,7 @@ router.post(process.env.ROUTER_ADMIN_READDATA, async (req, res) => {
 //批量修改學生 用於Upload Student
 router.post(process.env.ROUTER_ADMIN_UPLOADMANYSTUDENTS, async (req, res) => {
     await req.body.studentList.map(async (studentValue, studentIndex) => {
-        if (studentIndex == req.body.studentList.length - 1){
+        if (studentIndex == req.body.studentList.length - 1) {
             return
         }
         //studentSession
@@ -338,7 +339,7 @@ router.post(process.env.ROUTER_ADMIN_UPLOADMANYSTUDENTS, async (req, res) => {
                 bcrypt.hash(studentValue.studentPassword, saltRound, async (err, hashedPassword) => {
                     await studentsConfig.updateOne({ studentId: studentValue.currentStudentId },
                         {
-                            studentSession:studentValue.studentSession,
+                            studentSession: studentValue.studentSession,
                             studentId: studentValue.newStudentId == '' ? studentValue.currentStudentId : studentValue.newStudentId,
                             studentPassword: hashedPassword,
                             studentName: studentValue.studentName,
@@ -354,7 +355,7 @@ router.post(process.env.ROUTER_ADMIN_UPLOADMANYSTUDENTS, async (req, res) => {
                     })
             }
             //學生Task
-            if(studentValue.newStudentId != ''){
+            if (studentValue.newStudentId != '') {
                 await studentmission.updateMany({ studentId: studentValue.currentStudentId },
                     { studentId: studentValue.newStudentId })
 
@@ -370,7 +371,7 @@ router.post(process.env.ROUTER_ADMIN_UPLOADMANYSTUDENTS, async (req, res) => {
                 await responsecontentmodel.updateMany({ studentId: studentValue.currentStudentId },
                     { studentId: studentValue.newStudentId })
             }
-           
+
 
         } else {
             const saltRound = 15
@@ -417,22 +418,22 @@ router.post(process.env.ROUTER_ADMIN_DELETESTUDENT, async (req, res) => {
         newStudentData: []
     }
 
-    await studentsConfig.deleteOne({ studentId: req.body.studentId }).then(response => {
+    await studentsConfig.deleteOne({ studentSession: req.body.studentSession,studentId: req.body.studentId }).then(response => {
         returnData.deleteStatus["學生帳號"] = response.acknowledged
     })
-    await responsecontentmodel.deleteMany({ studentId: req.body.studentId }).then(response => {
+    await responsecontentmodel.deleteMany({ studentSession: req.body.studentSession,studentId: req.body.studentId }).then(response => {
         returnData.deleteStatus["學生回饋"] = response.acknowledged
     })
-    await studentmission.deleteMany({ studentId: req.body.studentId }).then(response => {
+    await studentmission.deleteMany({ studentSession: req.body.studentSession,studentId: req.body.studentId }).then(response => {
         returnData.deleteStatus["學生Task"] = response.acknowledged
     })
-    await studentmanage.deleteMany({ studentId: req.body.studentId }).then(response => {
+    await studentmanage.deleteMany({ studentSession: req.body.studentSession, studentId: req.body.studentId }).then(response => {
         returnData.deleteStatus["學生Plan"] = response.acknowledged
     })
-    await studentminding.deleteMany({ studentId: req.body.studentId }).then(response => {
+    await studentminding.deleteMany({ studentSession: req.body.studentSession,studentId: req.body.studentId }).then(response => {
         returnData.deleteStatus["學生Reflection"] = response.acknowledged
     })
-    await studentsConfig.find({}).then(response => {
+    await studentsConfig.find({ studentSession: req.body.studentSession }).then(response => {
         response.map((value, index) => {
             if (value.studentName != "Admin") {
                 const studentData = {
@@ -470,31 +471,31 @@ router.post(process.env.ROUTER_ADMIN_UPDATESTUDENTCONFIG, async (req, res) => {
     }
 
     //學生資料
-    await studentsConfig.updateOne({ studentId: req.body.originStudentId },
+    await studentsConfig.updateOne({ studetnSession: req.body.studentSession, studentId: req.body.originStudentId },
         { studentId: req.body.studentId, studentName: req.body.studentName })
         .then(response => {
             returnData.studentConfig = response.acknowledged
         })
     //學生Task
-    await studentmission.updateMany({ studentId: req.body.originStudentId },
+    await studentmission.updateMany({ studetnSession: req.body.studentSession, studentId: req.body.originStudentId },
         { studentId: req.body.studentId })
         .then(response => {
             returnData.studentMission = response.acknowledged
         })
     //學生Plan
-    await studentmanage.updateMany({ studentId: req.body.originStudentId },
+    await studentmanage.updateMany({ studetnSession: req.body.studentSession, studentId: req.body.originStudentId },
         { studentId: req.body.studentId })
         .then(response => {
             returnData.studentManage = response.acknowledged
         })
     //學生Reflection
-    await studentminding.updateMany({ studentId: req.body.originStudentId }, {
+    await studentminding.updateMany({ studetnSession: req.body.studentSession, studentId: req.body.originStudentId }, {
         studentId: req.body.studentId
     }).then(response => {
         returnData.studentMinding = response.acknowledged
     })
     //學生Feedback
-    await responsecontentmodel.updateMany({ studentId: req.body.originStudentId },
+    await responsecontentmodel.updateMany({ studetnSession: req.body.studentSession, studentId: req.body.originStudentId },
         { studentId: req.body.studentId })
         .then(response => {
             returnData.studentResponse = response.acknowledged
@@ -535,6 +536,7 @@ router.post(process.env.ROUTER_ADMIN_ADDSTUDENT, async (req, res) => {
                     })
                 }
                 const newStudent = new studentsConfig({
+                    studentSession: req.body.studentSession,
                     studentId: req.body.studentId,
                     studentPassword: hashedPassword,
                     studentName: req.body.studentName,
@@ -552,22 +554,22 @@ router.post(process.env.ROUTER_ADMIN_ADDSTUDENT, async (req, res) => {
 })
 //新增教學資料
 router.post(process.env.ROUTER_ADMIN_ADDDATA, async (req, res) => {
-    const addWeek = req.body.week
-    const checkWeek = datacontentmodel.findOne({ week: addWeek })
+    const checkWeek = datacontentmodel.findOne({ week: req.body.week, session: req.body.session })
 
-    await checkWeek.then(isAdded => {
+    await checkWeek.then(async isAdded => {
         try {
             //若尚未新增該周資料
             if (isAdded === null) {
                 const newWeekData = new datacontentmodel({
-                    week: addWeek,
+                    session: req.body.session,
+                    week: req.body.week,
                     content: req.body.content
                 })
                 newWeekData.save()
             }
             //已經新增過，欲進行更改
             else {
-                datacontentmodel.updateOne({ week: addWeek }, { content: req.body.content })
+                await datacontentmodel.updateOne({ week: req.body.week, session: req.body.session }, { content: req.body.content })
             }
         } catch {
             console.log("mongodb has error")
@@ -596,19 +598,19 @@ router.post(process.env.ROUTER_ADMIN_DELTEPDF, async (req, res) => {
 })
 //編輯任務
 router.post(process.env.ROUTER_ADMIN_ADDMISSION, async (req, res) => {
-    const addWeek = req.body.week
-    const checkWeek = missioncontentmodel.findOne({ week: addWeek })
+    const checkWeek = missioncontentmodel.findOne({ week: req.body.week, session: req.body.session, })
 
     await checkWeek.then(isAdded => {
         try {
             if (isAdded === null) {
                 const newWeekMission = new missioncontentmodel({
-                    week: addWeek,
+                    session: req.body.session,
+                    week: req.body.week,
                     mission: req.body.mission
                 })
                 newWeekMission.save()
             } else {
-                missioncontentmodel.updateOne({ week: addWeek }, { mission: req.body.mission }).then(response => {
+                missioncontentmodel.updateOne({ session: req.body.session, week: req.body.week }, { mission: req.body.mission }).then(response => {
                     res.send(response.acknowledged)
                 })
             }
@@ -623,11 +625,11 @@ router.post(process.env.ROUTER_ADMIN_ADDRESPONSE, async (req, res) => {
     let isFirstResponse = false
     let isSuccess = false
     let cloudStudentDetail = []
-    await responsecontentmodel.findOne({studentId: req.body.studentId ,week: req.body.week}).then(response=>{
+    await responsecontentmodel.findOne({ studentId: req.body.studentId, week: req.body.week }).then(response => {
         response == undefined ? isFirstResponse = true : null
     })
 
-    if(isFirstResponse) {
+    if (isFirstResponse) {
         const newResponse = new responsecontentmodel({
             studentId: req.body.studentId,
             week: req.body.week,
@@ -635,18 +637,18 @@ router.post(process.env.ROUTER_ADMIN_ADDRESPONSE, async (req, res) => {
         })
         await newResponse.save()
         isSuccess = true
-    }else{
-        await responsecontentmodel.updateOne({studentId: req.body.studentId,week:req.body.week},{teacherResponse:req.body.teacherResponse}).then(response=>{
+    } else {
+        await responsecontentmodel.updateOne({ studentId: req.body.studentId, week: req.body.week }, { teacherResponse: req.body.teacherResponse }).then(response => {
             isSuccess = response.acknowledged + ' response'
         })
     }
 
-    await studentsConfig.findOne({studentId: req.body.studentId}).then(response=>{
+    await studentsConfig.findOne({ studentId: req.body.studentId }).then(response => {
         cloudStudentDetail = response.studentDetail
         cloudStudentDetail[req.body.week - 1].Status.Response = 1
     })
-    await studentsConfig.updateOne({studentId: req.body.studentId},{studentDetail:cloudStudentDetail}).then(response=>{
-        isSuccess = response.acknowledged  + ' done'
+    await studentsConfig.updateOne({ studentId: req.body.studentId }, { studentDetail: cloudStudentDetail }).then(response => {
+        isSuccess = response.acknowledged + ' done'
     })
     res.send(isSuccess)
 })

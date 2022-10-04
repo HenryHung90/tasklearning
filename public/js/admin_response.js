@@ -566,9 +566,9 @@ function renderResponseSearch(studentData) {
         const weekSwitchBtn = $('<div>').prop({
             className: 'weekSwitchBtn',
             id: `week_${i}`,
-            innerHTML: `<h1>Week ${i}</h1>`
+            innerHTML: `<h2>Week ${i}</h2>`
         }).css({
-            'width': '15%',
+            'width': '12%',
             'height': '50px',
             'line-height': '50px',
             'text-align': 'center',
@@ -601,7 +601,8 @@ function renderResponseSearch(studentData) {
         className: 'responseSearchDiv',
         innerHTML: '<h1>Student Feedback</h1>'
     }).css({
-        'background-color': 'rgba(255, 255, 255, 0.5)',
+        'background-color': 'rgba(0, 0, 0, 0.3)',
+        'border-radius': '20px',
         'width': '95vw',
         'height': '160px',
         'text-align': 'center',

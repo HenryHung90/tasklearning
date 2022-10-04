@@ -53,6 +53,10 @@ function switchIdtoName(Id) {
 function weekCount() {
     return 2
 }
+//return 最多到第幾屆
+function sessionCount(){
+    return 111
+}
 //return status count外框
 function renderStatusCountDiv(status) {
     return ($('<div>').prop({
@@ -350,7 +354,6 @@ function weekMindingScoreProgress(Minding,Week) {
 ////////////////////////////////////
 //render AdminMainPage main function
 function renderAdminMainPage(studentData) {
-    console.log(studentData)
     //總Status完成度
     $('.totalStatus_div').append(renderTotal_StatusCompletePercentage())
     //周Status完成度

@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 
 const missioncontentmodel = new mongoose.Schema({
+    session:{
+        type:'string',
+        required: true,
+    },
     week: {
         type: 'string',
         required: true,

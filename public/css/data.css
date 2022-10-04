@@ -1,68 +1,63 @@
 .pdfData {
   margin: 15px;
   border-radius: 20px;
-  background-color: rgba(255, 255, 255, 0.4);
-  width: 60%;
-  height: 96%;
+  width: 100%;
+  height: 100%;
   text-align: center;
 }
-.dataContainer{
-  padding:25px;
-  border-radius:20px 0 0 20px;
-  background-color: rgba(255,255,255,0.8);
-  overflow:auto;
-  margin:0 auto;
-  margin-top:50px;
+.dataContainer {
+  padding: 25px;
+  border-radius: 20px 0 0 20px;
+  background-color: rgba(255, 255, 255, 0.8);
+  overflow: auto;
+  margin: 0 auto;
+  margin-top: 50px;
   width: 90%;
   height: 75%;
 }
-.dataLink{
-  margin:0 auto;
+.dataLink {
+  margin: 0 auto;
   margin-top: 5px;
   width: 90%;
   height: 15%;
 }
-.dataDownload:hover , .dataVideo:hover{
-  transition-duration:0.3s;
-  background-color: rgba(255,255,255,0.6);
+.dataDownload:hover,
+.dataVideo:hover {
+  transition-duration: 0.3s;
+  background-color: rgba(255, 255, 255, 0.6);
 }
 
-.lastWeekPointContainer, .thisWeekPointContainer{
-  margin:0 auto;
+.lastWeekPointContainer,
+.thisWeekPointContainer {
+  margin: 0 auto;
   width: 90%;
-  height:80%;
+  height: 80%;
   overflow: auto;
-}
-
-.mainPointData {
-  margin: 15px;
-  border-radius: 20px;
-  width: 40%;
-  height: 89%;
 }
 
 .lastWeekPoint {
   padding: 15px 5px 5px 5px;
   text-align: center;
   border-radius: 20px;
-  background-color: rgba(255, 255, 255, 0.4);
-  width: 100%;
-  height: 50%;
+  margin: 0 auto;
+  background-color: rgba(255, 255, 255, 0.8);
+  width: 80%;
+  height: 30%;
 }
 
 .thisWeekPoint {
   padding: 15px 5px 5px 5px;
   text-align: center;
-  margin-top: 6%;
   border-radius: 20px;
-  background-color: rgba(255, 255, 255, 0.4);
-  width: 100%;
-  height: 50%;
+  margin: 0 auto;
+  margin-top: 50px;
+  background-color: rgba(255, 255, 255, 0.8);
+  width: 80%;
+  height: 40%;
 }
 
-@media (max-width:1500px) {
-  .stageNormalContainer{
+@media (max-width: 1500px) {
+  .stageNormalContainer {
     height: 600px;
   }
 }
-

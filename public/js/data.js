@@ -1,4 +1,4 @@
-//教材文字部分
+7//教材文字部分
 const renderText = (text) => {
     const textDiv = $('<div>').prop({
         className: 'dataTextline',
@@ -45,7 +45,7 @@ const renderDownloadPDFandVideo = (pdfLocation, videoLocation) => {
             const pdfiFrame = $('<iframe>').prop({
                 className: 'pdfiFrame',
                 title: val.title,
-                src: val.link,
+                src: `${val.link}#toolbar=0`,
             }).css({
                 'width': '40vw',
                 'height': '95vh',
@@ -122,7 +122,6 @@ const renderDownloadPDFandVideo = (pdfLocation, videoLocation) => {
 
 //本周重點
 const renderThisWeekPoint = (thisWeekPoint) => {
-
     let returnPointDiv = $('<div>')
 
     thisWeekPoint.map((val, index) => {
@@ -167,12 +166,10 @@ const renderLastWeekPoint = (lastWeekPoint) => {
 
 
 function renderDataPage(data) {
-    const dataText = $('.dataContainer')
     const dataDownload = $('.dataLink')
     const dataThisWeekPoint = $('.thisWeekPointContainer')
     const dataLastWeekPoint = $('.lastWeekPointContainer')
 
-    dataText.append(renderText(data.thisWeekData.text))
     dataDownload.append(renderDownloadPDFandVideo(data.thisWeekData.pdf, data.thisWeekData.video))
 
     dataThisWeekPoint.append(renderThisWeekPoint(data.thisWeekData.thisWeekPoint))

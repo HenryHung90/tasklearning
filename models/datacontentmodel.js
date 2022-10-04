@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 
 const datacontentmodel = new mongoose.Schema({
+    session:{
+        type:'string',
+        required:true,
+    },
     week:{
         type: 'string',
         required: true,

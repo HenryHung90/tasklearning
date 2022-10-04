@@ -1,12 +1,13 @@
 //-------------------------------
 //axios function
 //return All Data
-function getWeekData(Week) {
+function getWeekData(Week, Session) {
     return (
         axios({
             method: 'post',
             url: '/admin/readdata',
             data: {
+                session: Session,
                 week: Week,
             },
             withCredentials: true
@@ -43,6 +44,7 @@ function updateWeekData(Data) {
             method: 'post',
             url: '/admin/adddata',
             data: {
+                session: Data.session,
                 week: Data.week,
                 content: Data.content
             },
@@ -57,6 +59,7 @@ function updateWeekMission(Data) {
             method: 'post',
             url: '/admin/addmission',
             data: {
+                session: Data.session,
                 week: Data.week,
                 mission: Data.mission
             },
@@ -64,19 +67,29 @@ function updateWeekMission(Data) {
         })
     )
 }
+//更換屆數Data
+function changeDatatList(Session) {
+    loadingPage(true)
+    const week = $('#data_week').val()
+    getWeekData(week, Session).then(response => {
+        $('.dataDetailContainer').fadeOut(100)
+        setTimeout((e) => {
+            $('.dataDetailContainer').remove()
+            $('.adminContainer').append(renderDataDetails(response.data))
+        }, 100)
+    }).then(() => {
+        loadingPage(false)
+        $('.dataDetailContainer').fadeIn(300)
+    })
+}
 //-------------------------------
 //Click function
-//weekSwitchBtn Click
-function weekSwitchClickBtn(Week) {
-    $('.weekSwitchBtn').removeClass('Selecting')
-    $(`#week_${Week}`).addClass('Selecting')
-}
 async function uploadDataDetail() {
     //建立模型
     const uploadData = {
-        week: $('.Selecting').attr('id').split("_")[1],
+        session: $('#data_session').val(),
+        week: $('#data_week').val(),
         content: {
-            text: $('.dataTextInput').val(),
             pdf: [],
             video: [],
             thisWeekPoint: [...$('.dataMainPoint').val().split("\n")],
@@ -85,7 +98,6 @@ async function uploadDataDetail() {
 
     //儲存PDF資料
     $('.dataDiv').find('.pdfIcon').map((index, value) => {
-        console.log($(`#pdfTitle_${index}`).val())
         uploadData.content.pdf.push({
             title: $(`#pdfTitle_${index}`).val(),
             link: value.id
@@ -93,7 +105,6 @@ async function uploadDataDetail() {
     })
     //儲存VIDEO資料
     $('.dataDiv').find('.videoIcon').map((index, value) => {
-        console.log($(`#videoTitle_${index}`).val())
         uploadData.content.video.push({
             title: $(`#videoTitle_${index}`).val(),
             link: value.id
@@ -108,7 +119,8 @@ async function uploadDataDetail() {
 async function uploadWeekMission() {
     //建立模型
     const uploadMission = {
-        week: $('.Selecting').attr('id').split("_")[1],
+        session:$('#data_session').val(),
+        week: $('#data_week').val(),
         mission: []
     }
     //儲存 Mission
@@ -117,7 +129,6 @@ async function uploadWeekMission() {
             title: $('.missionInputDiv').find('#missionTitle')[missionIndex].value,
             content: $('.missionInputDiv').find('#missionDecription')[missionIndex].value
         }
-        console.log(missionText)
         uploadMission.mission.push(missionText)
     })
 
@@ -258,7 +269,7 @@ function renderPDFandVideoIcon(Data, Index, type) {
     return dataDiv
 }
 //按鈕欄位
-function renderDataBtn(weekNumber) {
+function renderDataBtn() {
     //data week switch btn框
     const dataSwitchContainer = $('<div>').prop({
         className: 'btnContainer'
@@ -267,54 +278,62 @@ function renderDataBtn(weekNumber) {
         'width': '100%',
         'height': '50px',
         'display': 'flex',
-        'justify-content': 'space-between',
+        'justify-content': 'space-around',
     })
+    //選擇屆數
+    const changeStudentsSession = $('<select>').prop({
+        className: "form-select",
+        id: 'data_session',
+        ariaLabel: "Default select example"
+    }).css({
+        'width': '20%',
+        'margin': '0'
+    }).change((e) => {
+        console.log(123)
+        changeDatatList(e.target.value)
+    }).appendTo(dataSwitchContainer)
+    //108~111屆 (暫定 可以再做更改 )
+    for (let i = 108; i < sessionCount(); i++) {
+        $('<option>').prop({
+            value: i,
+            innerHTML: `第 ${i} 屆`
+        }).appendTo(changeStudentsSession)
+    }
 
+    //選擇星期
+    const chanageWeekData = $('<select>').prop({
+        className: "form-select",
+        id: 'data_week',
+        ariaLabel: "Default select example"
+    }).css({
+        'width': '40%',
+        'margin': '0'
+    }).change((e) => {
+        loadingPage(true)
+        $('.dataDetailContainer').fadeOut(200)
+        setTimeout(() => {
+            $('.dataDetailContainer').remove()
+            getWeekData(e.target.value, $('#data_session').val()).then(response => {
+                $('.adminContainer').append(renderDataDetails(response.data))
+            }).then(response => {
+                loadingPage(false)
+                $('.dataDetailContainer').css({ 'display': 'none' })
+                $('.dataDetailContainer').fadeIn(200)
+                $('.dataDetailContainer').css({ 'display': 'flex' })
+            })
+        }, 300)
+    }).appendTo(dataSwitchContainer)
     for (let i = 1; i <= 5; i++) {
-        const weekSwitchBtn = $('<div>').prop({
-            className: 'weekSwitchBtn',
-            id: `week_${i}`,
-            innerHTML: `<h1>Week ${i}</h1>`
-        }).css({
-            'width': '15%',
-            'height': '50px',
-            'line-height': '50px',
-            'text-align': 'center',
-            'background-color': '#6c757d',
-            'border-radius': '20px',
-            'transition-duration': '0.2s',
-            'color': 'white',
-            'user-select': 'none'
-        }).hover((e) => {
-            weekSwitchBtn.css({
-                'transition-duration': '0.2s',
-                'background-color': 'purple',
-            })
-        }, (e) => {
-            weekSwitchBtn.css({
-                'transition-duration': '0.2s',
-                'background-color': '#6c757d',
-            })
-        }).click((e) => {
-            loadingPage(true)
-            $('.dataDetailContainer').fadeOut(200)
-            setTimeout(() => {
-                $('.dataDetailContainer').remove()
-                getWeekData(i).then(response => {
-                    weekSwitchClickBtn(i)
-                    $('.adminContainer').append(renderDataDetails(response.data))
-                }).then(response => {
-                    loadingPage(false)
-                    $('.dataDetailContainer').css({ 'display': 'none' })
-                    $('.dataDetailContainer').fadeIn(200)
-                    $('.dataDetailContainer').css({ 'display': 'flex' })
-                })
-            }, 300)
-
-        }).appendTo(dataSwitchContainer)
-
-        if (weekNumber == i) {
-            weekSwitchBtn.addClass('Selecting')
+        if (i == weekCount()) {
+            $('<option selected>').prop({
+                value: i,
+                innerHTML: `<h2>Week ${i}</h2>`
+            }).appendTo(chanageWeekData)
+        } else {
+            $('<option>').prop({
+                value: i,
+                innerHTML: `<h2>Week ${i}</h2>`
+            }).appendTo(chanageWeekData)
         }
     }
     //data Btn選擇器外框
@@ -322,7 +341,8 @@ function renderDataBtn(weekNumber) {
         className: 'dataPageBtnContainer',
         innerHTML: '<h1>Data && Task</h1>'
     }).css({
-        'background-color': 'rgba(255, 255, 255, 0.5)',
+        'background-color': 'rgba(0, 0, 0, 0.3)',
+        'border-radius': '20px',
         'width': '95vw',
         'height': '160px',
         'text-align': 'center',
@@ -424,30 +444,7 @@ function renderDataDetails(Data) {
         'height': '82%',
         'overflow-y': 'auto'
     }).appendTo(dataInputDiv)
-    ////Text Input textarea
-    const dataText = $('<textarea>').prop({
-        className: 'dataTextInput',
-        placeholder: '該處輸入本周教學說明',
-        innerHTML: Data.dataContent ? Data.dataContent.content.text : ''
-    }).css({
-        'transition-duration': '0.3s',
-        'padding': '10px',
-        'margin-top': '10px',
-        'width': '95%',
-        'height': '30%',
-        'border-radius': '20px',
-        'border': '1px dashed rgba(0,0,0,0.3)',
-        'resize': 'none'
-    }).hover((e) => {
-        dataText.css({
-            'transition-duration': '0.3s',
-            'border': '1px solid black'
-        })
-    }, (e) => {
-        dataText.css({
-            'border': '1px dashed rgba(0,0,0,0.3)'
-        })
-    }).appendTo(dataBox)
+
     ////周次重點輸入區
     const dataMainPointDiv = $('<div>').prop({
         className: 'dataMainPointDiv',
@@ -472,15 +469,6 @@ function renderDataDetails(Data) {
         'border-radius': '20px',
         'border': '1px dashed rgba(0,0,0,0.3)',
         'resize': 'none'
-    }).hover((e) => {
-        dataText.css({
-            'transition-duration': '0.3s',
-            'border': '1px solid black'
-        })
-    }, (e) => {
-        dataText.css({
-            'border': '1px dashed rgba(0,0,0,0.3)'
-        })
     }).appendTo(dataMainPointDiv)
 
     ////PDF Input div
@@ -622,8 +610,8 @@ function renderDataDetails(Data) {
     }).click(async (e) => {
         //計算 Mission 數量用
         const missionLength = $('.dataMissionBox').find('.missionTextDiv').length - 1
-        const missionCount = parseInt($('.dataMissionBox').find('.missionTextDiv')[missionLength].id.split("_")[1] )+ 1
-        console.log(missionCount)
+        let missionCount = 0
+        if (missionLength != -1) missionCount = parseInt($('.dataMissionBox').find('.missionTextDiv')[missionLength].id.split("_")[1]) + 1
         await renderMissionTextBox("", missionCount).insertBefore(missionText)
         $(`#missionTextDiv_${missionCount}`).slideDown(200)
         $(`#missionTextDiv_${missionCount}`).css({ 'display': 'flex' })
@@ -675,7 +663,7 @@ function renderDataPage(Data) {
     //Data 單周資訊
     const pageContainer = $('.adminContainer')
     //產生週數按鈕
-    pageContainer.append(renderDataBtn(weekCount()))
+    pageContainer.append(renderDataBtn())
     //產生當前週數Container
     pageContainer.append(renderDataDetails(Data))
 }
@@ -685,7 +673,7 @@ function loadingData() {
     loadingPage(true)
 
     //取得目前周次的內容並開始Render
-    getWeekData(weekCount()).then(response => {
+    getWeekData(weekCount(), 108).then(response => {
         renderDataPage(response.data)
     }).then(() => {
         loadingPage(false)
