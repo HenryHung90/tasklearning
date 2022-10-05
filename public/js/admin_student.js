@@ -89,7 +89,7 @@ function studentListGenerate(studentList) {
             "當前學號": listValue.studentId,
             "姓名": listValue.studentName,
             "密碼(若要更新再輸入)": '',
-            "電子郵件": listValue.studentEmail
+            "是否激活": listValue.studentAccess
         }
         listValue.studentDetail.map((statusValue, statusIndex) => {
             data[`周 ${statusValue.Week} 進度`] = 'unchecked'
@@ -185,28 +185,24 @@ const UploadMember = async (e) => {
                 currentStudentId: DataContainer[i][2],
                 studentName: DataContainer[i][3],
                 studentPassword: DataContainer[i][4],
-                studentEmail: DataContainer[i][5]
+                studentAccess: DataContainer[i][5]
             };
             DataUpdate.push(UploadData);
         }
-        await uploadManyStudents(DataUpdate).then(async response => {
-            if (response.data) {
-                let nextData = ''
-
-                await loadingAllStudent(session).then(response => {
-                    nextData = response.data
+        await uploadManyStudents(DataUpdate).then(async res => {
+            setTimeout((e) => {
+                loadingAllStudent(session).then(response => {
+                    reloadStudentList(response.data, "success")
+                    loadingPage(false)
                 })
-                return nextData
-            }
-        }).then(response => {
-            reloadStudentList(response, "success")
-            loadingPage(false)
+            }, 500)
         })
     }
     reader.readAsBinaryString(file);
 }
 //新增學生頁面
 function addNewStudentPage() {
+
     let studentId = window.prompt("新增學生學號", '')
     if (studentId == null) {
         window.alert("取消")
@@ -222,16 +218,18 @@ function addNewStudentPage() {
         window.alert("取消")
         return
     }
-    let studentEmail = window.prompt("新增學生Email", '')
-    if (studentEmail == null) {
+    let studentAccess = window.prompt("是否激活帳號(true or false)", '')
+    if (studentAccess == null) {
         window.alert("取消")
         return
     }
 
+
+
     if (studentId == null ||
         studentPassword == null ||
         studentName == null ||
-        studentEmail == null) {
+        studentAccess == null) {
         window.alert("有值為空值")
         return
     }
@@ -245,7 +243,7 @@ function addNewStudentPage() {
         studentId: studentId,
         studentName: studentName,
         studentPassword: studentPassword,
-        studentEmail: studentEmail
+        studentAccess: studentAccess
     }
 
     uploadSingleStudent(studentData).then(response => {
@@ -256,7 +254,7 @@ function addNewStudentPage() {
         }
         let alertText = "新增完成\n" + `學號 : ${studentId}\n` +
             `姓名 : ${studentName}\n` + `密碼 : ${studentPassword}\n` +
-            `信箱 : ${studentEmail}`
+            `信箱 : ${studentAccess}`
 
         loadingAllStudent(session).then(response => {
             reloadStudentList(response.data, alertText)
@@ -316,7 +314,12 @@ function changeStudentConfig(Id) {
         window.alert("取消")
         return
     }
-    if (comfirmClick(`\n學生新學號 : ${studentId}\n學生新姓名 : ${studentName}`)) {
+    const studentAccess = window.prompt("請輸入是否開通(true or false)","true")
+    if(studentAccess == null){
+        window.alert("取消")
+        return
+    }
+    if (comfirmClick(`\n學生新學號 : ${studentId}\n學生新姓名 : ${studentName}\n是否開通 : ${studentAccess}`)) {
         axios({
             method: 'POST',
             url: '/admin/updatestudentconfig',
@@ -324,7 +327,8 @@ function changeStudentConfig(Id) {
                 studentSession: $('.form-select').val(),
                 originStudentId: Id.studentId,
                 studentId: studentId,
-                studentName: studentName
+                studentName: studentName,
+                studentAccess:studentAccess,
             },
             withCredentials: true
         }).then(response => {
@@ -486,7 +490,7 @@ function renderStudentList(studentDetail) {
             innerHTML: "事件紀錄"
         }).css({
             'width': '45%',
-            'margin-left':'5px',
+            'margin-left': '5px',
             'height': '40px',
             'background-color': 'purple'
         }).click(e => {

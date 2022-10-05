@@ -30,17 +30,17 @@ const studentminding = require('../models/studentminding')
 
 
 const availableWeek = 5
-router.use((req, res, next) => {
-    if (req.user != undefined) {
-        if (req.user.studentId == "admin") {
-            next()
-            return
-        }
-        res.send("fall")
-    } else {
-        res.send("fall")
-    }
-})
+// router.use((req, res, next) => {
+//     if (req.user != undefined) {
+//         if (req.user.studentId == "admin") {
+//             next()
+//             return
+//         }
+//         res.send("fall")
+//     } else {
+//         res.send("fall")
+//     }
+// })
 
 //取得所有學生各項數據
 router.post(process.env.ROUTER_ADMIN_READSTUDENTSTATUS, async (req, res) => {
@@ -51,14 +51,14 @@ router.post(process.env.ROUTER_ADMIN_READSTUDENTSTATUS, async (req, res) => {
         studentsResponse: []
     }
 
-    await studentsConfig.find({}).then(response => {
+    await studentsConfig.find({ studentSession: req.body.session }).then(response => {
         response.map((value, index) => {
             if (value.studentName != 'Admin') {
                 returnData.studentsStatus.push(value.studentDetail)
             }
         })
     })
-    await missioncontentmodel.find({}).then(response => {
+    await missioncontentmodel.find({ studentSession: req.body.session }).then(response => {
         response.map((value, index) => {
             const missionData = {
                 week: value.week,
@@ -67,7 +67,7 @@ router.post(process.env.ROUTER_ADMIN_READSTUDENTSTATUS, async (req, res) => {
             returnData.studentsMission.push(missionData)
         })
     })
-    await studentminding.find({}).then(response => {
+    await studentminding.find({ studentSession: req.body.session }).then(response => {
         response.map((value, index) => {
             const mindingData = {
                 week: value.week,
@@ -77,7 +77,7 @@ router.post(process.env.ROUTER_ADMIN_READSTUDENTSTATUS, async (req, res) => {
             returnData.studentsMinding.push(mindingData)
         })
     })
-    await responsecontentmodel.find({}).then(response => {
+    await responsecontentmodel.find({ studentSession: req.body.session }).then(response => {
         response.map((value, index) => {
             const responseData = {
                 studentId: value.studentId,
@@ -155,12 +155,16 @@ router.post(process.env.ROUTER_ADMIN_READSTUDENTSTATUSDETAIL, async (req, res) =
         manageContent: [],
         mindingContent: {}
     }
-    await missioncontentmodel.findOne({ week: req.body.week }).then(response => {
+    await missioncontentmodel.findOne({ session: req.body.studentSession, week: req.body.week }).then(response => {
+        if (response == null) {
+            res.send('fall');
+            return
+        }
         response.mission.map((missionValue) => {
             returnData.missionName.push(missionValue.title)
         })
     })
-    await studentmission.findOne({ studentId: req.body.studentId, week: req.body.week }).then(response => {
+    await studentmission.findOne({ session: req.body.studentSession, studentId: req.body.studentId, week: req.body.week }).then(response => {
         if (response == null) {
             return
         }
@@ -169,8 +173,7 @@ router.post(process.env.ROUTER_ADMIN_READSTUDENTSTATUSDETAIL, async (req, res) =
             returnData.missionContent.push(missionSelect)
         })
     })
-    await studentmanage.findOne({ studentId: req.body.studentId, week: req.body.week }).then(response => {
-        console.log(response)
+    await studentmanage.findOne({ session: req.body.studentSession, studentId: req.body.studentId, week: req.body.week }).then(response => {
         if (response == null) {
             return
         }
@@ -181,7 +184,7 @@ router.post(process.env.ROUTER_ADMIN_READSTUDENTSTATUSDETAIL, async (req, res) =
             returnData.manageContent.push(studentManage)
         })
     })
-    await studentminding.findOne({ studentId: req.body.studentId, week: req.body.week }).then(response => {
+    await studentminding.findOne({ session: req.body.studentSession, studentId: req.body.studentId, week: req.body.week }).then(response => {
         if (response == null) {
             return
         }
@@ -319,89 +322,87 @@ router.post(process.env.ROUTER_ADMIN_READDATA, async (req, res) => {
 })
 //批量修改學生 用於Upload Student
 router.post(process.env.ROUTER_ADMIN_UPLOADMANYSTUDENTS, async (req, res) => {
-    await req.body.studentList.map(async (studentValue, studentIndex) => {
-        if (studentIndex == req.body.studentList.length - 1) {
-            return
-        }
+    req.body.studentList.map(async (studentValue, studentIndex) => {
         //studentSession
         //newStudentId
         //currentStudentId
         //studentName
         //studentPassword
         //studentEmail
-        let isNewStudent = false
-        await studentsConfig.findOne({ studentId: studentValue.currentStudentId }).then(response => {
-            response == null ? isNewStudent = true : null
-        })
-        if (!isNewStudent) {
-            if (studentValue.studentPassword != '') {
-                const saltRound = 15
-                bcrypt.hash(studentValue.studentPassword, saltRound, async (err, hashedPassword) => {
-                    await studentsConfig.updateOne({ studentId: studentValue.currentStudentId },
+        studentValue.studentAccess == "TRUE" ? studentValue.studentAccess = true : studentValue.studentAccess = false
+        await studentsConfig.findOne({ studentSession: studentValue.studentSession, studentId: studentValue.currentStudentId }).then(async response => {
+            console.log(response)
+            if (response != null) {
+                if (studentValue.studentPassword != '') {
+                    const saltRound = 15
+                    bcrypt.hash(studentValue.studentPassword, saltRound, async (err, hashedPassword) => {
+                        await studentsConfig.updateOne({ studentSession: studentValue.studentSessionn, studentId: studentValue.currentStudentId },
+                            {
+                                studentSession: studentValue.studentSession,
+                                studentId: studentValue.newStudentId == '' ? studentValue.currentStudentId : studentValue.newStudentId,
+                                studentPassword: hashedPassword,
+                                studentName: studentValue.studentName,
+                                studentAccess: studentValue.studentAccess
+                            })
+                    })
+                } else {
+                    await studentsConfig.updateOne({ studentSession: studentValue.studentSession, studentId: studentValue.currentStudentId },
                         {
-                            studentSession: studentValue.studentSession,
                             studentId: studentValue.newStudentId == '' ? studentValue.currentStudentId : studentValue.newStudentId,
-                            studentPassword: hashedPassword,
                             studentName: studentValue.studentName,
-                            studentEmail: studentValue.studentEmail
+                            studentAccess: studentValue.studentAccess
                         })
-                })
-            } else {
-                await studentsConfig.updateOne({ studentId: studentValue.currentStudentId },
-                    {
-                        studentId: studentValue.newStudentId == '' ? studentValue.currentStudentId : studentValue.newStudentId,
-                        studentName: studentValue.studentName,
-                        studentEmail: studentValue.studentEmail
-                    })
-            }
-            //學生Task
-            if (studentValue.newStudentId != '') {
-                await studentmission.updateMany({ studentId: studentValue.currentStudentId },
-                    { studentId: studentValue.newStudentId })
-
-                //學生Plan
-                await studentmanage.updateMany({ studentId: studentValue.currentStudentId },
-                    { studentId: studentValue.newStudentId })
-
-                //學生Reflection
-                await studentminding.updateMany({ studentId: studentValue.currentStudentId },
-                    { studentId: studentValue.newStudentId })
-
-                //學生Feedback
-                await responsecontentmodel.updateMany({ studentId: studentValue.currentStudentId },
-                    { studentId: studentValue.newStudentId })
-            }
-
-
-        } else {
-            const saltRound = 15
-            studentValue.studentPassword == '' ? studentValue.studentPassword = studentValue.currentStudentId : null
-            bcrypt.hash(studentValue.studentPassword, saltRound, async (err, hashedPassword) => {
-                const studentDetailInit = new Array()
-
-                for (let i = 1; i <= availableWeek; i++) {
-                    studentDetailInit.push({
-                        Week: i,
-                        Status: {
-                            Data: false,
-                            Mission: false,
-                            Manage: false,
-                            Minding: false,
-                            Response: false
-                        }
-                    })
                 }
-                const newStudent = new studentsConfig({
-                    studentSession: studentValue.studentSession,
-                    studentId: studentValue.currentStudentId,
-                    studentPassword: hashedPassword,
-                    studentName: studentValue.studentName,
-                    studentEmail: studentValue.studentEmail,
-                    studentDetail: studentDetailInit
+                //學生Task
+                if (studentValue.newStudentId != '') {
+                    await studentmission.updateMany({ studentSession: studentValue.studentSession, studentId: studentValue.currentStudentId },
+                        { studentSession: studentValue.studentSession, studentId: studentValue.newStudentId })
+
+                    //學生Plan
+                    await studentmanage.updateMany({ studentSession: studentValue.studentSession, studentId: studentValue.currentStudentId },
+                        { studentSession: studentValue.studentSession, studentId: studentValue.newStudentId })
+
+                    //學生Reflection
+                    await studentminding.updateMany({ studentSession: studentValue.studentSession, studentId: studentValue.currentStudentId },
+                        { studentSession: studentValue.studentSession, studentId: studentValue.newStudentId })
+
+                    //學生Feedback
+                    await responsecontentmodel.updateMany({ studentSession: studentValue.studentSession, studentId: studentValue.currentStudentId },
+                        { studentSession: studentValue.studentSession, studentId: studentValue.newStudentId })
+                }
+
+
+            } else {
+                const saltRound = 15
+                studentValue.studentPassword == '' ? studentValue.studentPassword = studentValue.currentStudentId : null
+                bcrypt.hash(studentValue.studentPassword, saltRound, (err, hashedPassword) => {
+                    const studentDetailInit = new Array()
+
+                    for (let i = 1; i <= availableWeek; i++) {
+                        studentDetailInit.push({
+                            Week: i,
+                            Status: {
+                                Data: false,
+                                Mission: false,
+                                Manage: false,
+                                Minding: false,
+                                Response: false
+                            }
+                        })
+                    }
+                    const newStudent = new studentsConfig({
+                        studentSession: studentValue.studentSession,
+                        studentId: studentValue.currentStudentId,
+                        studentPassword: hashedPassword,
+                        studentName: studentValue.studentName,
+                        studentAccess: studentValue.studentAccess,
+                        studentDetail: studentDetailInit
+                    })
+                    newStudent.save()
                 })
-                await newStudent.save()
-            })
-        }
+            }
+        })
+
     })
     res.send(true)
 })
@@ -418,19 +419,19 @@ router.post(process.env.ROUTER_ADMIN_DELETESTUDENT, async (req, res) => {
         newStudentData: []
     }
 
-    await studentsConfig.deleteOne({ studentSession: req.body.studentSession,studentId: req.body.studentId }).then(response => {
+    await studentsConfig.deleteOne({ studentSession: req.body.studentSession, studentId: req.body.studentId }).then(response => {
         returnData.deleteStatus["學生帳號"] = response.acknowledged
     })
-    await responsecontentmodel.deleteMany({ studentSession: req.body.studentSession,studentId: req.body.studentId }).then(response => {
+    await responsecontentmodel.deleteMany({ studentSession: req.body.studentSession, studentId: req.body.studentId }).then(response => {
         returnData.deleteStatus["學生回饋"] = response.acknowledged
     })
-    await studentmission.deleteMany({ studentSession: req.body.studentSession,studentId: req.body.studentId }).then(response => {
+    await studentmission.deleteMany({ studentSession: req.body.studentSession, studentId: req.body.studentId }).then(response => {
         returnData.deleteStatus["學生Task"] = response.acknowledged
     })
     await studentmanage.deleteMany({ studentSession: req.body.studentSession, studentId: req.body.studentId }).then(response => {
         returnData.deleteStatus["學生Plan"] = response.acknowledged
     })
-    await studentminding.deleteMany({ studentSession: req.body.studentSession,studentId: req.body.studentId }).then(response => {
+    await studentminding.deleteMany({ studentSession: req.body.studentSession, studentId: req.body.studentId }).then(response => {
         returnData.deleteStatus["學生Reflection"] = response.acknowledged
     })
     await studentsConfig.find({ studentSession: req.body.studentSession }).then(response => {
@@ -472,36 +473,36 @@ router.post(process.env.ROUTER_ADMIN_UPDATESTUDENTCONFIG, async (req, res) => {
 
     //學生資料
     await studentsConfig.updateOne({ studetnSession: req.body.studentSession, studentId: req.body.originStudentId },
-        { studentId: req.body.studentId, studentName: req.body.studentName })
+        { studentId: req.body.studentId, studentName: req.body.studentName, studentAccess: req.body.studentAccess })
         .then(response => {
             returnData.studentConfig = response.acknowledged
         })
     //學生Task
     await studentmission.updateMany({ studetnSession: req.body.studentSession, studentId: req.body.originStudentId },
-        { studentId: req.body.studentId })
+        { studetnSession: req.body.studentSession, studentId: req.body.studentId })
         .then(response => {
             returnData.studentMission = response.acknowledged
         })
     //學生Plan
     await studentmanage.updateMany({ studetnSession: req.body.studentSession, studentId: req.body.originStudentId },
-        { studentId: req.body.studentId })
+        { studetnSession: req.body.studentSession, studentId: req.body.studentId })
         .then(response => {
             returnData.studentManage = response.acknowledged
         })
     //學生Reflection
     await studentminding.updateMany({ studetnSession: req.body.studentSession, studentId: req.body.originStudentId }, {
-        studentId: req.body.studentId
+        studetnSession: req.body.studentSession, studentId: req.body.studentId
     }).then(response => {
         returnData.studentMinding = response.acknowledged
     })
     //學生Feedback
     await responsecontentmodel.updateMany({ studetnSession: req.body.studentSession, studentId: req.body.originStudentId },
-        { studentId: req.body.studentId })
+        { studetnSession: req.body.studentSession, studentId: req.body.studentId })
         .then(response => {
             returnData.studentResponse = response.acknowledged
         })
 
-    await studentsConfig.find({}).then(response => {
+    await studentsConfig.find({ studentSession: req.body.studentSession }).then(response => {
         response.map((value, index) => {
             if (value.studentName != "Admin") {
                 const studentData = {
@@ -518,7 +519,7 @@ router.post(process.env.ROUTER_ADMIN_UPDATESTUDENTCONFIG, async (req, res) => {
 })
 //新增學生
 router.post(process.env.ROUTER_ADMIN_ADDSTUDENT, async (req, res) => {
-    await studentsConfig.find({ studentId: req.body.studentId }).then(response => {
+    await studentsConfig.find({ studentSession: req.body.studentSession, studentId: req.body.studentId }).then(response => {
         if (response.length == 0) {
             const saltRound = 15
             bcrypt.hash(req.body.studentPassword, saltRound, (err, hashedPassword) => {
@@ -540,7 +541,7 @@ router.post(process.env.ROUTER_ADMIN_ADDSTUDENT, async (req, res) => {
                     studentId: req.body.studentId,
                     studentPassword: hashedPassword,
                     studentName: req.body.studentName,
-                    studentEmail: req.body.studentEmail,
+                    studentAccess: req.body.studentAccess,
                     studentDetail: studentDetailInit
                 })
                 newStudent.save()
@@ -609,6 +610,7 @@ router.post(process.env.ROUTER_ADMIN_ADDMISSION, async (req, res) => {
                     mission: req.body.mission
                 })
                 newWeekMission.save()
+                res.send('success')
             } else {
                 missioncontentmodel.updateOne({ session: req.body.session, week: req.body.week }, { mission: req.body.mission }).then(response => {
                     res.send(response.acknowledged)

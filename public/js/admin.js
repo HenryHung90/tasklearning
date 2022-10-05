@@ -17,10 +17,13 @@ function logoutFunc() {
     })
 }
 //取得學生Detail
-function loadingStudentDetail() {
+function loadingStudentDetail(Session) {
     return (axios({
         method: 'post',
         url: '/admin/readStudentStatus',
+        data: {
+            session: Session
+        },
         withCredentials: true,
     }))
 }
@@ -44,7 +47,7 @@ function switchIdtoName(Id) {
             text = "師生回饋"
             break
         case 'Score':
-            text= ""
+            text = ""
             break
     }
     return text
@@ -54,7 +57,7 @@ function weekCount() {
     return 2
 }
 //return 最多到第幾屆
-function sessionCount(){
+function sessionCount() {
     return 111
 }
 //return status count外框
@@ -80,6 +83,9 @@ function renderProgressBarContainer(statusName) {
 }
 //return ProgressBar生成
 function renderProgressBar(name, index, total, count) {
+    if (total == 0) {
+        total = 1
+    }
     const targetContainer = document.querySelector(name)
     const percentageBar = new ProgressBar.SemiCircle(targetContainer, {
         id: name,
@@ -116,11 +122,11 @@ function renderProgressBar(name, index, total, count) {
         } else {
             percentageBar.animate(count[index] / total[index])
         }
-    }else if (name.split("_")[0] == '#minding'){
+    } else if (name.split("_")[0] == '#minding') {
         //自我評分僅有一項
         if (count == 0 && total == 0) {
             percentageBar.animate(0)
-        }else{
+        } else {
             percentageBar.animate(count / total)
         }
     } else {
@@ -188,7 +194,76 @@ function renderWeekStatusSelection(Id, target, appendTarget) {
         }, 300)
     }
 }
+function changeMainSession(Session) {
+    if(window.confirm("你確定要變換屆數嗎?這將導致可登入使用者會變換為該屆喔")){
+        
+    }
+    $('.adminContainer').fadeOut(100)
+    setTimeout(() =>{
+        $('.total_StatusCompletePercentage').remove()
+        $('.week_StatusCompletePercentage').remove()
+        $('.week_MissionCompletePercentage').remove()
+        $('.week_MindingSelfEvaluationAveraged').remove()
+        $('.weekSelect').remove()
+        loadingStudentDetail(Session).then(response => {
+            //總Status完成度
+            $('.totalStatus_div').append(renderTotal_StatusCompletePercentage())
+            //周Status完成度
+            $('.weekStatus_div').append(renderWeek_StatusCompletePercentage())
+            //周任務完成度
+            $('.weekMission_div').append(renderWeek_MissionCompletePercentage(response.data.studentsMission, weekCount()))
+            //周自我評價均分
+            $('.weekMindingScore_div').append(renderWeek_MindingSelfEvaluationAveraged())
+            return response.data
+        }).then(response => {
+            const nowWeek = weekCount()
+
+            totalStatusProgress(response.studentsStatus)
+            weekStatusProgress(response.studentsStatus, nowWeek)
+            weekMissionProgress(response.studentsMission, response.studentsMinding, nowWeek)
+            weekMindingScoreProgress(response.studentsMinding, nowWeek)
+
+            loadingPage(false)
+        })
+        setTimeout((e)=>{
+            $('.adminContainer').fadeIn(500)
+        },500)
+    },100)
+
+}
 ////////////////////////////////////
+function renderChangeSession() {
+    const sessionBarContainer = $("<div>").prop({
+        className: 'sessionBarContainer',
+        innerHTML: '<h3>變更屆數</h3>'
+    }).css({
+        'width': '90%',
+        'margin': '0 auto',
+        'height': '100px',
+    })
+
+    //選擇屆數
+    const changeStudentsSession = $('<select>').prop({
+        className: "form-select",
+        id: 'main_session',
+        ariaLabel: "Default select example"
+    }).css({
+        'width': '40%',
+        'margin': '0'
+    }).change((e) => {
+        loadingPage(true)
+        changeMainSession(e.target.value)
+    }).appendTo(sessionBarContainer)
+    //108~111屆 (暫定 可以再做更改 )
+    for (let i = 108; i < sessionCount(); i++) {
+        $('<option>').prop({
+            value: i,
+            innerHTML: `第 ${i} 屆`
+        }).appendTo(changeStudentsSession)
+    }
+
+    return sessionBarContainer
+}
 //render 總Status完成度
 function renderTotal_StatusCompletePercentage() {
     //總Status Container
@@ -338,22 +413,23 @@ function weekMissionProgress(Mission, Minding, Week) {
 
 }
 //WeekMindingScore ProgressBar
-function weekMindingScoreProgress(Minding,Week) {
+function weekMindingScoreProgress(Minding, Week) {
     let mindingTotal = 0
     let studentMindingTotal = 0
-    Minding.map((mindingValue,mindingIndex)=>{
-        if(mindingValue.week == Week){
+    Minding.map((mindingValue, mindingIndex) => {
+        if (mindingValue.week == Week) {
             mindingTotal += 5
-            if(mindingValue.studentRanking !== undefined){
+            if (mindingValue.studentRanking !== undefined) {
                 studentMindingTotal += parseInt(mindingValue.studentRanking)
             }
         }
     })
-    renderProgressBar('#minding_Score',0,mindingTotal,studentMindingTotal)
+    renderProgressBar('#minding_Score', 0, mindingTotal, studentMindingTotal)
 }
 ////////////////////////////////////
 //render AdminMainPage main function
 function renderAdminMainPage(studentData) {
+    $('.changeSession_div').append(renderChangeSession())
     //總Status完成度
     $('.totalStatus_div').append(renderTotal_StatusCompletePercentage())
     //周Status完成度
@@ -365,7 +441,7 @@ function renderAdminMainPage(studentData) {
 }
 //loading AdminMainPage main function
 function loadingAdminPage() {
-    loadingStudentDetail()
+    loadingStudentDetail(108)
         .then(response => {
             renderAdminMainPage(response.data)
             return response.data
@@ -387,6 +463,6 @@ $(window).ready((e) => {
 $(`#logoutBtn`).click(() => {
     logoutFunc()
 })
-$(`#Home`).click((e)=>{
+$(`#Home`).click((e) => {
     location.reload()
 })

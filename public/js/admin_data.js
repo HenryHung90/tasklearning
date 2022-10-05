@@ -138,6 +138,78 @@ async function uploadWeekMission() {
     })
     return status
 }
+//render missionText 的框架
+function renderMissionTextBox(missionData, missionCount) {
+    //mission外框
+    const missionTextDiv = $('<div>').prop({
+        className: 'missionTextDiv',
+        id: `missionTextDiv_${missionCount}`
+    }).css({
+        'width': '100%',
+        'height': '150px',
+        'padding': '5px 0',
+        'border-radius': '20px',
+        'border': '1px dashed rgba(0,0,0,0.3)',
+        'margin': '0 auto',
+        'margin-bottom': '15px',
+        'display': 'none',
+    })
+    if (missionData != "") {
+        missionTextDiv.css({ 'display': 'flex' })
+    }
+    //mission刪除紐
+    const missionDelete = $('<div>').prop({
+        className: 'missionDelete',
+        innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" width="50px" height="50px" viewBox="0 0 320 512"><!--! Font Awesome Pro 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M310.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L160 210.7 54.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L114.7 256 9.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 301.3 265.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L205.3 256 310.6 150.6z"/></svg>'
+    }).css({
+        'margin': '5px 20px',
+        'opacity': '0.2',
+        'height': '150px',
+        'width': '50px',
+        'transition-duration': '0.3s',
+    }).hover((e) => {
+        missionDelete.css({
+            'transition-duration': '0.3s',
+            'opacity': '1'
+        })
+    }, (e) => {
+        missionDelete.css({
+            'transition-duration': '0.3s',
+            'opacity': '0.2'
+        })
+    }).click((e) => {
+        $(`#missionTextDiv_${missionCount}`).slideUp(200);
+        setTimeout((e) => {
+            $(`#missionTextDiv_${missionCount}`).remove()
+        }, 200)
+    }).appendTo(missionTextDiv)
+    //mission輸入區
+    const missionInputDiv = $('<div>').prop({
+        className: 'missionInputDiv',
+    }).css({
+        'width': '80%',
+        'height': '70px',
+    }).appendTo(missionTextDiv)
+    //mission Title輸入
+    $('<div>').prop({
+        className: 'form-floating mb-3',
+        innerHTML: `<input type="text" class="form-control" id="missionTitle" placeholder="任務名稱" value="${missionData.title ? missionData.title : ''}">` +
+            '<label for="floatingInput">任務名稱</label>'
+    }).css({
+        'width': '50%',
+    }).appendTo(missionInputDiv)
+    //missionDecription輸入
+    $('<div>').prop({
+        className: 'form-floating mb-3',
+        innerHTML: `<input type="text" class="form-control" id="missionDecription" placeholder="任務簡易說明"  value="${missionData.content ? missionData.content : ''}">` +
+            '<label for="floatingInput">任務簡易說明</label>'
+    }).css({
+        'margin-top': '10px',
+        'width': '100%',
+    }).appendTo(missionInputDiv)
+
+    return missionTextDiv
+}
 //-------------------------------
 //render PDF 以及 Video 圖示
 function renderPDFandVideoIcon(Data, Index, type) {
@@ -349,78 +421,6 @@ function renderDataBtn() {
         'margin': '0 auto'
     }).append(dataSwitchContainer)
     return dataPageBtnContainer
-}
-//render missionText 的框架
-function renderMissionTextBox(missionData, missionCount) {
-    //mission外框
-    const missionTextDiv = $('<div>').prop({
-        className: 'missionTextDiv',
-        id: `missionTextDiv_${missionCount}`
-    }).css({
-        'width': '100%',
-        'height': '150px',
-        'padding': '5px 0',
-        'border-radius': '20px',
-        'border': '1px dashed rgba(0,0,0,0.3)',
-        'margin': '0 auto',
-        'margin-bottom': '15px',
-        'display': 'none',
-    })
-    if (missionData != "") {
-        missionTextDiv.css({ 'display': 'flex' })
-    }
-    //mission刪除紐
-    const missionDelete = $('<div>').prop({
-        className: 'missionDelete',
-        innerHTML: '<svg xmlns="http://www.w3.org/2000/svg" width="50px" height="50px" viewBox="0 0 320 512"><!--! Font Awesome Pro 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M310.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L160 210.7 54.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L114.7 256 9.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 301.3 265.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L205.3 256 310.6 150.6z"/></svg>'
-    }).css({
-        'margin': '5px 20px',
-        'opacity': '0.2',
-        'height': '150px',
-        'width': '50px',
-        'transition-duration': '0.3s',
-    }).hover((e) => {
-        missionDelete.css({
-            'transition-duration': '0.3s',
-            'opacity': '1'
-        })
-    }, (e) => {
-        missionDelete.css({
-            'transition-duration': '0.3s',
-            'opacity': '0.2'
-        })
-    }).click((e) => {
-        $(`#missionTextDiv_${missionCount}`).slideUp(200);
-        setTimeout((e) => {
-            $(`#missionTextDiv_${missionCount}`).remove()
-        }, 200)
-    }).appendTo(missionTextDiv)
-    //mission輸入區
-    const missionInputDiv = $('<div>').prop({
-        className: 'missionInputDiv',
-    }).css({
-        'width': '80%',
-        'height': '70px',
-    }).appendTo(missionTextDiv)
-    //mission Title輸入
-    $('<div>').prop({
-        className: 'form-floating mb-3',
-        innerHTML: `<input type="text" class="form-control" id="missionTitle" placeholder="任務名稱" value="${missionData.title ? missionData.title : ''}">` +
-            '<label for="floatingInput">任務名稱</label>'
-    }).css({
-        'width': '50%',
-    }).appendTo(missionInputDiv)
-    //missionDecription輸入
-    $('<div>').prop({
-        className: 'form-floating mb-3',
-        innerHTML: `<input type="text" class="form-control" id="missionDecription" placeholder="任務簡易說明"  value="${missionData.content ? missionData.content : ''}">` +
-            '<label for="floatingInput">任務簡易說明</label>'
-    }).css({
-        'margin-top': '10px',
-        'width': '100%',
-    }).appendTo(missionInputDiv)
-
-    return missionTextDiv
 }
 //DataContainer位置
 function renderDataDetails(Data) {

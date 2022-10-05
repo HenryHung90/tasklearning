@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 
 const studentstagecontent = new mongoose.Schema({
+    session: {
+        type: 'string',
+        required: true,
+    },
     studentId: {
         type: 'string',
         required: true,

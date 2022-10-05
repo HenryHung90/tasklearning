@@ -108,7 +108,8 @@ task.post(process.env.ROUTER_MAIN_LOGIN, (req, res, next) => {
             throw err
         }
         if (!user) {
-            res.send("login failed")
+            console.log(info.message)
+            res.send(`${info.message}`)
         }
         else {
             req.logIn(user, (err) => {

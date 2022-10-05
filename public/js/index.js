@@ -5,10 +5,12 @@ const LoginFunc = (e) => {
 
     if(Account === ""){
         window.alert("請輸入帳號")
+        loadingPage(false)
         return
     }
     if(Password === ""){
         window.alert("請輸入密碼")
+        loadingPage(false)
         return
     }
 
@@ -21,8 +23,13 @@ const LoginFunc = (e) => {
         url: '/login',
         withCredentials: true,
     }).then(res=>{
-        if(res.data === 'login failed'){
-            window.alert('帳號或密碼錯誤')
+        if(res.data == '無此用戶'){
+            window.alert('無此用戶')
+            loadingPage(false)
+            return
+        }
+        if(res.data == '密碼錯誤'){
+            window.alert("密碼錯誤")
             loadingPage(false)
             return
         }

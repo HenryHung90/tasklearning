@@ -17,8 +17,8 @@ const studentsConfig = new mongoose.Schema({
         type:'string',
         required:true,
     },
-    studentEmail:{
-        type:'string',
+    studentAccess:{
+        type:'boolean',
         required:true,
     },
     studentDetail:{

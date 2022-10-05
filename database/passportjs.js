@@ -66,7 +66,7 @@ const studentConfig = require('../models/studentsconfig')
 module.exports = (passport) => {
     passport.use(
         new localStrategy((username, password, done) => {
-            studentConfig.findOne({ studentId: username }, (err, user) => {
+            studentConfig.findOne({ studentAccess:true,studentId: username, }, (err, user) => {
                 if (err) {
                     console.log("passport error")
                     return done(err)

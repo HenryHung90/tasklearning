@@ -17,7 +17,7 @@ router.get(process.env.ROUTER_DASHBOARD_STUDENTSTAGE, (req, res) => {
 
     //req.user.studentId
     if (isAuthUser(Id,req.user.studentId)){
-        studentConfig.findOne({ studentId: Id }).then((response) => {
+        studentConfig.findOne({ studentId: Id,studentAccess:true }).then((response) => {
             if (response == undefined || response == null) {
                 res.status(404).send("無此用戶")
             }
@@ -41,7 +41,7 @@ router.get(process.env.ROUTER_DASHBOARD_STUDENTMAIN, (req, res) => {
             res.render('dashboard/admin')
             return
         }else{
-            studentConfig.findOne({ studentId: Id }).then((response) => {
+            studentConfig.findOne({ studentId: Id, studentAccess: true }).then((response) => {
                 if (response == undefined || response == null) {
                     res.status(404).send("無此用戶")
                 }

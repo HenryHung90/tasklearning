@@ -44,7 +44,7 @@ router.post(process.env.ROUTER_STUDENT_READDATA, async (req, res) => {
     let isEmpty = false
 
     //取得當周資料
-    await datacontentmodel.findOne({ week: req.body.week }).then(response => {
+    await datacontentmodel.findOne({ session: req.user.studentSession, week: req.body.week }).then(response => {
         //若尚未新增則回傳無值
         if (response === null || response === undefined) {
             res.send("no found")
@@ -54,7 +54,7 @@ router.post(process.env.ROUTER_STUDENT_READDATA, async (req, res) => {
         thisWeekData = response.content
     })
     //取得上週重點
-    await datacontentmodel.findOne({ week: (req.body.week - 1) }).then(response => {
+    await datacontentmodel.findOne({ session: req.user.studentSession, week: (req.body.week - 1) }).then(response => {
         if (response === null || response === undefined) {
             lastWeekPoint = ["無上週重點"]
             return
@@ -71,8 +71,8 @@ router.post(process.env.ROUTER_STUDENT_READDATA, async (req, res) => {
 //學生取得 任務資料
 router.post(process.env.ROUTER_STUDENT_READMISSION, async (req, res) => {
     //取得當周資料
-    const missionData = missioncontentmodel.findOne({ week: req.body.week }).exec()
-    const studentData = studentmission.findOne({ week: req.body.week, studentId: req.user.studentId }).exec()
+    const missionData = missioncontentmodel.findOne({ session: req.user.studentSession, week: req.body.week }).exec()
+    const studentData = studentmission.findOne({ session: req.user.studentSession, week: req.body.week, studentId: req.user.studentId }).exec()
     let returnData = {
         mission: [],
         studentSelect: {},
@@ -102,7 +102,7 @@ router.post(process.env.ROUTER_STUDENT_READMISSION, async (req, res) => {
 router.post(process.env.ROUTER_STUDENT_READMANAGE, async (req, res) => {
     let isEmpty = false
 
-    studentmanage.findOne({ week: req.body.week, studentId: req.user.studentId }).then(response => {
+    studentmanage.findOne({ session: req.user.studentSession, week: req.body.week, studentId: req.user.studentId }).then(response => {
         if (response === null || response === undefined) {
             res.send('no found')
             isEmpty = true
@@ -115,7 +115,7 @@ router.post(process.env.ROUTER_STUDENT_READMANAGE, async (req, res) => {
 router.post(process.env.ROUTER_STUDENT_READMINDING, async (req, res) => {
     let isEmpty = false
 
-    studentminding.findOne({ week: req.body.week, studentId: req.user.studentId }).then(response => {
+    studentminding.findOne({ session: req.user.studentSession, week: req.body.week, studentId: req.user.studentId }).then(response => {
         if (response === null || response === undefined) {
             res.send('no found')
             isEmpty = true
@@ -126,7 +126,7 @@ router.post(process.env.ROUTER_STUDENT_READMINDING, async (req, res) => {
 })
 //學生取得 Response 資料
 router.post(process.env.ROUTER_STUDENT_READRESPONSE, async (req, res) => {
-    responsecontentmodel.findOne({ week: req.body.week, studentId: req.user.studentId}).then(response => {
+    responsecontentmodel.findOne({ session: req.user.studentSession, week: req.body.week, studentId: req.user.studentId}).then(response => {
         res.send(response)
     })
 })
@@ -146,10 +146,11 @@ router.post(process.env.ROUTER_STUDENT_ADDMISSION, async (req, res) => {
     }
 
     if (!isEmpty) {
-        await studentmission.findOne({ studentId: req.user.studentId, week: req.body.week }).then(async (response) => {
+        await studentmission.findOne({ session: req.user.studentSession, studentId: req.user.studentId, week: req.body.week }).then(async (response) => {
             //若尚未新增過該周
             if (response === null || response === undefined) {
                 const newStudentMission = new studentmission({
+                    session:req.user.studentSession,
                     studentId: req.user.studentId,
                     week: req.body.week,
                     studentSelect: req.body.studentSelect
@@ -159,18 +160,19 @@ router.post(process.env.ROUTER_STUDENT_ADDMISSION, async (req, res) => {
             }
             //若已新增過該周
             else {
-                await studentmission.updateOne({ studentId: req.user.studentId, week: req.body.week }, { studentSelect: req.body.studentSelect }).then((response) => {
+                await studentmission.updateOne({ session: req.user.studentSession, studentId: req.user.studentId, week: req.body.week }, { studentSelect: req.body.studentSelect }).then((response) => {
                     isMissionComplete = response.acknowledged
                 })
             }
         })
 
         if (req.body.manageCheck == true) {
-            await studentmanage.findOne({ studentId: req.user.studentId, week: req.body.week }).then(async (response) => {
+            await studentmanage.findOne({ session: req.user.studentSession, studentId: req.user.studentId, week: req.body.week }).then(async (response) => {
                 //若尚未新增過該周
                 if (response === null || response === undefined) {
 
                     const newStudentManage = new studentmanage({
+                        session: req.user.studentSession,
                         studentId: req.user.studentId,
                         week: req.body.week,
                         studentManage: req.body.studentSelect
@@ -180,7 +182,7 @@ router.post(process.env.ROUTER_STUDENT_ADDMISSION, async (req, res) => {
                 }
                 //若已新增過該周
                 else {
-                    await studentmanage.updateOne({ studentId: req.user.studentId, week: req.body.week }, { studentManage: req.body.studentSelect }).then((response) => {
+                    await studentmanage.updateOne({ session: req.user.studentSession, studentId: req.user.studentId, week: req.body.week }, { studentManage: req.body.studentSelect }).then((response) => {
                         isManageComplete = response.acknowledged
                     })
                 }
@@ -193,11 +195,12 @@ router.post(process.env.ROUTER_STUDENT_ADDMISSION, async (req, res) => {
                 mindingData[value[0]] = { missionName: value[0], missionComplete: false, missionReason: '' }
             })
 
-            await studentminding.findOne({ studentId: req.user.studentId, week: req.body.week }).then(async (response) => {
+            await studentminding.findOne({ session: req.user.studentSession, studentId: req.user.studentId, week: req.body.week }).then(async (response) => {
                 //若尚未新增過該周
                 if (response === null || response === undefined) {
 
                     const newStudentMinding = new studentminding({
+                        session: req.user.studentSession,
                         studentId: req.user.studentId,
                         week: req.body.week,
                         studentMinding: mindingData,
@@ -209,7 +212,7 @@ router.post(process.env.ROUTER_STUDENT_ADDMISSION, async (req, res) => {
                 }
                 //若已新增過該周
                 else {
-                    await studentminding.updateOne({ studentId: req.user.studentId, week: req.body.week }, { studentMinding: mindingData, studentFixing:'', studentRanking:'' }).then((response) => {
+                    await studentminding.updateOne({ session: req.user.studentSession, studentId: req.user.studentId, week: req.body.week }, { studentMinding: mindingData, studentFixing:'', studentRanking:'' }).then((response) => {
                         isMindingComplete = response.acknowledged
                     })
                 }
@@ -222,7 +225,7 @@ router.post(process.env.ROUTER_STUDENT_ADDMISSION, async (req, res) => {
 })
 //學生寫入 Manage 資料
 router.post(process.env.ROUTER_STUDENT_ADDMANAGE, async (req, res) => {
-    const cloud = studentmanage.findOne({ week: req.body.week, studentId: req.user.studentId }).exec()
+    const cloud = studentmanage.findOne({ session: req.user.studentSession, week: req.body.week, studentId: req.user.studentId }).exec()
     let cloudData
 
     await cloud.then((response) => {
@@ -232,13 +235,13 @@ router.post(process.env.ROUTER_STUDENT_ADDMANAGE, async (req, res) => {
     cloudData[req.body.manageId][req.body.manageStep] = converDangerString(req.body.manageContent)
 
 
-    await studentmanage.updateOne({ week: req.body.week, studentId: req.user.studentId }, { studentManage: cloudData }).then(response => {
+    await studentmanage.updateOne({ session: req.user.studentSession, week: req.body.week, studentId: req.user.studentId }, { studentManage: cloudData }).then(response => {
         res.send(response.acknowledged)
     })
 })
 //學生寫入 Minding 資料
 router.post(process.env.ROUTER_STUDENT_ADDMINDING, async (req, res) => {
-    studentminding.updateOne({ studentId: req.user.studentId, week: req.body.week },
+    studentminding.updateOne({ session: req.user.studentSession, studentId: req.user.studentId, week: req.body.week },
         {
             studentMinding: req.body.studentMinding,
             studentRanking: req.body.studentRanking,
@@ -250,7 +253,7 @@ router.post(process.env.ROUTER_STUDENT_ADDMINDING, async (req, res) => {
 })
 //學生寫入 Response 資料
 router.post(process.env.ROUTER_STUDENT_ADDRESPONSE, async (req, res) => {
-    responsecontentmodel.updateOne({ studentId: req.user.studentId, week: req.body.week },
+    responsecontentmodel.updateOne({ session: req.user.studentSession, studentId: req.user.studentId, week: req.body.week },
         { studentResponse: req.body.studentResponse }).then((response) => {
             res.send(response.acknowledged)
         })

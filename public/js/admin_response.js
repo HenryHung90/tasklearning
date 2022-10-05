@@ -5,6 +5,7 @@ function getStudentStatusDetail(studentId, week) {
         method: 'post',
         url: '/admin/readstudentstatusdetail',
         data: {
+            studentSession:$('#response_session').val(),
             studentId: studentId,
             week: week
         },
@@ -97,10 +98,27 @@ async function isResendToTeacher(studentId,week){
     })
     return result
 }
+//變換屆數
+function changeResponsetList(Session){
+    $('.studentListDiv').fadeOut(200)
+    setTimeout((e)=>{
+        $('.studentListDiv').remove();
+        loadingAllStudent(Session).then(response => {
+            $('.adminContainer').append(renderResponseStudentList(response.data, $('#response_week').val()))
+            loadingPage(false)
+        })
+    },200)
+    
+}
 //render function-------------------------------
 //render 學生學習狀況
 function renderStudentStatus(studentId, week) {
     getStudentStatusDetail(studentId, week).then(response => {
+        if(response.data == 'fall'){
+            window.alert("該學生尚未開始任何動作")
+            loadingPage(false)
+            return
+        }
         //備份任務名稱
         const missionName = [...response.data.missionName]
 
@@ -539,14 +557,14 @@ function renderStudentResponse(studentId, week) {
     })
 }
 //變換月份
-function weekSwitchClickBtn(week, studentData) {
-    $('.weekSwitchBtn').removeClass('Selecting')
-    $(`#week_${week}`).addClass('Selecting')
+function weekSwitchClickBtn(week) {
     $('.studentListDiv').fadeOut(200)
     setTimeout(() => {
         $('.studentListDiv').remove()
-        $('.adminContainer').append(renderResponseStudentList(studentData, week))
-        loadingPage(false)
+        loadingAllStudent($('#response_session').val()).then(response => {
+            $('.adminContainer').append(renderResponseStudentList(response.data, week))
+            loadingPage(false)
+        })
     }, 200)
 }
 
@@ -561,38 +579,49 @@ function renderResponseSearch(studentData) {
         'display': 'flex',
         'justify-content': 'space-around',
     })
+    //選擇屆數
+    const changeStudentsSession = $('<select>').prop({
+        className: "form-select",
+        id: 'response_session',
+        ariaLabel: "Default select example"
+    }).css({
+        'width': '20%',
+        'margin': '0'
+    }).change((e) => {
+        loadingPage(true)
+        changeResponsetList(e.target.value)
+    }).appendTo(responseBarContainer)
+    //108~111屆 (暫定 可以再做更改 )
+    for (let i = 108; i < sessionCount(); i++) {
+        $('<option>').prop({
+            value: i,
+            innerHTML: `第 ${i} 屆`
+        }).appendTo(changeStudentsSession)
+    }
 
+    //選擇星期
+    const chanageWeekData = $('<select>').prop({
+        className: "form-select",
+        id: 'response_week',
+        ariaLabel: "Default select example"
+    }).css({
+        'width': '40%',
+        'margin': '0'
+    }).change((e) => {
+        loadingPage(true)
+        weekSwitchClickBtn(e.target.value)
+    }).appendTo(responseBarContainer)
     for (let i = 1; i <= 5; i++) {
-        const weekSwitchBtn = $('<div>').prop({
-            className: 'weekSwitchBtn',
-            id: `week_${i}`,
-            innerHTML: `<h2>Week ${i}</h2>`
-        }).css({
-            'width': '12%',
-            'height': '50px',
-            'line-height': '50px',
-            'text-align': 'center',
-            'background-color': '#6c757d',
-            'border-radius': '20px',
-            'transition-duration': '0.2s',
-            'color': 'white',
-            'user-select': 'none'
-        }).hover((e) => {
-            weekSwitchBtn.css({
-                'transition-duration': '0.2s',
-                'background-color': 'purple',
-            })
-        }, (e) => {
-            weekSwitchBtn.css({
-                'transition-duration': '0.2s',
-                'background-color': '#6c757d',
-            })
-        }).click((e) => {
-            loadingPage(true)
-            weekSwitchClickBtn(i, studentData)
-        }).appendTo(responseBarContainer)
         if (i == weekCount()) {
-            weekSwitchBtn.addClass('Selecting')
+            $('<option selected>').prop({
+                value: i,
+                innerHTML: `<h2>Week ${i}</h2>`
+            }).appendTo(chanageWeekData)
+        } else {
+            $('<option>').prop({
+                value: i,
+                innerHTML: `<h2>Week ${i}</h2>`
+            }).appendTo(chanageWeekData)
         }
     }
 
@@ -620,7 +649,7 @@ function renderResponseStudentList(studentDetail, Week) {
         'width': '100vw',
         'margin': '0 auto',
         'margin-top': '30px',
-        'height': '55vh',
+        'height': '65vh',
         'overflow-y': 'auto',
     })
 
@@ -675,7 +704,7 @@ function renderResponseStudentList(studentDetail, Week) {
         const studentNumber = $('<div>').prop({
             className: 'studentData_Number',
             id: `studentNumber_${studentIndex}`,
-            innerHTML: `S-${studentIndex}`
+            innerHTML: `${studentIndex}`
         })
         //學生ID
         const studentId = $('<div>').prop({
@@ -818,7 +847,6 @@ function renderResponseStudentList(studentDetail, Week) {
 //main function---------------------------------
 //render stundetList main function
 function renderResponsePage(studentData) {
-    console.log(studentData)
     const pageContainer = $('.adminContainer')
 
     pageContainer.append(renderResponseSearch(studentData))
@@ -829,7 +857,7 @@ function renderResponsePage(studentData) {
 function loadingResponse() {
     loadingPage(true)
 
-    loadingAllStudent().then(response => {
+    loadingAllStudent(108).then(response => {
         renderResponsePage(response.data)
     }).then(() => {
         loadingPage(false)
