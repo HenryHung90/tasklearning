@@ -30,6 +30,7 @@ function uploadResponse(studentId, week) {
         method: 'post',
         url: '/admin/addresponse',
         data: {
+            session:$('#response_session').val(),
             studentId: studentId,
             week: week,
             teacherResponse: $('.teacherResponseText').val()

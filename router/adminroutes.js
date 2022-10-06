@@ -637,12 +637,13 @@ router.post(process.env.ROUTER_ADMIN_ADDRESPONSE, async (req, res) => {
     let isFirstResponse = false
     let isSuccess = false
     let cloudStudentDetail = []
-    await responsecontentmodel.findOne({ studentId: req.body.studentId, week: req.body.week }).then(response => {
+    await responsecontentmodel.findOne({ session: req.body.session, studentId: req.body.studentId, week: req.body.week }).then(response => {
         response == undefined ? isFirstResponse = true : null
     })
 
     if (isFirstResponse) {
         const newResponse = new responsecontentmodel({
+            session:req.body.session,
             studentId: req.body.studentId,
             week: req.body.week,
             teacherResponse: req.body.teacherResponse,
@@ -655,11 +656,11 @@ router.post(process.env.ROUTER_ADMIN_ADDRESPONSE, async (req, res) => {
         })
     }
 
-    await studentsConfig.findOne({ studentId: req.body.studentId }).then(response => {
+    await studentsConfig.findOne({ session: req.body.session, studentId: req.body.studentId }).then(response => {
         cloudStudentDetail = response.studentDetail
         cloudStudentDetail[req.body.week - 1].Status.Response = 1
     })
-    await studentsConfig.updateOne({ studentId: req.body.studentId }, { studentDetail: cloudStudentDetail }).then(response => {
+    await studentsConfig.updateOne({ session: req.body.session, studentId: req.body.studentId }, { studentDetail: cloudStudentDetail }).then(response => {
         isSuccess = response.acknowledged + ' done'
     })
     res.send(isSuccess)
