@@ -364,13 +364,22 @@ function renderDataBtn() {
         console.log(123)
         changeDatatList(e.target.value)
     }).appendTo(dataSwitchContainer)
-    //108~111屆 (暫定 可以再做更改 )
-    for (let i = 108; i < sessionCount(); i++) {
-        $('<option>').prop({
-            value: i,
-            innerHTML: `第 ${i} 屆`
-        }).appendTo(changeStudentsSession)
-    }
+    //閱覽所有屆數
+    sessionCount().then(response => {
+        for (let sessionConfig of response.data) {
+            if (sessionConfig.active) {
+                $('<option selected>').prop({
+                    value: sessionConfig.session,
+                    innerHTML: `第 ${sessionConfig.session} 屆`
+                }).appendTo(changeStudentsSession)
+            } else {
+                $('<option>').prop({
+                    value: sessionConfig.session,
+                    innerHTML: `第 ${sessionConfig.session} 屆`
+                }).appendTo(changeStudentsSession)
+            }
+        }
+    })
 
     //選擇星期
     const chanageWeekData = $('<select>').prop({
@@ -487,6 +496,10 @@ function renderDataDetails(Data) {
         formData.append('uploadPDF', file)
         loadingPage(true)
         addNewPdf(formData).then(response => {
+            if(response.data == 'error'){
+                window.alert("上傳失敗，請再試一次")
+                return
+            }
             renderPDFandVideoIcon(response.data, $('.pdfIconDiv').find('.dataDiv').length, 'pdf').appendTo(dataPdfDiv)
         }).then(response => {
             uploadDataDetail()
@@ -671,14 +684,23 @@ function renderDataPage(Data) {
 //loading data page main function
 function loadingData() {
     loadingPage(true)
-
-    //取得目前周次的內容並開始Render
-    getWeekData(weekCount(), 108).then(response => {
-        renderDataPage(response.data)
-    }).then(() => {
-        loadingPage(false)
-        $('.adminContainer').fadeIn(300)
+    sessionCount().then(response=>{
+        for(let sessionConfig of response.data){
+            if(sessionConfig.active){
+                //取得目前周次的內容並開始Render
+                getWeekData(weekCount(), sessionConfig.session).then(response => {
+                    renderDataPage(response.data)
+                }).then(() => {
+                    loadingPage(false)
+                    $('.adminContainer').fadeIn(300)
+                })    
+                return
+            }   
+            
+        }
+        
     })
+    
 }
 
 $('#Data').click((e) => {

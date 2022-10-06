@@ -16,6 +16,16 @@ function logoutFunc() {
         window.location.href = response.data
     })
 }
+function changeActiveSession(Session) {
+    axios({
+        method: 'post',
+        url: '/admin/changesession',
+        data: {
+            session: Session
+        },
+        withCredentials: true
+    })
+}
 //取得學生Detail
 function loadingStudentDetail(Session) {
     return (axios({
@@ -56,9 +66,14 @@ function switchIdtoName(Id) {
 function weekCount() {
     return 2
 }
-//return 最多到第幾屆
+//return 屆數
 function sessionCount() {
-    return 111
+    return (
+        axios({
+            method: 'post',
+            url: '/admin/readsession',
+        })
+    )
 }
 //return status count外框
 function renderStatusCountDiv(status) {
@@ -194,42 +209,44 @@ function renderWeekStatusSelection(Id, target, appendTarget) {
         }, 300)
     }
 }
+//return 變換可登入屆數
 function changeMainSession(Session) {
-    if(window.confirm("你確定要變換屆數嗎?這將導致可登入使用者會變換為該屆喔")){
-        
+    if (window.confirm("你確定要變換屆數嗎?這將導致可登入使用者會變換為該屆喔")) {
+        changeActiveSession(Session)
+        $('.adminContainer').fadeOut(100)
+        setTimeout(() => {
+            $('.total_StatusCompletePercentage').remove()
+            $('.week_StatusCompletePercentage').remove()
+            $('.week_MissionCompletePercentage').remove()
+            $('.week_MindingSelfEvaluationAveraged').remove()
+            $('.weekSelect').remove()
+            loadingStudentDetail(Session).then(response => {
+                //總Status完成度
+                $('.totalStatus_div').append(renderTotal_StatusCompletePercentage())
+                //周Status完成度
+                $('.weekStatus_div').append(renderWeek_StatusCompletePercentage())
+                //周任務完成度
+                $('.weekMission_div').append(renderWeek_MissionCompletePercentage(response.data.studentsMission, weekCount()))
+                //周自我評價均分
+                $('.weekMindingScore_div').append(renderWeek_MindingSelfEvaluationAveraged())
+                return response.data
+            }).then(response => {
+                const nowWeek = weekCount()
+
+                totalStatusProgress(response.studentsStatus)
+                weekStatusProgress(response.studentsStatus, nowWeek)
+                weekMissionProgress(response.studentsMission, response.studentsMinding, nowWeek)
+                weekMindingScoreProgress(response.studentsMinding, nowWeek)
+
+                loadingPage(false)
+            })
+            setTimeout((e) => {
+                $('.adminContainer').fadeIn(500)
+            }, 500)
+        }, 100)
+    }else{
+        loadingPage(false)
     }
-    $('.adminContainer').fadeOut(100)
-    setTimeout(() =>{
-        $('.total_StatusCompletePercentage').remove()
-        $('.week_StatusCompletePercentage').remove()
-        $('.week_MissionCompletePercentage').remove()
-        $('.week_MindingSelfEvaluationAveraged').remove()
-        $('.weekSelect').remove()
-        loadingStudentDetail(Session).then(response => {
-            //總Status完成度
-            $('.totalStatus_div').append(renderTotal_StatusCompletePercentage())
-            //周Status完成度
-            $('.weekStatus_div').append(renderWeek_StatusCompletePercentage())
-            //周任務完成度
-            $('.weekMission_div').append(renderWeek_MissionCompletePercentage(response.data.studentsMission, weekCount()))
-            //周自我評價均分
-            $('.weekMindingScore_div').append(renderWeek_MindingSelfEvaluationAveraged())
-            return response.data
-        }).then(response => {
-            const nowWeek = weekCount()
-
-            totalStatusProgress(response.studentsStatus)
-            weekStatusProgress(response.studentsStatus, nowWeek)
-            weekMissionProgress(response.studentsMission, response.studentsMinding, nowWeek)
-            weekMindingScoreProgress(response.studentsMinding, nowWeek)
-
-            loadingPage(false)
-        })
-        setTimeout((e)=>{
-            $('.adminContainer').fadeIn(500)
-        },500)
-    },100)
-
 }
 ////////////////////////////////////
 function renderChangeSession() {
@@ -254,13 +271,23 @@ function renderChangeSession() {
         loadingPage(true)
         changeMainSession(e.target.value)
     }).appendTo(sessionBarContainer)
-    //108~111屆 (暫定 可以再做更改 )
-    for (let i = 108; i < sessionCount(); i++) {
-        $('<option>').prop({
-            value: i,
-            innerHTML: `第 ${i} 屆`
-        }).appendTo(changeStudentsSession)
-    }
+
+    //閱覽所有屆數
+    sessionCount().then(response => {
+        for (let sessionConfig of response.data) {
+            if (sessionConfig.active) {
+                $('<option selected>').prop({
+                    value: sessionConfig.session,
+                    innerHTML: `第 ${sessionConfig.session} 屆`
+                }).appendTo(changeStudentsSession)
+            } else {
+                $('<option>').prop({
+                    value: sessionConfig.session,
+                    innerHTML: `第 ${sessionConfig.session} 屆`
+                }).appendTo(changeStudentsSession)
+            }
+        }
+    })
 
     return sessionBarContainer
 }
@@ -441,20 +468,29 @@ function renderAdminMainPage(studentData) {
 }
 //loading AdminMainPage main function
 function loadingAdminPage() {
-    loadingStudentDetail(108)
-        .then(response => {
-            renderAdminMainPage(response.data)
-            return response.data
-        }).then(response => {
-            const nowWeek = weekCount()
+    sessionCount().then(response => {
+        for (let sesionConfig of response.data) {
+            if (sesionConfig.active) {
+                loadingStudentDetail(sesionConfig.session)
+                    .then(response => {
+                        renderAdminMainPage(response.data)
+                        return response.data
+                    }).then(response => {
+                        const nowWeek = weekCount()
 
-            totalStatusProgress(response.studentsStatus)
-            weekStatusProgress(response.studentsStatus, nowWeek)
-            weekMissionProgress(response.studentsMission, response.studentsMinding, nowWeek)
-            weekMindingScoreProgress(response.studentsMinding, nowWeek)
+                        totalStatusProgress(response.studentsStatus)
+                        weekStatusProgress(response.studentsStatus, nowWeek)
+                        weekMissionProgress(response.studentsMission, response.studentsMinding, nowWeek)
+                        weekMindingScoreProgress(response.studentsMinding, nowWeek)
 
-            loadingPage(false)
-        })
+                        loadingPage(false)
+                    })
+                return
+            }
+        }
+
+    })
+
 }
 $(window).ready((e) => {
     loadingAdminPage()
