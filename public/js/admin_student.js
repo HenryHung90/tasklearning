@@ -83,13 +83,14 @@ function comfirmClick(Name) {
 function studentListGenerate(studentList) {
     let member = []
     studentList.map((listValue, listIndex) => {
+        console.log(typeof listValue.studentAccess)
         let data = {
             "屆數": listValue.studentSession,
             "新學號(若要更新再輸入)": '',
             "當前學號": listValue.studentId,
             "姓名": listValue.studentName,
             "密碼(若要更新再輸入)": '',
-            "是否激活": listValue.studentAccess
+            "是否啟用": listValue.studentAccess.toString()
         }
         listValue.studentDetail.map((statusValue, statusIndex) => {
             data[`周 ${statusValue.Week} 進度`] = 'unchecked'
@@ -145,6 +146,7 @@ const downloadStudentUsingRecord = (studentId) => {
 }
 //批量下載學員
 const DownloadMember = (studentList, studentSession) => {
+    console.log(studentList)
     downloadDatatoExcel(`Detail_${studentSession}`, [studentListGenerate(studentList)], ["學生資料"])
 };
 //批量上傳學員
