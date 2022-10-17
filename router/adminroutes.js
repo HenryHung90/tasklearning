@@ -19,6 +19,8 @@ const upload = multer({
     storage: uploadLocation
 })
 const studentsConfig = require('../models/studentsconfig')
+const sessionconfig = require('../models/sessionconfig')
+const studentlistenconfig = require('../models/studentlistenconfig')
 
 const datacontentmodel = require('../models/datacontentmodel')
 const missioncontentmodel = require('../models/missioncontentmodel')
@@ -27,6 +29,9 @@ const responsecontentmodel = require('../models/responsecontentmodel')
 const studentmission = require('../models/studentmission')
 const studentmanage = require('../models/studentmanage')
 const studentminding = require('../models/studentminding')
+const { response } = require('express')
+const { resolveSoa } = require('dns')
+const { resourceLimits } = require('worker_threads')
 
 
 const availableWeek = 5
@@ -214,7 +219,7 @@ router.post(process.env.ROUTER_ADMIN_READSTUDENTDATA, async (req, res) => {
         dataTitle: []
     }
     let missionName = {}
-    await studentsConfig.findOne({ studentId: req.body.studentId }).then(response => {
+    await studentsConfig.findOne({studentSession:req.body.studentSession, studentId: req.body.studentId }).then(response => {
         returnData.studentData.push(
             [{
                 "學號": response.studentId,
@@ -230,7 +235,7 @@ router.post(process.env.ROUTER_ADMIN_READSTUDENTDATA, async (req, res) => {
             missionName[value.week] = value.mission
         })
     })
-    await studentmission.find({ studentId: req.body.studentId }).then(response => {
+    await studentmission.find({ studentSession: req.body.studentSession, studentId: req.body.studentId }).then(response => {
         if (response == null) {
             return
         }
@@ -248,7 +253,7 @@ router.post(process.env.ROUTER_ADMIN_READSTUDENTDATA, async (req, res) => {
         returnData.dataTitle.push("Task")
     })
     //儲存Plan
-    await studentmanage.find({ studentId: req.body.studentId }).then(response => {
+    await studentmanage.find({ studentSession: req.body.studentSession, studentId: req.body.studentId }).then(response => {
         if (response == null) {
             return
         }
@@ -266,7 +271,7 @@ router.post(process.env.ROUTER_ADMIN_READSTUDENTDATA, async (req, res) => {
         returnData.dataTitle.push("Plan")
     })
     //儲存Reflection
-    await studentminding.find({ studentId: req.body.studentId }).then(response => {
+    await studentminding.find({ studentSession: req.body.studentSession, studentId: req.body.studentId }).then(response => {
         if (response == null) {
             return
         }
@@ -288,7 +293,7 @@ router.post(process.env.ROUTER_ADMIN_READSTUDENTDATA, async (req, res) => {
         returnData.dataTitle.push("Reflection")
     })
     //儲存Response
-    await responsecontentmodel.find({ studentId: req.body.studentId }).then(response => {
+    await responsecontentmodel.find({ studentSession: req.body.studentSession, studentId: req.body.studentId }).then(response => {
         if (response == null) {
             return
         }
@@ -580,11 +585,16 @@ router.post(process.env.ROUTER_ADMIN_ADDDATA, async (req, res) => {
 })
 //上傳PDF
 router.post(process.env.ROUTER_ADMIN_ADDPDF, upload.single('uploadPDF'), async (req, res) => {
-    const returnData = {
-        title: req.file.fieldname,
-        link: 'http://localhost:3000/checkdata/' + req.file.filename
+    if (req.file != null) {
+        const returnData = {
+            title: req.file.fieldname,
+            link: 'http://localhost:3000/checkdata/' + req.file.filename
+        }
+        res.send(returnData)
+    } else {
+        res.send("error")
     }
-    res.send(returnData)
+
 })
 //刪除PDF
 router.post(process.env.ROUTER_ADMIN_DELTEPDF, async (req, res) => {
@@ -627,12 +637,13 @@ router.post(process.env.ROUTER_ADMIN_ADDRESPONSE, async (req, res) => {
     let isFirstResponse = false
     let isSuccess = false
     let cloudStudentDetail = []
-    await responsecontentmodel.findOne({ studentId: req.body.studentId, week: req.body.week }).then(response => {
+    await responsecontentmodel.findOne({ session: req.body.session, studentId: req.body.studentId, week: req.body.week }).then(response => {
         response == undefined ? isFirstResponse = true : null
     })
 
     if (isFirstResponse) {
         const newResponse = new responsecontentmodel({
+            session:req.body.session,
             studentId: req.body.studentId,
             week: req.body.week,
             teacherResponse: req.body.teacherResponse,
@@ -645,14 +656,62 @@ router.post(process.env.ROUTER_ADMIN_ADDRESPONSE, async (req, res) => {
         })
     }
 
-    await studentsConfig.findOne({ studentId: req.body.studentId }).then(response => {
+    await studentsConfig.findOne({ session: req.body.session, studentId: req.body.studentId }).then(response => {
         cloudStudentDetail = response.studentDetail
         cloudStudentDetail[req.body.week - 1].Status.Response = 1
     })
-    await studentsConfig.updateOne({ studentId: req.body.studentId }, { studentDetail: cloudStudentDetail }).then(response => {
+    await studentsConfig.updateOne({ session: req.body.session, studentId: req.body.studentId }, { studentDetail: cloudStudentDetail }).then(response => {
         isSuccess = response.acknowledged + ' done'
     })
     res.send(isSuccess)
 })
+//新增 / 變更 session active
+router.post(process.env.ROUTER_ADMIN_CHANGESESSION, async (req, res) => {
+    await sessionconfig.updateMany({}, { active: false })
+    await studentsConfig.updateMany({}, { studentAccess: false })
+
+    await sessionconfig.find({ session: req.body.session }).then(async response => {
+        if (response.length == 0) {
+            const newSessionconfig = new sessionconfig({
+                session: req.body.session,
+                active: true,
+            })
+            await newSessionconfig.save()
+        } else {
+            await sessionconfig.updateOne({ session: req.body.session }, { active: true })
+        }
+        await studentsConfig.updateMany({ studentSession: req.body.session }, { studentAccess: true })
+        await studentsConfig.updateOne({ studentId:"admin" }, { studentAccess: true })
+        res.send('success')
+    })
+})
+//讀取 session
+router.post(process.env.ROUTER_ADMIN_READESESSION, async (req, res) => {
+    await sessionconfig.find({}).then(response => {
+        const returnData = []
+        for (let session of response) {
+            returnData.push({
+                session: session.session,
+                active: session.active,
+            })
+        }
+        res.send(returnData)
+    })
+})
+//讀取 monitor
+router.post(process.env.ROUTER_ADMIN_READSTUDENTMONITOR, async (req, res) => {
+    studentlistenconfig.findOne({studentId:req.body.studentId,sesion:req.body.session}).then(response=>{
+        const returnData = []
+        for (let listenConfig of response.studentMonitor){
+            returnData.push({
+                "學號":req.body.studentId,
+                "時間":listenConfig.operationTime,
+                "行為":listenConfig.operationName,
+                "描述":listenConfig.operationIntro,
+            })
+        }
+    })
+})
+
 
 module.exports = router

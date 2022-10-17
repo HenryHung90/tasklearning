@@ -213,7 +213,7 @@ body {
 }
 
 .studentData_Setting {
-  width: 15%;
+  width: 40%;
   height: 50px;
   margin-top: 15px;
   display: flex;
@@ -238,7 +238,7 @@ body {
   }
 
   .studentData_Setting {
-    width: 35%;
+    width: 40%;
   }
 
   .dataDetailContainer {

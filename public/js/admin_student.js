@@ -129,19 +129,32 @@ const downloadManageStatus = (manageStatus) => {
     downloadDatatoExcel("Task", generateData, generateTitle)
 }
 //下載單一學員資料
-const downloadStudentDetail = (studentId) => {
+const downloadStudentDetail = (studentId, studentSession) => {
     axios({
         method: 'POST',
         url: '/admin/readstudentdata',
         data: {
-            studentId: studentId
+            studentId: studentId,
+            studentSession:studentSession,
         },
         withCredentials: true
     }).then(response => {
         downloadDatatoExcel(studentId, response.data.studentData, response.data.dataTitle)
     })
 }
-const downloadStudentUsingRecord = (studentId) => {
+//下載學生監聽事件紀錄
+const downloadStudentUsingRecord = (studentId, studentSession) => {
+    axios({
+        method:'post',
+        url:'/admin/readstudentmonitor',
+        data:{
+            session: studentSession,
+            studentId:studentId
+        },
+        withCredentials: true
+    }).then(response=>{
+        downloadDatatoExcel(`${studentSession}_${studentId}`,response.data,["監控資料"])
+    })
 
 }
 //批量下載學員
@@ -316,8 +329,8 @@ function changeStudentConfig(Id) {
         window.alert("取消")
         return
     }
-    const studentAccess = window.prompt("請輸入是否開通(true or false)","true")
-    if(studentAccess == null){
+    const studentAccess = window.prompt("請輸入是否開通(true or false)", "true")
+    if (studentAccess == null) {
         window.alert("取消")
         return
     }
@@ -330,7 +343,7 @@ function changeStudentConfig(Id) {
                 originStudentId: Id.studentId,
                 studentId: studentId,
                 studentName: studentName,
-                studentAccess:studentAccess,
+                studentAccess: studentAccess,
             },
             withCredentials: true
         }).then(response => {
@@ -410,13 +423,22 @@ function renderStudentPageBtn() {
     }).change((e) => {
         changeStudentList(e.target.value)
     })
-    //108~111屆 (暫定 可以再做更改 )
-    for (let i = 108; i < sessionCount(); i++) {
-        $('<option>').prop({
-            value: i,
-            innerHTML: `第 ${i} 屆`
-        }).appendTo(changeStudentsSession)
-    }
+    //閱覽所有屆數
+    sessionCount().then(response => {
+        for (let sessionConfig of response.data) {
+            if (sessionConfig.active) {
+                $('<option selected>').prop({
+                    value: sessionConfig.session,
+                    innerHTML: `第 ${sessionConfig.session} 屆`
+                }).appendTo(changeStudentsSession)
+            } else {
+                $('<option>').prop({
+                    value: sessionConfig.session,
+                    innerHTML: `第 ${sessionConfig.session} 屆`
+                }).appendTo(changeStudentsSession)
+            }
+        }
+    })
     //Btn Container
     const btnContainer = $('<div>').prop({
         className: 'btnContainer'
@@ -475,36 +497,36 @@ function renderStudentList(studentDetail) {
         const studentDetail = $('<div>').prop({
             className: 'studentData_Detail'
         })
-        //學習檔案
-        $('<button>').prop({
-            className: 'btn btn-primary',
-            innerHTML: "學習檔案"
-        }).css({
-            'width': '45%',
-            'height': '40px',
-            'background-color': 'purple'
-        }).click(e => {
-            downloadStudentDetail(studentData.studentId)
-        }).appendTo(studentDetail)
+       
         //事件紀錄
         $('<button>').prop({
             className: 'btn btn-primary',
             innerHTML: "事件紀錄"
         }).css({
-            'width': '45%',
-            'margin-left': '5px',
+            'width': '40%',
             'height': '40px',
             'background-color': 'purple'
         }).click(e => {
-            downloadStudentUsingRecord(studentData.studentId)
+            downloadStudentUsingRecord(studentData.studentId, studentData.studentSession)
         }).appendTo(studentDetail)
 
 
+        //學習檔案
+        const studentProfile = $('<button>').prop({
+            className: 'btn btn-primary',
+            innerHTML: "學習檔案"
+        }).css({
+            'width': '30%',
+            'height': '40px',
+            'background-color': 'purple'
+        }).click(e => {
+            downloadStudentDetail(studentData.studentId, studentData.studentSession)
+        })
         const studentPassword = $('<button>').prop({
             className: 'btn btn-primary',
             innerHTML: "變更密碼"
         }).css({
-            'width': '35%',
+            'width': '30%',
             'height': '40px',
         }).click((e) => {
             changeStudentPassword(studentData.studentId)
@@ -513,7 +535,7 @@ function renderStudentList(studentDetail) {
             className: 'btn btn-secondary',
             innerHTML: '修改'
         }).css({
-            'width': '30%',
+            'width': '20%',
             'height': '40px',
         }).click((e) => {
             changeStudentConfig(studentData)
@@ -523,7 +545,7 @@ function renderStudentList(studentDetail) {
             className: 'btn btn-danger',
             innerHTML: '刪除'
         }).css({
-            'width': '30%',
+            'width': '20%',
             'height': '40px',
         }).click((e) => {
             if (comfirmClick(`刪除 ${studentData.studentName}`)) {
@@ -542,7 +564,7 @@ function renderStudentList(studentDetail) {
         //設定學生//
         const studentSetting = $('<div>').prop({
             className: 'studentData_Setting'
-        }).append(studentPassword).append(studentEdit).append(studentDelete)
+        }).append(studentProfile).append(studentPassword).append(studentEdit).append(studentDelete)
 
         //學生資料表格框
         $('<div>').prop({
@@ -584,14 +606,22 @@ function renderAdminStudentPage(studentData) {
 function loadingStudent() {
     loadingPage(true)
 
-    //預設Loading 108 屆學生
-    loadingAllStudent(108)
-        .then(response => {
-            renderAdminStudentPage(response.data)
-        }).then(() => {
-            loadingPage(false)
-            $('.adminContainer').fadeIn(300)
-        })
+    sessionCount().then(response => {
+        for (let sessionConfig of response.data) {
+            if (sessionConfig.active) {
+                //預設Loading 108 屆學生
+                loadingAllStudent(sessionConfig.session)
+                    .then(response => {
+                        renderAdminStudentPage(response.data)
+                    }).then(() => {
+                        loadingPage(false)
+                        $('.adminContainer').fadeIn(300)
+                    })
+            }
+
+        }
+    })
+
 }
 
 $('#Student').click((e) => {

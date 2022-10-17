@@ -30,6 +30,7 @@ function uploadResponse(studentId, week) {
         method: 'post',
         url: '/admin/addresponse',
         data: {
+            session:$('#response_session').val(),
             studentId: studentId,
             week: week,
             teacherResponse: $('.teacherResponseText').val()
@@ -591,13 +592,22 @@ function renderResponseSearch(studentData) {
         loadingPage(true)
         changeResponsetList(e.target.value)
     }).appendTo(responseBarContainer)
-    //108~111屆 (暫定 可以再做更改 )
-    for (let i = 108; i < sessionCount(); i++) {
-        $('<option>').prop({
-            value: i,
-            innerHTML: `第 ${i} 屆`
-        }).appendTo(changeStudentsSession)
-    }
+    //閱覽所有屆數
+    sessionCount().then(response => {
+        for (let sessionConfig of response.data) {
+            if (sessionConfig.active) {
+                $('<option selected>').prop({
+                    value: sessionConfig.session,
+                    innerHTML: `第 ${sessionConfig.session} 屆`
+                }).appendTo(changeStudentsSession)
+            } else {
+                $('<option>').prop({
+                    value: sessionConfig.session,
+                    innerHTML: `第 ${sessionConfig.session} 屆`
+                }).appendTo(changeStudentsSession)
+            }
+        }
+    })
 
     //選擇星期
     const chanageWeekData = $('<select>').prop({
@@ -856,13 +866,20 @@ function renderResponsePage(studentData) {
 //loading stundetList main function
 function loadingResponse() {
     loadingPage(true)
-
-    loadingAllStudent(108).then(response => {
-        renderResponsePage(response.data)
-    }).then(() => {
-        loadingPage(false)
-        $('.adminContainer').fadeIn(300)
+    sessionCount().then(response => {
+        for(let sessionConfig of response.data){
+            if (sessionConfig.active){
+                loadingAllStudent(sessionConfig.session).then(response => {
+                    renderResponsePage(response.data)
+                }).then(() => {
+                    loadingPage(false)
+                    $('.adminContainer').fadeIn(300)
+                })
+            }
+            
+        }
     })
+    
 }
 
 $('#Response').click((e) => {
