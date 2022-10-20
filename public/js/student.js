@@ -281,4 +281,6 @@ $(window).ready(() => {
     })
 })
 
+
+
 $('#logoutBtn').click((e) => logoutFunc(e))

@@ -33,7 +33,6 @@ router.get(process.env.ROUTER_DASHBOARD_STUDENTSTAGE, (req, res) => {
 })
 //進入主畫面
 router.get(process.env.ROUTER_DASHBOARD_STUDENTMAIN, (req, res) => {
-    console.log(req)
     let Id = req.params.user.toString()
     let User , Week 
 

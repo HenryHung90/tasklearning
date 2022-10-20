@@ -29,9 +29,6 @@ const responsecontentmodel = require('../models/responsecontentmodel')
 const studentmission = require('../models/studentmission')
 const studentmanage = require('../models/studentmanage')
 const studentminding = require('../models/studentminding')
-const { response } = require('express')
-const { resolveSoa } = require('dns')
-const { resourceLimits } = require('worker_threads')
 
 
 const availableWeek = 5
