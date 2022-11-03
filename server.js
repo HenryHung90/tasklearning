@@ -26,19 +26,16 @@ const mongoDbStatus = mongoose.connection
 mongoDbStatus.on("error", err => console.error("connection error", err))
 mongoDbStatus.once("open", db => console.log("Connection to mongodb"))
 
-// //express helmet
+//express helmet
 // const helmet = require("helmet")
 
 // // //開啟DNS預讀取
 // task.use(helmet({ dnsPrefetchControl: { allow: true } }))
-// //禁止使用iframe
-// // task.use(helmet({frameguard: {action: 'deny'}}))
 // //CSP
 // task.use(
 //     helmet.contentSecurityPolicy({
 //         directives: {
 //             "script-src": [
-//                 "http://localhost",
 //                 "https://code.jquery.com",
 //                 "https://cdn.jsdelivr.net",
 //                 "https://cdnjs.cloudflare.com",

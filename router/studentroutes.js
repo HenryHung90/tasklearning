@@ -1,4 +1,5 @@
 const express = require("express")
+const bcrypt = require("bcryptjs")
 const router = express.Router()
 const passport = require("passport")
 require("../database/passportjs")(passport)
@@ -13,6 +14,7 @@ const datacontentmodel = require("../models/datacontentmodel")
 const missioncontentmodel = require("../models/missioncontentmodel")
 const responsecontentmodel = require("../models/responsecontentmodel")
 
+const studentsConfig = require("../models/studentsconfig")
 const studentmission = require("../models/studentmission")
 const studentmanage = require("../models/studentmanage")
 const studentminding = require("../models/studentminding")
@@ -346,12 +348,19 @@ router.post(process.env.ROUTER_STUDENT_ADDMINDING, async (req, res) => {
         Minding[index].missionReason = converDangerString(value.missionReason)
     })
     Minding = Object.assign({}, Minding)
-    studentminding.updateOne({ session: req.user.studentSession, studentId: req.user.studentId, week: req.body.week },
-        {
-            studentMinding: Minding,
-            studentRanking: req.body.studentRanking,
-            studentFixing: converDangerString(req.body.studentFixing)
-        })
+    studentminding
+        .updateOne(
+            {
+                session: req.user.studentSession,
+                studentId: req.user.studentId,
+                week: req.body.week,
+            },
+            {
+                studentMinding: Minding,
+                studentRanking: req.body.studentRanking,
+                studentFixing: converDangerString(req.body.studentFixing),
+            }
+        )
         .then(response => {
             res.send(response.acknowledged)
         })
@@ -371,28 +380,62 @@ router.post(process.env.ROUTER_STUDENT_ADDRESPONSE, async (req, res) => {
             res.send(response.acknowledged)
         })
 })
-
-router.post(process.env.ROUTER_STUDENT_ADDLISTENER, async (req, res) => {
-    await studentlistenconfig.findOne({session:req.user.studentSession,studentId:req.user.studentId}).then(async response=>{
-        if(response == null){
-            const newListenerContent = new studentlistenconfig({
-                session:req.user.studentSession,
-                studentId:req.user.studentId,
-                studentMonitor:req.body.clickTemp
+//學生更改密碼
+router.post(process.env.ROUTER_STUDENT_CHANGEPASSWORD, async (req, res) => {
+    const saltRound = 15
+    bcrypt.hash(req.body.newPassword, saltRound, (err, hashedPassword) => {
+        bcrypt
+            .compare(req.body.oldPassword, req.user.studentPassword)
+            .then(async response => {
+                if (response) {
+                    await studentsConfig
+                        .updateOne(
+                            {
+                                studentId: req.user.studentId,
+                                studentAccess: true,
+                            },
+                            { studentPassword: hashedPassword }
+                        )
+                        .then(response => {
+                            res.send(response.acknowledged)
+                        })
+                } else {
+                    res.send("舊密碼不正確")
+                }
             })
-
-            newListenerContent.save()
-        }else{
-            const newData = [...response.studentMonitor,req.body.clickTemp]
-            console.log(newData)
-
-            await studentlistenconfig.updateOne({session:req.user.studentSession,studentId:req.user.studentId},
-                {studentMonitor:newData})
-                
-        }
-        res.send("success")
     })
-    
+})
+
+//監聽學生輸入
+router.post(process.env.ROUTER_STUDENT_ADDLISTENER, async (req, res) => {
+    await studentlistenconfig
+        .findOne({
+            session: req.user.studentSession,
+            studentId: req.user.studentId,
+        })
+        .then(async response => {
+            if (response == null) {
+                const newListenerContent = new studentlistenconfig({
+                    session: req.user.studentSession,
+                    studentId: req.user.studentId,
+                    studentMonitor: req.body.clickTemp,
+                })
+
+                newListenerContent.save()
+            } else {
+                const newData = [...response.studentMonitor, req.body.clickTemp]
+                console.log(newData)
+
+                await studentlistenconfig.updateOne(
+                    {
+                        session: req.user.studentSession,
+                        studentId: req.user.studentId,
+                    },
+                    { studentMonitor: newData }
+                )
+            }
+            res.send("success")
+        })
 })
 
 module.exports = router

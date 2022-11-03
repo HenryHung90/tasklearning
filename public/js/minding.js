@@ -252,7 +252,7 @@ function renderManageFixing(studentFixing) {
     const manageFixingTextarea = $('<textarea>').prop({
         className: 'manageFixingTextarea',
         innerHTML: studentFixing,
-        placeholder: '請輸入你認為下次的目標應該如何修正'
+        placeholder: '請輸入妳為了完成這些任務花費了多少時間?'
     }).css({
         'width': '90%',
         'height': '80%',
