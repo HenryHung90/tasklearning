@@ -585,7 +585,7 @@ router.post(process.env.ROUTER_ADMIN_ADDPDF, upload.single('uploadPDF'), async (
     if (req.file != null) {
         const returnData = {
             title: req.file.fieldname,
-            link: 'http://localhost:3000/checkdata/' + req.file.filename
+            link: 'http://ccj.infocom.yzu.edu.tw/checkdata/' + req.file.filename
         }
         res.send(returnData)
     } else {

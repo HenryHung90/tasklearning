@@ -4,7 +4,9 @@
   "description": "for YZUIC students to learn task plaining",
   "main": "server.js",
   "scripts": {
-    "start": "nodemon server.js"
+    "start":"pm2 start --name tasklearning server.js --watch",
+    "stop":"pm2 stop all",
+    "restart":"pm2 restart all"
   },
   "repository": {
     "type": "git",
@@ -32,6 +34,7 @@
     "nodemon": "^2.0.19",
     "passport": "^0.6.0",
     "passport-local": "^1.0.0",
+    "pm2": "^5.2.2",
     "progressbar.js": "^1.1.0",
     "pug": "^3.0.2",
     "uuid": "^9.0.0"
