@@ -50,15 +50,15 @@ function switchOptionIcon(option) {
 function switchOptionText(option) {
     switch (option) {
         case "1":
-            return '<h3 style="font-weight:bolder">結構性問題</h3><p>環境結構即是你是在甚麼樣的環境下讀書並完成這件事。</p>'
+            return '<p>能夠選擇合適的學習環境進行學習，或是選擇合適的軟體硬體進行學習</p>'
         case "2":
-            return '<h3 style="font-weight:bolder">中華碩能考台大博</h3><p>學習策略即是你是如何規畫你的學習方式。</p>'
+            return '<p>能夠根據任務挑選合適的學習策略，例如作筆記、重點整理、畫流程圖或是心智圖</p><p>上網尋找資料、上網尋找相關問題、從範例中學習、額外尋找相關資料補充</p>'
         case "3":
-            return '<h3 style="font-weight:bolder">時間管理大師</h3><p>時間管理即是你是如何規劃你的學習時間。</p>'
+            return '能夠規劃多久時間內完成任務、規劃每天花多久時間學習、或是在固定時段學習'
         case "4":
-            return '<h3 style="font-weight:bolder">酒肉朋友</h3><p>尋求協助即是你是如何尋求朋友、老師、助教或是上網查資料等等。</p>'
+            return '<p>尋找助教幫忙、請教老師問題、尋找學長姊幫忙、請教朋友或是同儕共同解決</p><p>線上尋找網友協助、網路上發貼詢問問題</p>'
         case "5":
-            return '<h3 style="font-weight:bolder">贖罪審判</h3><p>自我評估即是你是對於規劃是如何評估的。</p>'
+            return '<p>能夠自我檢視或是評量自己的學習狀況，例如: 從筆記重點整理、與同學討論過程中</p><p>從實作成果中、與同學交換心得或是作品中、從老師給予的評量中</p>'
     }
 }
 //return Option 數量是否符合規範

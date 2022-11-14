@@ -20,7 +20,7 @@ const renderWeekTaskManager = (week, stage) => {
     }
 
     //task之week
-    const taskWeekTitle = `<div class="taskWeekTitle" id="week_${week}"><h1> Week ${week}</h1><div class="taskProgress" id="taskProgress_${week}"></div><h3 class="taskProgressText" id="taskProgressText_${week}"></h3></div>`
+    const taskWeekTitle = `<div class="taskWeekTitle" id="week_${week}"><h1> Progress ${week}</h1><div class="taskProgress" id="taskProgress_${week}"></div><h3 class="taskProgressText" id="taskProgressText_${week}"></h3></div>`
 
     //task middle
     const taskMiddle = `<div class="taskMiddle" id="taskMiddle_${week}">`
