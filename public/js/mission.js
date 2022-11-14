@@ -161,7 +161,7 @@ function deleteSelectOption() {
             300
         )
         //event Listener
-        optionClick(optionDelete,"CS")
+        optionClick(optionDelete, "CS")
 
         setTimeout(async e => {
             $(optionDelete.currentTarget).remove()
@@ -416,7 +416,7 @@ function stepsSelectOption() {
                 className: "optionBox",
                 innerHTML: switchOptionIcon(optionsText),
                 id: newMissionId + "_" + option,
-                name:switchOptionName(optionsId)
+                name: switchOptionName(optionsId),
             })
             .css({
                 "transition-duration": "0.3s",
@@ -501,7 +501,7 @@ function stepsSelectOption() {
                 .prop({
                     className: "optionsText",
                     id: `optionsText_${i}`,
-                    innerHTML: switchOptionText(`${i}`)
+                    innerHTML: switchOptionText(`${i}`),
                 })
                 .css({
                     "margin-top": "15px",
@@ -564,7 +564,7 @@ function stepsSelectOption() {
             //確定選擇Option以及所屬Mission
             selectedStep(e.currentTarget.id, id)
             //eventListener
-            optionClick(e,"DS")
+            optionClick(e, "DS")
             //上傳Steps
             await uploadStudentDecideSteps()
         })
@@ -741,10 +741,6 @@ $(window).ready(() => {
 })
 
 $("#stageMissionCheck").click(async e => {
-    if (!checkStatusisFinish(2, "end")) {
-        window.alert("每項任務至少需安排兩項策略")
-        return
-    }
     await stageBtnEnterForMission().then(response => {
         if (response == false) {
             if (window.confirm("確定完成 設定目標 進度嗎?")) {

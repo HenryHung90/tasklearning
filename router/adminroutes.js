@@ -109,6 +109,13 @@ router.post(process.env.ROUTER_ADMIN_READSTUDENTS, async (req, res) => {
                 returnData.push(studentData)
             }
         })
+        returnData.sort((a,b)=>{
+            if(a.studentId == 'TEST' || a.studentId =='1090001'){
+                return b.studentId - a.studentId
+            }else{
+                return a.studentId - b.studentId
+            }
+        })
         res.send(returnData)
     })
 })

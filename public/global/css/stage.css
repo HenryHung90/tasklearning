@@ -55,17 +55,18 @@ body {
 .taskTitleContainer h1 {
   padding: 0;
   margin: 0;
-  font-size: 20px;
+  font-size: 18px;
 }
 
 .taskTitleText {
   font-family: 'Silkscreen', cursive;
-  height:50px
+  height: 50px
 }
 
-.taskTitleBtn{
+.taskTitleBtn {
   height: 50px;
 }
+
 .taskTitleUser {
   display: flex;
 }
@@ -73,6 +74,7 @@ body {
 .taskTitle {
   margin: 0 auto;
   height: 50px;
+  display: flex;
   text-align: center;
 }
 
@@ -82,11 +84,11 @@ body {
 
 .WeekTitle {
   font-family: 'Silkscreen', cursive;
-  font-size: 20px;
+  font-size: 25px;
 }
 
 .stageCheckBtn {
-  margin-top:20px;
+  margin-top: 20px;
   text-align: center;
 }
 
@@ -94,6 +96,6 @@ body {
   border-radius: 20px;
   margin-top: 10px;
   width: 100%;
-  height: 700px;
+  height: 600px;
   display: flex;
 }

@@ -90,7 +90,7 @@ function studentListGenerate(studentList) {
             "當前學號": listValue.studentId,
             "姓名": listValue.studentName,
             "密碼(若要更新再輸入)": '',
-            "是否啟用": listValue.studentAccess.toString()
+            "是否啟用": listValue.studentAccess
         }
         listValue.studentDetail.map((statusValue, statusIndex) => {
             data[`周 ${statusValue.Week} 進度`] = 'unchecked'
