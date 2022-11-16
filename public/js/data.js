@@ -1,4 +1,4 @@
-7 //教材文字部分
+//教材文字部分
 const renderText = text => {
     const textDiv = $("<div>")
         .prop({

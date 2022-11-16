@@ -146,19 +146,29 @@ function renderManageDecide(
     })
     switch (currentStepTitle.split(" ")[1]) {
         case "環境結構":
-            missionExplainContent.html("能夠選擇合適的學習環境進行學習，或是選擇合適的軟體硬體進行學習")
+            missionExplainContent.html(
+                "能夠選擇合適的學習環境進行學習，或是選擇合適的軟體硬體進行學習"
+            )
             break
         case "學習策略":
-            missionExplainContent.html("能夠根據任務挑選合適的學習策略，例如作筆記、重點整理、畫流程圖或是心智圖、上網尋找資料、上網尋找相關問題、從範例中學習、額外尋找相關資料補充")
+            missionExplainContent.html(
+                "能夠根據任務挑選合適的學習策略，例如作筆記、重點整理、畫流程圖或是心智圖、上網尋找資料、上網尋找相關問題、從範例中學習、額外尋找相關資料補充"
+            )
             break
         case "時間管理":
-            missionExplainContent.html("能夠規劃多久時間內完成任務、規劃每天花多久時間學習、或是在固定時段學習")
+            missionExplainContent.html(
+                "能夠規劃多久時間內完成任務、規劃每天花多久時間學習、或是在固定時段學習"
+            )
             break
         case "尋求協助":
-            missionExplainContent.html("找助教幫忙、請教老師問題、尋找學長姊幫忙、請教朋友或是同儕共同解決、線上尋找網友協助、網路上發貼詢問問題")
+            missionExplainContent.html(
+                "找助教幫忙、請教老師問題、尋找學長姊幫忙、請教朋友或是同儕共同解決、線上尋找網友協助、網路上發貼詢問問題"
+            )
             break
         case "自我評估":
-            missionExplainContent.html("能夠自我檢視或是評量自己的學習狀況，例如: 從筆記重點整理、與同學討論過程中、從實作成果中、與同學交換心得或是作品中、從老師給予的評量中")
+            missionExplainContent.html(
+                "能夠自我檢視或是評量自己的學習狀況，例如: 從筆記重點整理、與同學討論過程中、從實作成果中、與同學交換心得或是作品中、從老師給予的評量中"
+            )
             break
     }
 
@@ -366,6 +376,7 @@ $(window).ready(() => {
         const dataWeek = parseInt($(".WeekTitle").html().split(" ")[1]) - 1
         const userId = $("#userId").html()
         loadingPage(true)
+        uploadManageData($(".Clicking")[0].id, false)
         axios({
             method: "POST",
             url: "/studentstage/checkstage",

@@ -102,7 +102,8 @@ task.use(urlencodedParser)
 // task.get('/user', login, (req, res) => {
 //     res.send("Is user")
 // })
-
+const studentLearning = require("./models/studentlearningcontent")
+const studentlistenconfig = require('./models/studentlistenconfig')
 //登入
 task.post(process.env.ROUTER_MAIN_LOGIN, (req, res, next) => {
     passport.authenticate("local", (err, user, info) => {
@@ -114,8 +115,29 @@ task.post(process.env.ROUTER_MAIN_LOGIN, (req, res, next) => {
             console.log(info.message)
             res.send(`${info.message}`)
         } else {
-            req.logIn(user, err => {
+            req.logIn(user, async err => {
                 if (err) throw err
+                if (
+                    await studentLearning.exists({
+                        session: user.studentSession,
+                        studentId: user.studentId,
+                    })
+                ) {
+                    await studentLearning.updateOne(
+                        {
+                            session: user.studentSession,
+                            studentId: user.studentId,
+                        },
+                        { learningTime: { accessTime: new Date() } }
+                    )
+                } else {
+                    await studentLearning({
+                        session: user.studentSession,
+                        studentId: user.studentId,
+                        learningTime: { accessTime: new Date() },
+                    }).save()
+                }
+
                 res.send(`/dashboard/${req.body.username}`)
             })
         }
@@ -123,11 +145,96 @@ task.post(process.env.ROUTER_MAIN_LOGIN, (req, res, next) => {
 })
 
 //登出
-task.get(process.env.ROUTER_MAIN_LOGOUT, (req, res, next) => {
-    req.logout(err => {
-        if (err) return next(err)
-        res.send("/")
-    })
+task.get(process.env.ROUTER_MAIN_LOGOUT, async (req, res, next) => {
+    if (req.user != undefined) {
+        let learningTotalTime = ""
+        await studentLearning
+            .findOne({
+                session: req.user.studentSession,
+                studentId: req.user.studentId,
+            })
+            .then(response => {
+                const nowDate = new Date()
+                const oldDate = response.learningTime.accessTime
+
+                //s
+                const hr = parseInt(parseInt((nowDate - oldDate) / 1000) / 3600)
+                const min = parseInt(
+                    (parseInt((nowDate - oldDate) / 1000) - hr * 3600) / 60
+                )
+
+                const sec = parseInt(
+                    parseInt((nowDate - oldDate) / 1000) - hr * 3600 - min * 60
+                )
+
+                learningTotalTime = hr + " 時 " + min + " 分 " + sec + " 秒"
+            })
+        await studentlistenconfig
+            .findOne({
+                session: req.user.studentSession,
+                studentId: req.user.studentId,
+            })
+            .then(async response => {
+                if (response == null) {
+                    const time = new Date()
+                    const newListenerContent = new studentlistenconfig({
+                        session: req.user.studentSession,
+                        studentId: req.user.studentId,
+                        studentMonitor: {
+                            "time": learningTotalTime,
+                            "operation": "學習",
+                            "item": "學習時間",
+                            "description": `在 ${time.getFullYear() +
+                                "/" +
+                                time.getMonth() +
+                                "/" +
+                                time.getDate() +
+                                " " +
+                                time.getHours() +
+                                ":" +
+                                time.getMinutes() +
+                                ":" +
+                                time.getSeconds()} 學習 共 ${learningTotalTime}`
+                        },
+                    })
+
+                    newListenerContent.save()
+                } else {
+                    const time = new Date()
+                    const newData = [
+                        ...response.studentMonitor,
+                        {
+                            "time": learningTotalTime,
+                            "operation": "學習",
+                            "item": "學習時間",
+                            "description": `在 ${time.getFullYear() +
+                                "/" +
+                                time.getMonth() +
+                                "/" +
+                                time.getDate() +
+                                " " +
+                                time.getHours() +
+                                ":" +
+                                time.getMinutes() +
+                                ":" +
+                                time.getSeconds()} 學習 共 ${learningTotalTime}`
+                        },
+                    ]
+
+                    await studentlistenconfig.updateOne(
+                        {
+                            session: req.user.studentSession,
+                            studentId: req.user.studentId,
+                        },
+                        { studentMonitor: newData }
+                    )
+                }
+            })
+        req.logout(err => {
+            if (err) return next(err)
+            res.send("/")
+        })
+    }
 })
 
 //守門員用法use

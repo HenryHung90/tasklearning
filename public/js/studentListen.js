@@ -1,9 +1,8 @@
-$(document).ready(e => {
+$(document).ready(e => {        
     setTimeout(e => {
-        console.log(window.location.pathname.split("/"))
+        // console.log(window.location.pathname.split("/"))
         //student Dashboard Listener
         if (window.location.pathname.split("/")[1] == "dashboard") {
-            console.log("dashboard")
             $(".taskStage_Box_Complete").mousedown(e => {
                 taskStageBoxClick(e)
             })
@@ -16,7 +15,6 @@ $(document).ready(e => {
         }
         //student Data Listener
         if (window.location.pathname.split("/")[4] == "data") {
-            console.log("data")
             $(".dataDownload").click(e => {
                 dataBoxClick(e, "O")
             })
@@ -59,6 +57,16 @@ $(document).ready(e => {
         }
     }, 500)
 })
+window.addEventListener('beforeunload', (event) => {
+    // Cancel the event as stated by the standard.
+    event.preventDefault();
+    // Chrome requires returnValue to be set.
+    axios({
+        method: "GET",
+        url: "/logout",
+        withCredentials: true,
+    })
+  });
 //dashboard
 function taskStageBoxClick(e) {
     const stageType = e.currentTarget.id.split("_")[0]
@@ -118,6 +126,10 @@ function optionText(missionId , optionName){
     uploadClick(`任務${missionId} 的 ${optionName}`,"U")
 }
 
+//----------------------------------------------------------------------------
+//minding
+
+//response
 
 //upload fcuntion
 function uploadClick(item, operation) {

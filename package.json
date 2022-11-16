@@ -6,7 +6,8 @@
   "scripts": {
     "start":"pm2 start --name tasklearning server.js --watch",
     "stop":"pm2 stop all",
-    "restart":"pm2 restart all"
+    "restart":"pm2 restart all",
+    "test":"nodemon server.js"
   },
   "repository": {
     "type": "git",
