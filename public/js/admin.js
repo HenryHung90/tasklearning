@@ -172,7 +172,7 @@ function renderWeekStatusSelection(Id, target, appendTarget) {
         $("<option>")
             .prop({
                 value: i,
-                innerHTML: `Week ${i}`,
+                innerHTML: `Progress ${i}`,
             })
             .appendTo(weekStatusSwitch)
     }
@@ -193,13 +193,13 @@ function renderWeekStatusSelection(Id, target, appendTarget) {
                     $(".weekStatus_div").append(
                         renderWeek_StatusCompletePercentage()
                     )
-                    loadingStudentDetail().then(response => {
+                    loadingStudentDetail($('#main_session').val()).then(response => {
                         weekStatusProgress(response.data.studentsStatus, week)
                         loadingPage(false)
                     })
                     break
                 case "week_MissionConut":
-                    loadingStudentDetail()
+                    loadingStudentDetail($('#main_session').val())
                         .then(response => {
                             $(".weekMission_div").append(
                                 renderWeek_MissionCompletePercentage(
@@ -222,7 +222,7 @@ function renderWeekStatusSelection(Id, target, appendTarget) {
                     $(".weekMindingScore_div").append(
                         renderWeek_MindingSelfEvaluationAveraged()
                     )
-                    loadingStudentDetail().then(response => {
+                    loadingStudentDetail($('#main_session').val()).then(response => {
                         weekMindingScoreProgress(
                             response.data.studentsMinding,
                             week
@@ -539,13 +539,15 @@ function weekMissionProgress(Mission, Minding, Week) {
     Minding.map((mindingValue, mindingIndex) => {
         if (mindingValue.week == Week) {
             //原studentMinding為Object 轉 Array
-            const targetValue = Object.values(mindingValue.studentMinding)
-            targetValue.map((value, index) => {
-                missionSelectCount[parseInt(value.missionName)]++
-                if (value.missionComplete == true) {
-                    missionCompleteCount[parseInt(value.missionName)]++
-                }
-            })
+            if (mindingValue.studentMinding != undefined) {
+                const targetValue = Object.values(mindingValue.studentMinding)
+                targetValue.map((value, index) => {
+                    missionSelectCount[parseInt(value.missionName)]++
+                    if (value.missionComplete == true) {
+                        missionCompleteCount[parseInt(value.missionName)]++
+                    }
+                })
+            }
         }
     })
     missionId.map((missionName, missionIndex) => {
@@ -569,6 +571,10 @@ function weekMindingScoreProgress(Minding, Week) {
             }
         }
     })
+    if(isNaN(studentMindingTotal)){
+        studentMindingTotal = 0
+    }
+
     renderProgressBar("#minding_Score", 0, mindingTotal, studentMindingTotal)
 }
 ////////////////////////////////////

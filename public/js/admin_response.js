@@ -215,12 +215,14 @@ function renderStudentStatus(studentId, week) {
                         'border-radius': '10px'
                     }).appendTo(missionText)
                     //mission執行內容˙
-                    $('<p>').prop({
-                        className: `missionCotent_${contentIndex}`,
-                        innerHTML: response.data.manageContent[missionIndex][contentIndex]
-                    }).css({
-                        'word-break': 'break-all'
-                    }).appendTo(missionStep)
+                    if( response.data.manageContent[missionIndex] != undefined){
+                        $('<p>').prop({
+                            className: `missionCotent_${contentIndex}`,
+                            innerHTML: response.data.manageContent[missionIndex][contentIndex]
+                        }).css({
+                            'word-break': 'break-all'
+                        }).appendTo(missionStep)
+                    }
                     if (contentIndex < studentMission.length - 1) {
                         $('<div>').prop({
                             className: 'arrowDown',
@@ -325,7 +327,7 @@ function renderStudentStatus(studentId, week) {
         ////自我評分分數
         $('<h4>').prop({
             className: 'mindingRanking',
-            innerHTML: '<strong>自我評分 : ' + response.data.mindingContent.studentRanking + " 分</strong>"
+            innerHTML: '<strong>自我評分 : ' + response.data.mindingContent.studentRanking ? response.data.mindingContent.studentRanking : 0 + " 分</strong>"
         }).css({
             'margin-top': '10px',
             'padding': '10px 0',
@@ -428,6 +430,13 @@ function renderTeacherandStudentResponse(studentId, week) {
             'transition-duration': '0.5s',
             'resize': 'none'
         }).appendTo(responseTextDiv)
+
+        $('<div>').prop({
+            className:'teacherResponseTime',
+            innerHTML:response.data.teacherResponseTime ? response.data.teacherResponseTime : '時間戳尚未記載',
+        }).css({
+            'text-align':'left',
+        }).appendTo(responseContainer)
 
         ////data儲存按鈕
         $('<button>').prop({
@@ -625,12 +634,12 @@ function renderResponseSearch(studentData) {
         if (i == weekCount()) {
             $('<option selected>').prop({
                 value: i,
-                innerHTML: `<h2>Week ${i}</h2>`
+                innerHTML: `<h2>Progress ${i}</h2>`
             }).appendTo(chanageWeekData)
         } else {
             $('<option>').prop({
                 value: i,
-                innerHTML: `<h2>Week ${i}</h2>`
+                innerHTML: `<h2>Progress ${i}</h2>`
             }).appendTo(chanageWeekData)
         }
     }
@@ -709,12 +718,13 @@ function renderResponseStudentList(studentDetail, Week) {
         studentDetail, Week, 'not yet',
         '.studentDataContainer_notYet', '#ArrowDownIcon_notYet').appendTo(studentListDiv)
 
+    studentDetail.reverse()
     studentDetail.map(async (studentData, studentIndex) => {
         //學生序號
         const studentNumber = $('<div>').prop({
             className: 'studentData_Number',
             id: `studentNumber_${studentIndex}`,
-            innerHTML: `${studentIndex}`
+            innerHTML: `${studentDetail.length - studentIndex}`
         })
         //學生ID
         const studentId = $('<div>').prop({
@@ -729,7 +739,7 @@ function renderResponseStudentList(studentDetail, Week) {
             innerHTML: studentData.studentName
         })
         //設定狀態
-        const studentDetail = $('<button>').prop({
+        const studentDetails = $('<button>').prop({
             className: 'btn btn-outline-primary',
             id: 'checkStudentStatus',
             innerHTML: '學習狀況'
@@ -762,7 +772,7 @@ function renderResponseStudentList(studentDetail, Week) {
             const studentSetting = $('<div>').prop({
                 className: 'studentData_Setting',
                 id: 'responseSetting'
-            }).append(studentDetail).append(studentResponse)
+            }).append(studentDetails).append(studentResponse)
 
             //學生資料表格框
             $('<div>').prop({
@@ -793,7 +803,7 @@ function renderResponseStudentList(studentDetail, Week) {
             const studentSetting = $('<div>').prop({
                 className: 'studentData_Setting',
                 id: 'responseSetting'
-            }).append(studentDetail).append(studentResponse)
+            }).append(studentDetails).append(studentResponse)
 
             //學生資料表格框
             $('<div>').prop({
@@ -824,7 +834,7 @@ function renderResponseStudentList(studentDetail, Week) {
             const studentSetting = $('<div>').prop({
                 className: 'studentData_Setting',
                 id: 'responseSetting'
-            }).append(studentDetail).append(studentResponse)
+            }).append(studentDetails).append(studentResponse)
 
             //學生資料表格框
             $('<div>').prop({

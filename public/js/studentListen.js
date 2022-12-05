@@ -57,16 +57,16 @@ $(document).ready(e => {
         }
     }, 500)
 })
-window.addEventListener('beforeunload', (event) => {
-    // Cancel the event as stated by the standard.
-    event.preventDefault();
-    // Chrome requires returnValue to be set.
-    axios({
-        method: "GET",
-        url: "/logout",
-        withCredentials: true,
-    })
-  });
+// window.addEventListener('beforeunload', (event) => {
+//     // Cancel the event as stated by the standard.
+//     event.preventDefault();
+//     // Chrome requires returnValue to be set.
+//     axios({
+//         method: "GET",
+//         url: "/logout",
+//         withCredentials: true,
+//     })
+//   });
 //dashboard
 function taskStageBoxClick(e) {
     const stageType = e.currentTarget.id.split("_")[0]
@@ -185,7 +185,7 @@ function getNowTime() {
     return (
         time.getFullYear() +
         "/" +
-        time.getMonth() +
+        time.getMonth()+1 +
         "/" +
         time.getDate() +
         " " +

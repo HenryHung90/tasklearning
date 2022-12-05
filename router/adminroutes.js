@@ -166,7 +166,6 @@ router.post(process.env.ROUTER_ADMIN_READSTUDENTSTATUSDETAIL, async (req, res) =
     }
     await missioncontentmodel.findOne({ session: req.body.studentSession, week: req.body.week }).then(response => {
         if (response == null) {
-            res.send('fall');
             return
         }
         response.mission.map((missionValue) => {
@@ -197,11 +196,13 @@ router.post(process.env.ROUTER_ADMIN_READSTUDENTSTATUSDETAIL, async (req, res) =
         if (response == null) {
             return
         }
-        response.studentMinding = Object.values(response.studentMinding)
-        returnData.mindingContent = {
-            studentRanking: response.studentRanking,
-            studentFixing: response.studentFixing,
-            studentMinding: response.studentMinding,
+        if(response.studentMinding != undefined){
+            response.studentMinding = Object.values(response.studentMinding)
+            returnData.mindingContent = {
+                studentRanking: response.studentRanking,
+                studentFixing: response.studentFixing,
+                studentMinding: response.studentMinding,
+            }
         }
     })
     res.send(returnData)
@@ -211,7 +212,10 @@ router.post(process.env.ROUTER_ADMIN_READTEACHERRESPONSE, async (req, res) => {
     await responsecontentmodel.findOne({ studentId: req.body.studentId, week: req.body.week }).then(response => {
         const returnData = {
             teacherResponse: response ? response.teacherResponse : '',
-            studentResponse: response ? response.studentResponse : ''
+            teacherResponseTime: response ? response.teacherResponseTime : '',
+            studentResponse: response ? response.studentResponse : '',
+            studentResponse: response ? response.studentResponseTime : '',
+
         }
         res.send(returnData)
     })
@@ -651,6 +655,7 @@ router.post(process.env.ROUTER_ADMIN_ADDRESPONSE, async (req, res) => {
             studentId: req.body.studentId,
             week: req.body.week,
             teacherResponse: req.body.teacherResponse,
+            teacherResponseTime:req.body.teacherResponseTime,
         })
         await newResponse.save()
         isSuccess = true

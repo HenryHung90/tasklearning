@@ -104,6 +104,7 @@ task.use(urlencodedParser)
 // })
 const studentLearning = require("./models/studentlearningcontent")
 const studentlistenconfig = require('./models/studentlistenconfig')
+const { truncateSync } = require("fs")
 //登入
 task.post(process.env.ROUTER_MAIN_LOGIN, (req, res, next) => {
     passport.authenticate("local", (err, user, info) => {
@@ -242,9 +243,13 @@ task.get(process.env.ROUTER_MAIN_LOGOUT, async (req, res, next) => {
 //     next()
 // })
 let isAuthenticated = function (req, res, next) {
-    if (req.isAuthenticated()) return next()
+    console.log(new Date(),req.isAuthenticated())
+    if (req.isAuthenticated()){ 
+        return next()
+    }
     res.redirect("/")
 }
+
 task.get("/", (req, res) => {
     if (req.user !== undefined) {
         res.redirect(`/dashboard/${req.user.studentId}`)
@@ -252,27 +257,32 @@ task.get("/", (req, res) => {
         res.render("index")
     }
 })
+// //Stagepage
+// task.use(process.env.ROUTER_MAIN_DASHBOARD, isAuthenticated, dashboardRoutes)
+// //stageCheck
+// task.use(
+//     process.env.ROUTER_MAIN_STUDENTSTAGE,
+//     isAuthenticated,
+//     stageCheckRoutes
+// )
+// //student
+// task.use(process.env.ROUTER_MAIN_STUDENT, isAuthenticated, studentRoutes)
 
-//Stagepage
-task.use(process.env.ROUTER_MAIN_DASHBOARD, isAuthenticated, dashboardRoutes)
-//stageCheck
-task.use(
-    process.env.ROUTER_MAIN_STUDENTSTAGE,
-    isAuthenticated,
-    stageCheckRoutes
-)
-//student
-task.use(process.env.ROUTER_MAIN_STUDENT, isAuthenticated, studentRoutes)
 //admin
-task.use(process.env.ROUTER_MAIN_ADMIN, adminRoutes)
+task.use(process.env.ROUTER_MAIN_ADMIN, isAuthenticated, adminRoutes)
+
+task.get('/dashboard/admin',isAuthenticated,async(req,res)=>{
+    res.render('dashboard/admin')
+})
 
 task.get("/checkdata/:filename", async (req, res) => {
     res.sendFile(`${__dirname}/public/media/pdf/${req.params.filename}`)
 })
 
+
 //無此路由
 task.use((req, res, next) => {
-    res.status(404).send("找不到")
+    res.status(404).send("系統維修中，預計維修時間為12/5 17:00~ 12/5 23:00")
 })
 
 //程式錯誤

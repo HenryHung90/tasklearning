@@ -374,7 +374,10 @@ router.post(process.env.ROUTER_STUDENT_ADDRESPONSE, async (req, res) => {
                 studentId: req.user.studentId,
                 week: req.body.week,
             },
-            { studentResponse: converDangerString(req.body.studentResponse) }
+            {
+                studentResponse: converDangerString(req.body.studentResponse),
+                studentResponseTime: req.body.studentResponseTime,
+            }
         )
         .then(response => {
             res.send(response.acknowledged)
@@ -424,7 +427,6 @@ router.post(process.env.ROUTER_STUDENT_ADDLISTENER, async (req, res) => {
                 newListenerContent.save()
             } else {
                 const newData = [...response.studentMonitor, req.body.clickTemp]
-                console.log(newData)
 
                 await studentlistenconfig.updateOne(
                     {

@@ -236,10 +236,12 @@ function loadingData() {
         withCredentials: true,
     })
         .then(response => {
+            console.log(response)
             if (response.data === "no found") {
                 window.alert("尚未新增該周資訊!")
                 window.location.href = `/dashboard/${userId}`
             }
+
             //loading page data
             renderDataPage(response.data)
         })

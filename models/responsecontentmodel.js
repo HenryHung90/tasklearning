@@ -17,7 +17,15 @@ const responsecontentmodel = new mongoose.Schema({
         type:'string',
         required: true,
     },
+    teacherResponseTime:{
+        type:'string',
+        required:false,
+    },
     studentResponse: {
+        type: 'string',
+        required: false,
+    },
+    studentResponseTime: {
         type: 'string',
         required: false,
     },
