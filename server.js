@@ -103,8 +103,7 @@ task.use(urlencodedParser)
 //     res.send("Is user")
 // })
 const studentLearning = require("./models/studentlearningcontent")
-const studentlistenconfig = require('./models/studentlistenconfig')
-const { truncateSync } = require("fs")
+const studentlistenconfig = require("./models/studentlistenconfig")
 //登入
 task.post(process.env.ROUTER_MAIN_LOGIN, (req, res, next) => {
     passport.authenticate("local", (err, user, info) => {
@@ -182,10 +181,11 @@ task.get(process.env.ROUTER_MAIN_LOGOUT, async (req, res, next) => {
                         session: req.user.studentSession,
                         studentId: req.user.studentId,
                         studentMonitor: {
-                            "time": learningTotalTime,
-                            "operation": "學習",
-                            "item": "學習時間",
-                            "description": `在 ${time.getFullYear() +
+                            time: learningTotalTime,
+                            operation: "學習",
+                            item: "學習時間",
+                            description: `在 ${
+                                time.getFullYear() +
                                 "/" +
                                 time.getMonth() +
                                 "/" +
@@ -195,7 +195,8 @@ task.get(process.env.ROUTER_MAIN_LOGOUT, async (req, res, next) => {
                                 ":" +
                                 time.getMinutes() +
                                 ":" +
-                                time.getSeconds()} 學習 共 ${learningTotalTime}`
+                                time.getSeconds()
+                            } 學習 共 ${learningTotalTime}`,
                         },
                     })
 
@@ -205,10 +206,11 @@ task.get(process.env.ROUTER_MAIN_LOGOUT, async (req, res, next) => {
                     const newData = [
                         ...response.studentMonitor,
                         {
-                            "time": learningTotalTime,
-                            "operation": "學習",
-                            "item": "學習時間",
-                            "description": `在 ${time.getFullYear() +
+                            time: learningTotalTime,
+                            operation: "學習",
+                            item: "學習時間",
+                            description: `在 ${
+                                time.getFullYear() +
                                 "/" +
                                 time.getMonth() +
                                 "/" +
@@ -218,7 +220,8 @@ task.get(process.env.ROUTER_MAIN_LOGOUT, async (req, res, next) => {
                                 ":" +
                                 time.getMinutes() +
                                 ":" +
-                                time.getSeconds()} 學習 共 ${learningTotalTime}`
+                                time.getSeconds()
+                            } 學習 共 ${learningTotalTime}`,
                         },
                     ]
 
@@ -243,8 +246,8 @@ task.get(process.env.ROUTER_MAIN_LOGOUT, async (req, res, next) => {
 //     next()
 // })
 let isAuthenticated = function (req, res, next) {
-    console.log(new Date(),req.isAuthenticated())
-    if (req.isAuthenticated()){ 
+    console.log(new Date(), req.user.studentId, req.isAuthenticated())
+    if (req.isAuthenticated()) {
         return next()
     }
     res.redirect("/")
@@ -257,16 +260,16 @@ task.get("/", (req, res) => {
         res.render("index")
     }
 })
-// //Stagepage
-// task.use(process.env.ROUTER_MAIN_DASHBOARD, isAuthenticated, dashboardRoutes)
-// //stageCheck
-// task.use(
-//     process.env.ROUTER_MAIN_STUDENTSTAGE,
-//     isAuthenticated,
-//     stageCheckRoutes
-// )
-// //student
-// task.use(process.env.ROUTER_MAIN_STUDENT, isAuthenticated, studentRoutes)
+//Stagepage
+task.use(process.env.ROUTER_MAIN_DASHBOARD, isAuthenticated, dashboardRoutes)
+//stageCheck
+task.use(
+    process.env.ROUTER_MAIN_STUDENTSTAGE,
+    isAuthenticated,
+    stageCheckRoutes
+)
+//student
+task.use(process.env.ROUTER_MAIN_STUDENT, isAuthenticated, studentRoutes)
 
 //admin
 task.use(process.env.ROUTER_MAIN_ADMIN, isAuthenticated, adminRoutes)
@@ -279,16 +282,19 @@ task.get("/checkdata/:filename", async (req, res) => {
     res.sendFile(`${__dirname}/public/media/pdf/${req.params.filename}`)
 })
 
-
-//無此路由
+// //無此路由
 task.use((req, res, next) => {
-    res.status(404).send("系統維修中，預計維修時間為12/5 17:00~ 12/5 23:00")
+    res.status(404).render('./404')
 })
+//維修路由
+// task.use((req, res, next) => {
+//     res.status(500).render('./500')
+// })
 
 //程式錯誤
 task.use((err, req, res, next) => {
     console.error(err.stack)
-    res.status(500).send("程式有問題 請檢查")
+    res.status(500).render('./500')
 })
 
 task.listen(port, () => {

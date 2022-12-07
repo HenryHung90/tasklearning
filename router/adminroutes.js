@@ -214,7 +214,7 @@ router.post(process.env.ROUTER_ADMIN_READTEACHERRESPONSE, async (req, res) => {
             teacherResponse: response ? response.teacherResponse : '',
             teacherResponseTime: response ? response.teacherResponseTime : '',
             studentResponse: response ? response.studentResponse : '',
-            studentResponse: response ? response.studentResponseTime : '',
+            studentResponseTime: response ? response.studentResponseTime : '',
 
         }
         res.send(returnData)
@@ -660,7 +660,7 @@ router.post(process.env.ROUTER_ADMIN_ADDRESPONSE, async (req, res) => {
         await newResponse.save()
         isSuccess = true
     } else {
-        await responsecontentmodel.updateOne({ studentId: req.body.studentId, week: req.body.week }, { teacherResponse: req.body.teacherResponse }).then(response => {
+        await responsecontentmodel.updateOne({ studentId: req.body.studentId, week: req.body.week }, { teacherResponse: req.body.teacherResponse, teacherResponseTime:req.body.teacherResponseTime }).then(response => {
             isSuccess = response.acknowledged + ' response'
         })
     }

@@ -1,4 +1,4 @@
-$(document).ready(e => {        
+$(document).ready(e => {
     setTimeout(e => {
         // console.log(window.location.pathname.split("/"))
         //student Dashboard Listener
@@ -47,7 +47,7 @@ $(document).ready(e => {
             })
         }
 
-        if(window.location.pathname.split("/")[4] == "manage"){
+        if (window.location.pathname.split("/")[4] == "manage") {
             $("#backBtn").click(e => {
                 uploadClick("執行階段", "L")
             })
@@ -112,18 +112,18 @@ function missionDrag(e) {
     uploadClick(missionName, missionOperation)
 }
 
-function optionClick(e,option) {
+function optionClick(e, option) {
     let optionName = e.currentTarget.name
-    if(e.currentTarget.name == undefined){
-        optionName = switchOptionName(e.currentTarget.id.split('_')[3])
+    if (e.currentTarget.name == undefined) {
+        optionName = switchOptionName(e.currentTarget.id.split("_")[3])
     }
     uploadClick("策略 " + optionName, option)
 }
 //----------------------------------------------------------------------------
 
 //manage
-function optionText(missionId , optionName){
-    uploadClick(`任務${missionId} 的 ${optionName}`,"U")
+function optionText(missionId, optionName) {
+    uploadClick(`任務${missionId} 的 ${optionName}`, "U")
 }
 
 //----------------------------------------------------------------------------
@@ -185,7 +185,7 @@ function getNowTime() {
     return (
         time.getFullYear() +
         "/" +
-        time.getMonth()+1 +
+        (time.getMonth() + 1) +
         "/" +
         time.getDate() +
         " " +

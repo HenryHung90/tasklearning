@@ -64,8 +64,26 @@ function switchIdtoName(Id) {
 }
 //return 現在是第幾周
 function weekCount() {
-    return 2
+    return 3
 }
+//return 現在時間
+function getNowTime() {
+    const time = new Date()
+    return (
+        time.getFullYear() +
+        "/" +
+        (time.getMonth() + 1) +
+        "/" +
+        time.getDate() +
+        " " +
+        time.getHours() +
+        ":" +
+        time.getMinutes() +
+        ":" +
+        time.getSeconds()
+    )
+}
+
 //return 屆數
 function sessionCount() {
     return axios({

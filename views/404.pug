@@ -1,0 +1,37 @@
+html 
+head 
+    link(rel="stylesheet" href='../css/404.css')  
+    script(src='../js/404.js')
+body 
+    p
+        | HTTP: 
+        span 404
+    code
+        span this_page
+        | .
+        em not_found
+        |  = true;
+    code
+        span if
+        |  (
+        b you_spelt_it_wrong
+        | ) {
+        span try_again()
+        | ;}
+    code
+        span
+        | else if (
+        b we_screwed_up
+        | )
+        |  {
+        em alert
+        | (
+        i "We're really sorry about that."
+        | ); 
+        span window
+        | .
+        em location
+        |  = home;}
+    center
+        a(href='/') HOME
+
