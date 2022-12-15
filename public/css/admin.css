@@ -166,6 +166,21 @@ body {
 .missionUncomplete {
   background-color: rgba(255, 45, 45, 0.5) !important;
 }
+.question_title{
+  font-weight:bolder;
+  margin-bottom:20px;
+}
+.question_subtitle{
+  font-weight: bold;
+  padding-bottom:4px;
+  border-bottom:1px solid rgba(0, 0, 0, 0.6)
+}
+.question_contents{
+  text-align: left;
+  padding:0 35px;
+  margin:5px;
+  font-size: 16px;
+}
 
 .studentBtnContainer h1,
 .dataPageBtnContainer h1,

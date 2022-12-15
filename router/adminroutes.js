@@ -60,7 +60,7 @@ router.post(process.env.ROUTER_ADMIN_READSTUDENTSTATUS, async (req, res) => {
             }
         })
     })
-    await missioncontentmodel.find({ studentSession: req.body.session }).then(response => {
+    await missioncontentmodel.find({ session: req.body.session }).then(response => {
         response.map((value, index) => {
             const missionData = {
                 week: value.week,
@@ -119,7 +119,7 @@ router.post(process.env.ROUTER_ADMIN_READSTUDENTS, async (req, res) => {
         res.send(returnData)
     })
 })
-//取得所有學生Manage資訊
+//取得所有學生 Manage 資訊
 router.post(process.env.ROUTER_ADMIN_READMANAGESTATUS, async (req, res) => {
     const returnData = {
         mission: [],
@@ -152,7 +152,7 @@ router.post(process.env.ROUTER_ADMIN_READMANAGESTATUS, async (req, res) => {
     })
     res.send(returnData)
 })
-//取得所有學生Minding資訊
+//取得所有學生 Minding 資訊
 router.post(process.env.ROUTER_ADMIN_READMINDINGSTATUS, async (req, res) => {
 
 })
@@ -709,17 +709,20 @@ router.post(process.env.ROUTER_ADMIN_READESESSION, async (req, res) => {
 })
 //讀取 monitor
 router.post(process.env.ROUTER_ADMIN_READSTUDENTMONITOR, async (req, res) => {
-    studentlistenconfig.findOne({studentId:req.body.studentId,sesion:req.body.session}).then(response=>{
-        const returnData = []
+    const returnData = []
+    await studentlistenconfig.findOne({studentId:req.body.studentId,sesion:req.body.session}).then(response=>{
+        console.log(response.studentMonitor)
         for (let listenConfig of response.studentMonitor){
             returnData.push({
                 "學號":req.body.studentId,
-                "時間":listenConfig.operationTime,
-                "行為":listenConfig.operationName,
-                "描述":listenConfig.operationIntro,
+                "時間":listenConfig.time,
+                "行為":listenConfig.operation,
+                "物件":listenConfig.item,
+                "描述":listenConfig.description,
             })
         }
     })
+    res.send(returnData)
 })
 
 

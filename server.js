@@ -246,8 +246,8 @@ task.get(process.env.ROUTER_MAIN_LOGOUT, async (req, res, next) => {
 //     next()
 // })
 let isAuthenticated = function (req, res, next) {
-    console.log(new Date(), req.user.studentId, req.isAuthenticated())
     if (req.isAuthenticated()) {
+        console.log(new Date(), req.user.studentId, req.isAuthenticated())
         return next()
     }
     res.redirect("/")
@@ -257,7 +257,7 @@ task.get("/", (req, res) => {
     if (req.user !== undefined) {
         res.redirect(`/dashboard/${req.user.studentId}`)
     } else {
-        res.render("index")
+        res.render("./index")
     }
 })
 //Stagepage
@@ -274,9 +274,10 @@ task.use(process.env.ROUTER_MAIN_STUDENT, isAuthenticated, studentRoutes)
 //admin
 task.use(process.env.ROUTER_MAIN_ADMIN, isAuthenticated, adminRoutes)
 
-task.get('/dashboard/admin',isAuthenticated,async(req,res)=>{
-    res.render('dashboard/admin')
-})
+
+// task.get('/dashboard/admin',isAuthenticated,async(req,res)=>{
+//     res.render('dashboard/admin')
+// })
 
 task.get("/checkdata/:filename", async (req, res) => {
     res.sendFile(`${__dirname}/public/media/pdf/${req.params.filename}`)

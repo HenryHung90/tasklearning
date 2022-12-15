@@ -133,7 +133,8 @@ function renderStudentStatus(studentId, week) {
             .css({
                 position: "absolute",
                 height: "80vh",
-                left: "15vw",
+                width: "80%",
+                left: "10vw",
                 top: "10vh",
                 "z-index": "9999",
                 "background-color": "white",
@@ -743,7 +744,7 @@ function weekSwitchClickBtn(week) {
 //render 上方搜尋列表
 function renderResponseSearch() {
     function renderQuestionData() {
-        const closePage = (e) => {
+        const closePage = e => {
             questionDataBlock.fadeOut(200)
             questionDataContainer.fadeOut(200)
             setTimeout(e => {
@@ -773,7 +774,7 @@ function renderResponseSearch() {
             })
             .css({
                 margin: "0 25vw",
-                'margin-top': `calc(${window.pageYOffset}px + 50px)`,
+                "margin-top": `calc(${window.pageYOffset}px + 50px)`,
                 overflow: "hidden",
                 display: "flex",
                 "align-items": "flex-end",
@@ -786,46 +787,75 @@ function renderResponseSearch() {
             .prependTo($("body"))
 
         //Main div for question
-        const questionDataDiv = $('<div>')
-        .prop({
-            className:'questionDataDiv'
-        })
-        .css({
-            'background-color':'white',
-            'border-radius':'20px',
-            'height':'100%',
-            'width':'100%',
-            'text-align':'center'
-        }).appendTo(questionDataContainer)
+        const questionDataDiv = $("<div>")
+            .prop({
+                className: "questionDataDiv",
+            })
+            .css({
+                "background-color": "white",
+                "border-radius": "20px",
+                height: "100%",
+                width: "100%",
+                "text-align": "center",
+                padding:'24px'
+            })
+            .appendTo(questionDataContainer)
 
-        $('<h1>')
-        .prop({
-            className:'question_title',
-            innerHTML:"Questions"
-        })
-        .css({
+        $("<h1>")
+            .prop({
+                className: "question_title",
+                innerHTML: "Questions",
+            })
+            .appendTo(questionDataDiv)
 
-        })
-        .appendTo(questionDataDiv)
-
-        $('<p>')
+        //Well Done
+        $("<h3>")
+            .prop({
+                className: "question_subtitle",
+                innerHTML: "Well Done",
+            })
+            .appendTo(questionDataDiv)
+        //Well Done Content
+        $("<p>")
+            .prop({
+                className: "question_contents",
+                innerHTML:
+                    "<button class='btn btn-success'>師生回覆</button> : 學生有給予老師回覆<br/>" +
+                    "<button class='btn btn-outline-success'>師生回覆</button> : 學生未給老師回覆但已閱讀老師回覆",
+            })
+            .appendTo(questionDataDiv)
+        //Feed Back
+        $("<h3>")
+            .prop({
+                className: "question_subtitle",
+                innerHTML: "Feed Back",
+            })
+            .appendTo(questionDataDiv)
+        //Feed Back Content
+        $("<p>")
+            .prop({
+                className: "question_contents",
+                innerHTML:
+                "<button class='btn btn-success'>師生回覆</button> : 老師已完成對學生的回覆<br/>" +
+                "<button class='btn btn-outline-success'>師生回覆</button> : 學生已完成且老師尚未給予回覆",
+            })
+            .appendTo(questionDataDiv)
+        //Not Yet
+        $("<h3>")
         .prop({
-            className:'question_contents',
-            innerHTML:"Well Done => 為學生已完成所有內容並閱讀過老師之回覆，若 老師回覆btn 亮起為學生有給予老師回覆"
+            className: "question_subtitle",
+            innerHTML: "Not Yet",
         })
         .appendTo(questionDataDiv)
-        $('<p>')
-        .prop({
-            className:'question_contents',
-            innerHTML:"Feed Back => 為學生已完成所有內容但老師尚未回覆，若 老師回覆btn 亮起為老師已完成回覆"
-        })
-        .appendTo(questionDataDiv)
-        $('<p>')
-        .prop({
-            className:'question_contents',
-            innerHTML:"No Yet => 為學生尚未完成內容，若 老師回覆btn 亮起為老師已完成回覆"
-        })
-        .appendTo(questionDataDiv)
+        //Not Yet Content
+        $("<p>")
+            .prop({
+                className: "question_contents",
+                innerHTML:
+                "<button class='btn btn-success'>師生回覆</button> : 老師已完成對學生的回覆<br/>" +
+                "<button class='btn btn-outline-success'>師生回覆</button> : 學生未完成且老師尚未給予回覆",
+            })
+            .appendTo(questionDataDiv)
     }
 
     const responseBarContainer = $("<div>")
@@ -1083,7 +1113,7 @@ function renderResponseStudentList(studentDetail, Week) {
                 innerHTML: "學習狀況",
             })
             .css({
-                width: "30%",
+                width: "35%",
                 height: "40px",
             })
             .click(e => {

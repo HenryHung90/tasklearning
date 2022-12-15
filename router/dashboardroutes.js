@@ -46,7 +46,7 @@ router.get(process.env.ROUTER_DASHBOARD_STUDENTMAIN, (req, res) => {
                     res.status(404).send("無此用戶")
                 }
                 User = response.studentName
-                Week = "Progress 3"
+                Week = "Progress 4"
             }).then(() => {
                 res.render('dashboard/student', { Id: Id, User: User, Week: Week });
                 return

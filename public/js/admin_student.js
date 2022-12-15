@@ -62,8 +62,8 @@ async function uploadManyStudents(studentsData) {
 //return Download xlsx
 async function downloadDatatoExcel(workbookTitle, worksheetData, worksheetName) {
     const workbook = XLSX.utils.book_new();
-    worksheetData.map((dataValue, dataIndex) => {
-        XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(dataValue), worksheetName[dataIndex]);
+    worksheetData.map(async (dataValue, dataIndex) => {
+        await XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(dataValue), worksheetName[dataIndex]);
         //Binary string
         // XLSX.write(workbook, { book_type: "xlsx", type: "binary" });
         if (dataIndex == worksheetData.length - 1) {
@@ -139,6 +139,7 @@ const downloadStudentDetail = (studentId, studentSession) => {
         },
         withCredentials: true
     }).then(response => {
+        console.log(response.data)
         downloadDatatoExcel(studentId, response.data.studentData, response.data.dataTitle)
     })
 }
@@ -153,7 +154,8 @@ const downloadStudentUsingRecord = (studentId, studentSession) => {
         },
         withCredentials: true
     }).then(response=>{
-        downloadDatatoExcel(`${studentSession}_${studentId}`,response.data,["監控資料"])
+        console.log(response.data)
+        downloadDatatoExcel(`${studentSession}_${studentId}`,[response.data],["監控資料"])
     })
 
 }

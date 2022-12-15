@@ -64,7 +64,7 @@ function switchIdtoName(Id) {
 }
 //return 現在是第幾周
 function weekCount() {
-    return 3
+    return 4
 }
 //return 現在時間
 function getNowTime() {
@@ -423,6 +423,7 @@ function renderWeek_MissionCompletePercentage(Mission, Week) {
             "#weekMissionSelect"
         )
     }
+    console.log(Mission)
     Mission.map((missionValue, missionIndex) => {
         if (missionValue.week == Week) {
             missionValue.mission.map((value, index) => {
