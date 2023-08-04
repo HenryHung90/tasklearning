@@ -7,8 +7,7 @@ dotenv.config();
 //cors 跨來源資源共用
 const cors = require('cors');
 task.use(cors({
-    origin: 'process.env.ROUTER_CORS',
-    credentials: true,
+    origin: [process.env.CORS_ALLOW_CAST_MAIN, process.env.CORS_ALLOW_CAST_TEST],
 }))
 //設定port 與 host
 const host = process.env.ROUTER_HOST
@@ -27,6 +26,8 @@ mongoDbStatus.once('open', (db) => console.log('Connection to mongodb'))
 //express helmet
 const helmet = require('helmet')
 
+
+
 //開啟DNS預讀取
 task.use(helmet({ dnsPrefetchControl: { allow: true } }))
 //禁止使用iframe
@@ -35,9 +36,9 @@ task.use(helmet({ dnsPrefetchControl: { allow: true } }))
 task.use(
     helmet.contentSecurityPolicy({
         directives: {
-            "script-src": ["self", "https://code.jquery.com", 
-            "https://cdn.jsdelivr.net",'http://localhost:3000',
-            'https://cdnjs.cloudflare.com'],
+            "script-src": ["self", "https://code.jquery.com",
+                "https://cdn.jsdelivr.net", 'http://localhost:3000',
+                'https://cdnjs.cloudflare.com'],
         },
     })
 );
