@@ -25,7 +25,7 @@
 
 body {
   margin: 0 auto;
-  background-color: rgba(255,255,255,0.5);
+  background-color: rgba(255, 255, 255, 0.5);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='250' viewBox='0 0 20 20'%3E%3Cg fill-opacity='0.2'%3E%3Cpolygon fill='%23FFFF52' points='20 10 10 0 0 0 20 20'/%3E%3Cpolygon fill='%23FFFF52' points='0 10 0 20 10 20'/%3E%3C/g%3E%3C/svg%3E");
   overflow-x: hidden;
 }
@@ -102,7 +102,6 @@ body {
 }
 
 #StatusTitle {
-  font-family: "Silkscreen", cursive;
   font-size: 2em;
   font-weight: bolder;
 }
@@ -149,7 +148,7 @@ body {
 .weekMindingScore_div {
   margin: 0 auto;
   margin-top: 30px;
-  width: 50vw;
+  width: 70vw;
   padding: 10px 10px;
   height: 340px;
   background-color: rgba(255, 255, 255, 0.7);
@@ -166,6 +165,21 @@ body {
 
 .missionUncomplete {
   background-color: rgba(255, 45, 45, 0.5) !important;
+}
+.question_title{
+  font-weight:bolder;
+  margin-bottom:20px;
+}
+.question_subtitle{
+  font-weight: bold;
+  padding-bottom:4px;
+  border-bottom:1px solid rgba(0, 0, 0, 0.6)
+}
+.question_contents{
+  text-align: left;
+  padding:0 35px;
+  margin:5px;
+  font-size: 16px;
 }
 
 .studentBtnContainer h1,
@@ -247,17 +261,31 @@ body {
 
   #responseSetting {
     width: 28%;
-  } 
-  .container{
-    left:3vw !important;
+  }
+
+  .container {
+    left: 3vw !important;
   }
 }
 
-@media (max-width: 1440px) {
-
-}
+@media (max-width: 1440px) {}
 
 @media (max-width: 1073px) {
+  .ProgramTitle {
+    height: 5vh;
+    line-height: 5vh;
+  }
+
+  .ProgramDiv {
+    height: 5vh;
+    line-height: 5vh;
+    font-size: 20px;
+  }
+
+  .ProgramBar {
+    height: 5vh;
+  }
+
   .ProgramBtn {
     width: 80%;
   }

@@ -1,9 +1,9 @@
 //render老師回饋
-function renderTeacherResponse(teacherResponse){
+function renderTeacherResponse(teacherResponse,responseTime){
     //teacherResponse內文
     const teacherResponseContent = $('<span>').prop({
         className:'teacherResponseContent',
-        innerHTML: teacherResponse
+        innerHTML: teacherResponse + `<strong><h4>${responseTime ? responseTime : '無時間戳記'}</h4></strong>`
     }).css({
         'word-wrap':'break-word',
         'white-space': 'pre-wrap',
@@ -32,11 +32,11 @@ function renderTeacherResponse(teacherResponse){
     return teacherResponseDiv
 }
 //render學生回饋
-function renderStudentResponse(studentResponse){
+function renderStudentResponse(studentResponse,responseTime){
     
     const studentResponseContent = $('<div>').prop({
         className:'studentResponseContent',
-        innerHTML:"有需要問或是想告訴老師的都可以留言喔!"
+        innerHTML:"有需要問或是想告訴老師的都可以留言喔!<br/>最後留言時間:" + (responseTime ? responseTime : '無時間戳記')
     }).css({
         'margin':'0 auto',
         'width': '90%',
@@ -80,6 +80,23 @@ function renderStudentResponse(studentResponse){
 
     return studentResponseDiv
 }
+//return 現在時間
+function getNowTime() {
+    const time = new Date()
+    return (
+        time.getFullYear() +
+        "/" +
+        (time.getMonth() + 1) +
+        "/" +
+        time.getDate() +
+        " " +
+        time.getHours() +
+        ":" +
+        time.getMinutes() +
+        ":" +
+        time.getSeconds()
+    )
+}
 
 
 //render response page main function
@@ -87,8 +104,8 @@ function renderResponsePage(data){
     const responseTeacher = $('.responseTeacher')
     const responseStudent = $('.responseStudent')
 
-    responseTeacher.append(renderTeacherResponse(data.teacherResponse))
-    responseStudent.append(renderStudentResponse(data.studentResponse))
+    responseTeacher.append(renderTeacherResponse(data.teacherResponse, data.teacherResponseTime))
+    responseStudent.append(renderStudentResponse(data.studentResponse, data.studentResponseTime))
 }
 //Click 確認是否已經完成過
 async function stageBtnEnterForResponse() {
@@ -122,7 +139,8 @@ async function uploadResponse(){
             url: '/student/addresponse',
             data: {
                 week: dataWeek,
-                studentResponse: $('.studentResponseTextarea').val()
+                studentResponse: $('.studentResponseTextarea').val(),
+                studentResponseTime:getNowTime(),
             },
             withCredentials: true
         }).then(response => {

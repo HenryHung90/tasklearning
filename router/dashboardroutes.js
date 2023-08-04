@@ -13,7 +13,7 @@ function isAuthUser(userId,sessionId){
 //進入各個 Stage
 router.get(process.env.ROUTER_DASHBOARD_STUDENTSTAGE, (req, res) => {
     let Id = req.params.user.toString()
-    let Week = "Week " + req.params.week;
+    let Week = "Progress " + req.params.week;
 
     //req.user.studentId
     if (isAuthUser(Id,req.user.studentId)){
@@ -46,7 +46,7 @@ router.get(process.env.ROUTER_DASHBOARD_STUDENTMAIN, (req, res) => {
                     res.status(404).send("無此用戶")
                 }
                 User = response.studentName
-                Week = "Week 3"
+                Week = "Progress 4"
             }).then(() => {
                 res.render('dashboard/student', { Id: Id, User: User, Week: Week });
                 return

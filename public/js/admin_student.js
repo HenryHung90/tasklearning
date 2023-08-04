@@ -62,8 +62,8 @@ async function uploadManyStudents(studentsData) {
 //return Download xlsx
 async function downloadDatatoExcel(workbookTitle, worksheetData, worksheetName) {
     const workbook = XLSX.utils.book_new();
-    worksheetData.map((dataValue, dataIndex) => {
-        XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(dataValue), worksheetName[dataIndex]);
+    worksheetData.map(async (dataValue, dataIndex) => {
+        await XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(dataValue), worksheetName[dataIndex]);
         //Binary string
         // XLSX.write(workbook, { book_type: "xlsx", type: "binary" });
         if (dataIndex == worksheetData.length - 1) {
@@ -83,13 +83,14 @@ function comfirmClick(Name) {
 function studentListGenerate(studentList) {
     let member = []
     studentList.map((listValue, listIndex) => {
+        console.log(typeof listValue.studentAccess)
         let data = {
             "屆數": listValue.studentSession,
             "新學號(若要更新再輸入)": '',
             "當前學號": listValue.studentId,
             "姓名": listValue.studentName,
             "密碼(若要更新再輸入)": '',
-            "是否激活": listValue.studentAccess
+            "是否啟用": listValue.studentAccess
         }
         listValue.studentDetail.map((statusValue, statusIndex) => {
             data[`周 ${statusValue.Week} 進度`] = 'unchecked'
@@ -138,6 +139,7 @@ const downloadStudentDetail = (studentId, studentSession) => {
         },
         withCredentials: true
     }).then(response => {
+        console.log(response.data)
         downloadDatatoExcel(studentId, response.data.studentData, response.data.dataTitle)
     })
 }
@@ -152,12 +154,14 @@ const downloadStudentUsingRecord = (studentId, studentSession) => {
         },
         withCredentials: true
     }).then(response=>{
-        downloadDatatoExcel(`${studentSession}_${studentId}`,response.data,["監控資料"])
+        console.log(response.data)
+        downloadDatatoExcel(`${studentSession}_${studentId}`,[response.data],["監控資料"])
     })
 
 }
 //批量下載學員
 const DownloadMember = (studentList, studentSession) => {
+    console.log(studentList)
     downloadDatatoExcel(`Detail_${studentSession}`, [studentListGenerate(studentList)], ["學生資料"])
 };
 //批量上傳學員

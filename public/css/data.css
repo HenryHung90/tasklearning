@@ -5,6 +5,7 @@
   height: 100%;
   text-align: center;
 }
+
 .dataContainer {
   padding: 25px;
   border-radius: 20px 0 0 20px;
@@ -15,12 +16,14 @@
   width: 90%;
   height: 75%;
 }
+
 .dataLink {
   margin: 0 auto;
   margin-top: 5px;
   width: 90%;
   height: 15%;
 }
+
 .dataDownload:hover,
 .dataVideo:hover {
   transition-duration: 0.3s;
@@ -36,7 +39,7 @@
 }
 
 .lastWeekPoint {
-  padding: 15px 5px 5px 5px;
+  padding: 10px 5px 5px 5px;
   text-align: center;
   border-radius: 20px;
   margin: 0 auto;
@@ -46,11 +49,11 @@
 }
 
 .thisWeekPoint {
-  padding: 15px 5px 5px 5px;
+  padding: 10px 5px 5px 5px;
   text-align: center;
   border-radius: 20px;
   margin: 0 auto;
-  margin-top: 50px;
+  margin-top: 10px;
   background-color: rgba(255, 255, 255, 0.8);
   width: 80%;
   height: 40%;

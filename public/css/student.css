@@ -1,8 +1,9 @@
 body {
   margin: 0 auto;
- background-color: #FFF68C !important;
+  background-color: #FFF68C !important;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 800 800'%3E%3Cg fill='none' stroke='%23E4E0E5' stroke-width='1'%3E%3Cpath d='M769 229L1037 260.9M927 880L731 737 520 660 309 538 40 599 295 764 126.5 879.5 40 599-197 493 102 382-31 229 126.5 79.5-69-63'/%3E%3Cpath d='M-31 229L237 261 390 382 603 493 308.5 537.5 101.5 381.5M370 905L295 764'/%3E%3Cpath d='M520 660L578 842 731 737 840 599 603 493 520 660 295 764 309 538 390 382 539 269 769 229 577.5 41.5 370 105 295 -36 126.5 79.5 237 261 102 382 40 599 -69 737 127 880'/%3E%3Cpath d='M520-140L578.5 42.5 731-63M603 493L539 269 237 261 370 105M902 382L539 269M390 382L102 382'/%3E%3Cpath d='M-222 42L126.5 79.5 370 105 539 269 577.5 41.5 927 80 769 229 902 382 603 493 731 737M295-36L577.5 41.5M578 842L295 764M40-201L127 80M102 382L-261 269'/%3E%3C/g%3E%3Cg fill='%23C1E7FF'%3E%3Ccircle cx='769' cy='229' r='5'/%3E%3Ccircle cx='539' cy='269' r='5'/%3E%3Ccircle cx='603' cy='493' r='5'/%3E%3Ccircle cx='731' cy='737' r='5'/%3E%3Ccircle cx='520' cy='660' r='5'/%3E%3Ccircle cx='309' cy='538' r='5'/%3E%3Ccircle cx='295' cy='764' r='5'/%3E%3Ccircle cx='40' cy='599' r='5'/%3E%3Ccircle cx='102' cy='382' r='5'/%3E%3Ccircle cx='127' cy='80' r='5'/%3E%3Ccircle cx='370' cy='105' r='5'/%3E%3Ccircle cx='578' cy='42' r='5'/%3E%3Ccircle cx='237' cy='261' r='5'/%3E%3Ccircle cx='390' cy='382' r='5'/%3E%3C/g%3E%3C/svg%3E");
 }
+
 /* width */
 ::-webkit-scrollbar {
   width: 10px;
@@ -22,6 +23,7 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+
 .loading {
   position: absolute;
   width: 100vw;
@@ -29,20 +31,21 @@ body {
   background-color: rgba(0, 0, 0, 0.3);
   z-index: 10000;
 }
+
 #loadingImg {
   position: fixed;
   top: calc(100vh / 3);
   left: calc(100vw / 3 + 100px);
   z-index: 10001;
 }
+
 .weektaskContainer {
   padding: 10px;
 }
 
 .taskContainer {
-  margin:0 auto;
-  margin-top: 10px;
-  width: 80%;
+  margin: 0 auto;
+  width: 85%;
   padding-right: 20px;
 }
 
@@ -53,50 +56,66 @@ body {
   background-color: rgba(240, 248, 255, 0.8);
   border-radius: 30px;
 }
+
 .taskWeekTitle {
   font-family: 'Silkscreen', cursive;
   user-select: none;
   color: rgba(84, 10, 163, 0.8);
   display: flex;
 }
-.taskProgress{
+
+.taskWeekTitle h1 {
+  width: 15%;
+  font-size: 30px;
+}
+
+.taskProgress {
   width: 70%;
   height: 10px;
-  margin-top:1%;
-  margin-left:2%;
+  margin-top: 1%;
+  margin-left: 2%;
 }
-.taskProgressText{
-  width:15%;
+
+.taskProgressText {
+  width: 15%;
   height: 40px;
-  margin-top:1%;
-  margin-left:1%;
+  margin-top: 1%;
+  margin-left: 1%;
   overflow: hidden;
-  white-space:nowrap;
+  white-space: nowrap;
   animation: typeProgressText 1s steps(60, end);
 }
-.taskArrow{
-  width:5%;
-  height:90%; 
+
+.taskArrow {
+  width: 5%;
+  height: 90%;
   transform: rotate(-90deg);
 }
+
 .taskTitle {
   user-select: none;
   text-align: center;
 }
-.taskTitle h3{
+
+.taskTitle h3 {
   font-family: 'Silkscreen', cursive;
 }
-.taskTitleText{
-  width: 50%;
+
+.taskTitleText {
+  width: 70%;
   display: flex;
   justify-content: space-between;
 }
-.taskTitleText h5{
-  font-weight:bold;
+
+.taskTitleText h5 {
+  font-weight: bold;
 }
-.taskTitleText h1, .taskTitleText .h5{
+
+.taskTitleText h1,
+.taskTitleText .h5 {
   font-family: 'Silkscreen', cursive;
 }
+
 .taskContent {
   transition-duration: 0.4s;
   padding: 10px;
@@ -104,6 +123,7 @@ body {
   border-radius: 20px;
   margin-top: 20px;
 }
+
 .taskContent_complete {
   transition-duration: 0.4s;
   padding: 10px;
@@ -172,63 +192,78 @@ body {
   from {
     background-color: rgba(75, 75, 75, 0.4);
   }
+
   50% {
     background-color: rgba(255, 255, 255, 0.6);
   }
+
   to {
     background-color: rgba(75, 75, 75, 0.4);
   }
 }
+
 @keyframes breathingLight_complete {
   from {
     background-color: rgba(0, 217, 69, 0.6);
   }
+
   50% {
     background-color: rgba(255, 255, 255, 0.6);
   }
+
   to {
     background-color: rgba(0, 217, 69, 0.6);
   }
 }
+
 @keyframes breathingLight_teacherComplete {
   from {
     background-color: rgba(213, 3, 3, 0.4);
   }
+
   50% {
     background-color: rgba(255, 255, 255, 0.6);
   }
+
   to {
     background-color: rgba(213, 3, 3, 0.4);
   }
 }
+
 @keyframes typeProgressText {
-  from{
+  from {
     width: 0;
   }
-  to{
-    width:15%;
+
+  to {
+    width: 15%;
   }
 }
 
-@media (max-width:1500px){
-  .taskContainer{
-    width:90%;
+@media (max-width:1500px) {
+  .taskContainer {
+    width: 90%;
   }
-  .taskWeekTitle h1{
-    font-size:2em;
+
+  .taskWeekTitle h1 {
+    font-size: 2em;
   }
-  .taskStage{
-    height:130px;
+
+  .taskStage {
+    height: 130px;
   }
-  .taskStage_Box h4{
+
+  .taskStage_Box h4 {
     line-height: 50px;
   }
 }
-@media(max-width:1000px){
-  .taskWeekTitle h1{
-    font-size:1.5em;
+
+@media(max-width:1000px) {
+  .taskWeekTitle h1 {
+    font-size: 1.5em;
   }
-  .taskProgressText{
+
+  .taskProgressText {
     font-size: 20px;
   }
 }

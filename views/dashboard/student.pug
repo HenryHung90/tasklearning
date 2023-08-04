@@ -24,12 +24,17 @@ body
                     h5=User + " 歡迎回來!"
                 .taskTitle
                     h5 當前進度
-                    h3#nowWeek=Week
+                    h5#nowWeek=Week
+                .changePassword 
+                    button#changePassword.btn.btn-info(type='button' style='width:100px;height:50px;margin-top: 10px')
+                      svg(xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' width='50%' height='50%')
+                        path(d='M336 352c97.2 0 176-78.8 176-176S433.2 0 336 0S160 78.8 160 176c0 18.7 2.9 36.8 8.3 53.7L7 391c-4.5 4.5-7 10.6-7 17v80c0 13.3 10.7 24 24 24h80c13.3 0 24-10.7 24-24V448h40c13.3 0 24-10.7 24-24V384h40c6.4 0 12.5-2.5 17-7l33.3-33.3c16.9 5.4 35 8.3 53.7 8.3zm40-176c-22.1 0-40-17.9-40-40s17.9-40 40-40s40 17.9 40 40s-17.9 40-40 40z')
             div
-                button#logoutBtn.btn.btn-info(type='button' style='width: 140px;;height: 80%;margin-top: 10px;')
+                button#logoutBtn.btn.btn-info(type='button' style='width: 140px;;height: 50px;margin-top: 10px;')
                     svg.bi.bi-box-arrow-right(xmlns='http://www.w3.org/2000/svg' width='50%' height='50%' fill='currentColor' viewBox='0 0 16 16')
                         path(fill-rule='evenodd' d='M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z')
                         path(fill-rule='evenodd' d='M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z')
         .taskContainer
         
 script(src="../js/student.js")
+script(src='../js/studentListen.js')

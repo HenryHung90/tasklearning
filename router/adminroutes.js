@@ -29,9 +29,6 @@ const responsecontentmodel = require('../models/responsecontentmodel')
 const studentmission = require('../models/studentmission')
 const studentmanage = require('../models/studentmanage')
 const studentminding = require('../models/studentminding')
-const { response } = require('express')
-const { resolveSoa } = require('dns')
-const { resourceLimits } = require('worker_threads')
 
 
 const availableWeek = 5
@@ -63,7 +60,7 @@ router.post(process.env.ROUTER_ADMIN_READSTUDENTSTATUS, async (req, res) => {
             }
         })
     })
-    await missioncontentmodel.find({ studentSession: req.body.session }).then(response => {
+    await missioncontentmodel.find({ session: req.body.session }).then(response => {
         response.map((value, index) => {
             const missionData = {
                 week: value.week,
@@ -112,10 +109,17 @@ router.post(process.env.ROUTER_ADMIN_READSTUDENTS, async (req, res) => {
                 returnData.push(studentData)
             }
         })
+        returnData.sort((a,b)=>{
+            if(a.studentId == 'TEST' || a.studentId =='1090001'){
+                return b.studentId - a.studentId
+            }else{
+                return a.studentId - b.studentId
+            }
+        })
         res.send(returnData)
     })
 })
-//取得所有學生Manage資訊
+//取得所有學生 Manage 資訊
 router.post(process.env.ROUTER_ADMIN_READMANAGESTATUS, async (req, res) => {
     const returnData = {
         mission: [],
@@ -148,7 +152,7 @@ router.post(process.env.ROUTER_ADMIN_READMANAGESTATUS, async (req, res) => {
     })
     res.send(returnData)
 })
-//取得所有學生Minding資訊
+//取得所有學生 Minding 資訊
 router.post(process.env.ROUTER_ADMIN_READMINDINGSTATUS, async (req, res) => {
 
 })
@@ -162,7 +166,6 @@ router.post(process.env.ROUTER_ADMIN_READSTUDENTSTATUSDETAIL, async (req, res) =
     }
     await missioncontentmodel.findOne({ session: req.body.studentSession, week: req.body.week }).then(response => {
         if (response == null) {
-            res.send('fall');
             return
         }
         response.mission.map((missionValue) => {
@@ -193,11 +196,13 @@ router.post(process.env.ROUTER_ADMIN_READSTUDENTSTATUSDETAIL, async (req, res) =
         if (response == null) {
             return
         }
-        response.studentMinding = Object.values(response.studentMinding)
-        returnData.mindingContent = {
-            studentRanking: response.studentRanking,
-            studentFixing: response.studentFixing,
-            studentMinding: response.studentMinding,
+        if(response.studentMinding != undefined){
+            response.studentMinding = Object.values(response.studentMinding)
+            returnData.mindingContent = {
+                studentRanking: response.studentRanking,
+                studentFixing: response.studentFixing,
+                studentMinding: response.studentMinding,
+            }
         }
     })
     res.send(returnData)
@@ -207,7 +212,10 @@ router.post(process.env.ROUTER_ADMIN_READTEACHERRESPONSE, async (req, res) => {
     await responsecontentmodel.findOne({ studentId: req.body.studentId, week: req.body.week }).then(response => {
         const returnData = {
             teacherResponse: response ? response.teacherResponse : '',
-            studentResponse: response ? response.studentResponse : ''
+            teacherResponseTime: response ? response.teacherResponseTime : '',
+            studentResponse: response ? response.studentResponse : '',
+            studentResponseTime: response ? response.studentResponseTime : '',
+
         }
         res.send(returnData)
     })
@@ -588,7 +596,7 @@ router.post(process.env.ROUTER_ADMIN_ADDPDF, upload.single('uploadPDF'), async (
     if (req.file != null) {
         const returnData = {
             title: req.file.fieldname,
-            link: 'http://localhost:3000/checkdata/' + req.file.filename
+            link: 'http://ccj.infocom.yzu.edu.tw/checkdata/' + req.file.filename
         }
         res.send(returnData)
     } else {
@@ -647,11 +655,12 @@ router.post(process.env.ROUTER_ADMIN_ADDRESPONSE, async (req, res) => {
             studentId: req.body.studentId,
             week: req.body.week,
             teacherResponse: req.body.teacherResponse,
+            teacherResponseTime:req.body.teacherResponseTime,
         })
         await newResponse.save()
         isSuccess = true
     } else {
-        await responsecontentmodel.updateOne({ studentId: req.body.studentId, week: req.body.week }, { teacherResponse: req.body.teacherResponse }).then(response => {
+        await responsecontentmodel.updateOne({ studentId: req.body.studentId, week: req.body.week }, { teacherResponse: req.body.teacherResponse, teacherResponseTime:req.body.teacherResponseTime }).then(response => {
             isSuccess = response.acknowledged + ' response'
         })
     }
@@ -700,17 +709,20 @@ router.post(process.env.ROUTER_ADMIN_READESESSION, async (req, res) => {
 })
 //讀取 monitor
 router.post(process.env.ROUTER_ADMIN_READSTUDENTMONITOR, async (req, res) => {
-    studentlistenconfig.findOne({studentId:req.body.studentId,sesion:req.body.session}).then(response=>{
-        const returnData = []
+    const returnData = []
+    await studentlistenconfig.findOne({studentId:req.body.studentId,sesion:req.body.session}).then(response=>{
+        console.log(response.studentMonitor)
         for (let listenConfig of response.studentMonitor){
             returnData.push({
                 "學號":req.body.studentId,
-                "時間":listenConfig.operationTime,
-                "行為":listenConfig.operationName,
-                "描述":listenConfig.operationIntro,
+                "時間":listenConfig.time,
+                "行為":listenConfig.operation,
+                "物件":listenConfig.item,
+                "描述":listenConfig.description,
             })
         }
     })
+    res.send(returnData)
 })
 
 
