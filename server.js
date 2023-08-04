@@ -5,13 +5,12 @@ const task = express()
 const dotenv = require("dotenv")
 dotenv.config()
 //cors 跨來源資源共用
-const cors = require("cors")
-task.use(
-    cors({
-        origin: process.env.ROUTER_CORS,
-        credentials: true,
-    })
-)
+
+const cors = require('cors');
+task.use(cors({
+    origin: [process.env.CORS_ALLOW_CAST_MAIN, process.env.CORS_ALLOW_CAST_TEST],
+}))
+
 //設定port 與 host
 const host = process.env.ROUTER_HOST
 const port = process.env.ROUTER_PORT || 3000
@@ -29,21 +28,20 @@ mongoDbStatus.once("open", db => console.log("Connection to mongodb"))
 //express helmet
 // const helmet = require("helmet")
 
-// // //開啟DNS預讀取
-// task.use(helmet({ dnsPrefetchControl: { allow: true } }))
-// //CSP
-// task.use(
-//     helmet.contentSecurityPolicy({
-//         directives: {
-//             "script-src": [
-//                 "https://code.jquery.com",
-//                 "https://cdn.jsdelivr.net",
-//                 "https://cdnjs.cloudflare.com",
-//                 "http://ccj.infocom.yzu.edu.tw",
-//             ],
-//         },
-//     })
-// )
+//開啟DNS預讀取
+task.use(helmet({ dnsPrefetchControl: { allow: true } }))
+//禁止使用iframe
+// task.use(helmet({frameguard: {action: 'deny'}}))
+//CSP
+task.use(
+    helmet.contentSecurityPolicy({
+        directives: {
+            "script-src": ["self", "https://code.jquery.com",
+                "https://cdn.jsdelivr.net", 'http://localhost:3000',
+                'https://cdnjs.cloudflare.com'],
+        },
+    })
+);
 
 //passport
 const passport = require("passport")
